@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Board Quest | Image Edition (Offline)</title>
+    <style>
+        :root {
+            --bg-color: #08090f; --panel-color: #121420; --accent-pink: #ff2a74;
+            --accent-blue: #00f0ff; --accent-purple: #7000ff; --accent-yellow: #ffbe0b; --text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
+            background-image: radial-gradient(circle at 50% 10%, #1a153a 0%, #08090f 100%);
+            height: 100vh; box-sizing: border-box; overflow: hidden;
+        }
+
+        h1 { font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px var(--accent-blue); margin: 5px 0 15px 0; }
+
+        #setup-container { background: var(--panel-color); border: 2px solid var(--accent-blue); padding: 30px; border-radius: 20px; max-width: 500px; width: 100%; text-align: center; margin-top: 40px; }
+        .setup-row { display: flex; gap: 12px; margin: 20px 0; }
+        input[type="text"] { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid var(--accent-purple); background: #08090f; color: #fff; font-size: 1rem; }
+
+        #game-container { display: none; flex-direction: row; gap: 20px; width: 100%; height: calc(100vh - 80px); box-sizing: border-box; }
+        #board-wrapper { flex: 1; overflow: auto; background: rgba(18, 20, 32, 0.85); border-radius: 20px; border: 2px solid var(--accent-purple); height: 100%; }
+        #board { display: grid; grid-template-columns: repeat(10, 130px); grid-template-rows: repeat(10, 125px); gap: 8px; width: max-content; margin: 0 auto; padding: 20px; }
+        .cell { background: #191d30; border: 2px solid #2d3454; border-radius: 10px; position: relative; display: flex; flex-direction: column; padding: 6px; }
+        .cell-num { align-self: flex-start; background: rgba(0, 0, 0, 0.8); padding: 1px 5px; border-radius: 4px; color: var(--accent-blue); font-size: 0.75rem; font-weight: bold; }
+        .cell.start .cell-num { background: #00ff66; color: #000; }
+        .cell-name { font-size: 0.75rem; font-weight: bold; color: #ffffff; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .cell.start { border-color: #00ff66; background: #082d18; }
+        .cell.finish { border-color: var(--accent-pink); background: #4a061d; }
+        .cell.goose { border-color: var(--accent-yellow); background: #3a2b02; }
+        .cell.goose .cell-name { color: var(--accent-yellow); }
+        .cell.malus { border-color: #ff3b3b; background: #380a0e; }
+        .cell.malus .cell-name { color: #ff8080; }
+        .cell.question { border-color: #ff781f; background: #3d1c07; }
+        .cell.question .cell-name { color: #ff781f; }
+        .cell.custom-rule { border-color: #ad00ff; background: #26023a; }
+        .cell.custom-rule .cell-name { color: #ad00ff; }
+        .cell.forward { border-color: #00ff66; background: #0b3d17; }
+        .cell.backward { border-color: #ff3366; background: #3d0b16; }
+
+        .players-container { display: flex; gap: 3px; justify-content: center; flex-wrap: wrap; margin-top: auto; min-height: 20px; }
+        .pawn { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #fff; box-shadow: 0 0 6px rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: bold; color: white; cursor: pointer; position: relative; animation: hop 0.25s ease-in-out; }
+        @keyframes hop { 0% { transform: translateY(0) scale(1); } 50% { transform: translateY(-8px) scale(1.2); } 100% { transform: translateY(0) scale(1); } }
+        .pawn:hover::after { content: attr(data-fullname); position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; z-index: 600; border: 1px solid var(--accent-blue); }
+
+        #side-panels { display: flex; flex-direction: column; gap: 15px; width: 320px; height: 100%; flex-shrink: 0; }
+        .panel { background: var(--panel-color); border: 2px solid var(--accent-blue); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; }
+        #controls { border-color: var(--accent-pink); height: 45%; }
+        #custom-rules-panel { border-color: #ad00ff; flex: 1; background: #150d22; }
+        #rules-list { overflow-y: auto; padding: 0; margin: 0; flex: 1; list-style-type: none; }
+        #rules-list li { background: rgba(173, 0, 255, 0.15); border-left: 4px solid #ad00ff; padding: 10px; margin-bottom: 10px; border-radius: 4px 8px 8px 4px; font-size: 0.95rem; }
+
+        .turn-indicator { font-size: 1.15rem; text-align: center; padding: 10px; background: #08090f; border-radius: 8px; border-left: 5px solid var(--accent-blue); font-weight: bold; margin-bottom: 12px; }
+        #dice { width: 60px; height: 60px; background: white; color: #111; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; font-weight: bold; margin: 0 auto 12px auto; box-shadow: 0 0 15px rgba(255,255,255,0.4); flex-shrink: 0; }
+        .rolling { animation: spin 0.4s infinite linear; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        button { background: linear-gradient(45deg, var(--accent-pink), var(--accent-purple)); border: none; color: white; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; transition: opacity 0.3s; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        button.add-btn { background: linear-gradient(45deg, #00f0ff, #7000ff); width: auto; }
+
+        #log { background: #08090f; border-radius: 8px; padding: 10px; font-size: 0.8rem; border: 1px solid #2d3454; margin-top: 12px; flex: 1; overflow-y: auto; }
+        .log-entry { margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 4px; }
+        .player-item { display: flex; justify-content: space-between; align-items: center; background: #191d30; padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; }
+
+        /* QUIZ MODAL - MODIFICATO PER L'IMMAGINE GIGANTE */
+        #quiz-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--panel-color); border: 3px solid #ff781f; padding: 25px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; max-height: 95vh; overflow-y: auto; }
+        #quiz-image { width: 100%; max-height: 280px; object-fit: cover; border-radius: 10px; border: 3px solid var(--accent-blue); margin-bottom: 15px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
+        .quiz-option { background: #191d30; border: 1px solid #ff781f; color: white; padding: 12px; margin: 8px 0; border-radius: 8px; cursor: pointer; text-align: left; font-weight: bold; font-size: 1rem; transition: background 0.2s; }
+        .quiz-option:hover { background: #ff781f; color: black; }
+    </style>
+</head>
+<body>
+
+    <h1>Anime Board Quest</h1>
+
+    <div id="setup-container">
+        <h2>Iscrivi Giocatori (Da 2 a 10)</h2>
+        <div class="setup-row">
+            <input type="text" id="player-name-input" placeholder="Nome Giocatore" maxlength="15">
+            <button class="add-btn" onclick="addPlayer()">Inserisci</button>
+        </div>
+        <div id="player-list"><p style="color: #5a5f75;">Nessun giocatore inserito.</p></div>
+        <button id="start-btn" style="background: #00ff66; color: #000; font-size: 1.1rem; margin-top: 25px;" onclick="startGame()">Comincia la Partita! ⚔️</button>
+    </div>
+
+    <div id="game-container">
+        <div id="board-wrapper"><div id="board"></div></div>
+        <div id="side-panels">
+            <div class="panel" id="controls">
+                <div class="turn-indicator" id="turn-display">Pannello</div>
+                <div id="dice">⚀</div>
+                <button id="roll-btn" onclick="playTurn()">Lancia Dado!</button>
+                <div id="log"></div>
+            </div>
+            <div class="panel" id="custom-rules-panel">
+                <h3>📜 Leggi Attive</h3>
+                <ul id="rules-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="quiz-modal">
+        <div class="modal-content">
+            <h2 style="color: #ff781f; margin-top: 0; font-size: 1.4rem;">CHI È QUESTO PERSONAGGIO?</h2>
+            <!-- IMMAGINE DEL PERSONAGGIO -->
+            <img id="quiz-image" src="" alt="Personaggio Anime">
+            
+            <p id="quiz-question" style="font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; color: var(--accent-yellow);"></p>
+            <div id="quiz-options-container"></div>
+            <p style="font-size: 0.8rem; color: #ff3b3b; margin-top: 15px;">Sbagliare costa -2 passi.</p>
+        </div>
+    </div>
+
+    <script>
+        const TOTAL_CELLS = 100;
+        const pColors = ["#ff477e", "#00f0ff", "#9d4edd", "#ffbe0b", "#00ff66", "#ff6600", "#ff33cc", "#99ccff", "#cc99ff", "#ffffff"];
+        let setupPlayers = [];
+
+        // =========================================================================
+        // DOMANDE 1-100 (Livello 1: Facile - Shonen e Protagonisti)
+        // FORMATO IMMAGINI ANILIST
+        // =========================================================================
+        let quizDatabase = [
+        
+  { "q": "Chi è questo personaggio?", "a": ["Monkey D. Luffy", "Roronoa Zoro", "Nami", "Usopp"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-YCD30A3i269N.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Roronoa Zoro", "Monkey D. Luffy", "Sanji", "Nami"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-YCD30A3i269N.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Sanji", "Zoro", "Luffy", "Chopper"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-YCD30A3i269N.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Naruto Uzumaki", "Sasuke Uchiha", "Kakashi Hatake", "Sakura Haruno"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20-4oD9D9G9g9oD.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Sasuke Uchiha", "Naruto Uzumaki", "Kakashi Hatake", "Shikamaru Nara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20-4oD9D9G9g9oD.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kakashi Hatake", "Jiraiya", "Naruto Uzumaki", "Iruka Umino"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20-4oD9D9G9g9oD.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Goku", "Vegeta", "Gohan", "Piccolo"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx813-Z5ELEto28Xw3.png" },
+  { "q": "Chi è questo personaggio?", "a": ["Vegeta", "Goku", "Trunks", "Krillin"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx813-Z5ELEto28Xw3.png" },
+  { "q": "Chi è questo personaggio?", "a": ["Piccolo", "Kami", "Dende", "Cell"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx813-Z5ELEto28Xw3.png" },
+  { "q": "Chi è questo personaggio?", "a": ["Ichigo Kurosaki", "Renji Abarai", "Uryu Ishida", "Byakuya Kuchiki"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx269-l0o9s2j4L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rukia Kuchiki", "Orihime Inoue", "Yoruichi Shihoin", "Rangiku Matsumoto"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx269-l0o9s2j4L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Edward Elric", "Alphonse Elric", "Roy Mustang", "Ling Yao"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx5114-1C65S1Q696nF.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Alphonse Elric", "Edward Elric", "Scar", "Hohenheim"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx5114-1C65S1Q696nF.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Roy Mustang", "Maes Hughes", "Alex Louis Armstrong", "Jean Havoc"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx5114-1C65S1Q696nF.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Gon Freecss", "Killua Zoldyck", "Kurapika", "Leorio"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11061-F998r1J1E73K.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Killua Zoldyck", "Gon Freecss", "Hisoka Morow", "Illumi Zoldyck"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11061-F998r1J1E73K.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Hisoka Morow", "Chrollo Lucilfer", "Ging Freecss", "Feitan"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11061-F998r1J1E73K.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Izuku Midoriya", "Katsuki Bakugo", "Shoto Todoroki", "Tenya Iida"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21459-oZQK0KxofIuz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Katsuki Bakugo", "Izuku Midoriya", "Eijiro Kirishima", "Denki Kirishima"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21459-oZQK0KxofIuz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["All Might", "Endeavor", "Eraser Head", "Hawks"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21459-oZQK0KxofIuz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Tanjiro Kamado", "Zenitsu Agatsuma", "Inosuke Hashibira", "Giyu Tomioka"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-38eU26k0zG3e.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Nezuko Kamado", "Kanao Tsuyuri", "Shinobu Kocho", "Mitsuri Kocho"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-38eU26k0zG3e.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Zenitsu Agatsuma", "Tanjiro Kamado", "Inosuke Hashibira", "Tengen Uzui"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-38eU26k0zG3e.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Inosuke Hashibira", "Sanemi Uzui", "Obanai Shinazugawa", "Gyomei Iguro"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101922-38eU26k0zG3e.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yuji Itadori", "Megumi Fushiguro", "Toge Inumaki", "Kento Nanami"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113415-p9M2P9Z6b3zL.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Satoru Gojo", "Suguru Geto", "Kento Nanami", "Toji Fushiguro"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113415-p9M2P9Z6b3zL.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Megumi Fushiguro", "Yuji Itadori", "Maki Zenin", "Panda"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113415-p9M2P9Z6b3zL.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Nobara Kugisaki", "Maki Zenin", "Mai Zenin", "Miwa Kasumi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113415-p9M2P9Z6b3zL.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Eren Yeager", "Armin Arlert", "Jean Kirstein", "Connie Springer"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16498-C6yJ5D1R2v6Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Mikasa Ackerman", "Sasha Blouse", "Annie Leonhart", "Historia Reiss"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16498-C6yJ5D1R2v6Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Levi Ackerman", "Erwin Smith", "Eren Yeager", "Zeke Yeager"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16498-C6yJ5D1R2v6Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Light Yagami", "L Lawliet", "Near", "Mello"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1535-c33Ea260840A.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["L Lawliet", "Light Yagami", "Ryuk", "Teru Mikami"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1535-c33Ea260840A.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Ryuk", "Rem", "Gelus", "Sidoh"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1535-c33Ea260840A.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Saitama", "Genos", "King", "Mumen Rider"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20287-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Genos", "Saitama", "Silver Fang", "Metal Bat"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20287-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Tatsumaki", "Fubuki", "Psykos", "Mosquito Girl"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20287-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Asta", "Yuno", "Magna Swing", "Finral Roulacase"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20806-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yami Sukehiro", "William Vangeance", "Nozel Silva", "Fuegoleon Silva"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20806-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Natsu Dragneel", "Gray Fullbuster", "Gajeel Redfox", "Laxus Dreyar"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx6702-xZfE303J6806.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Erza Scarlet", "Lucy Heartfilia", "Juvia Lockser", "Mirajane Strauss"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx6702-xZfE303J6806.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Gintoki Sakata", "Shinpachi Shimura", "Kotaro Katsura", "Toushirou Hijikata"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx918-i0e3M3g9I9oD.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kagura", "Otae Shimura", "Tsukuyo", "Sarutobi Ayame"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx918-i0e3M3g9I9oD.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Jotaro Kujo", "Joseph Joestar", "Josuke Higashikata", "Giorno Giovanna"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx14719-i0E0eD2P2W2O.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Dio Brando", "Yoshikage Kira", "Kars", "Diavolo"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx14719-i0E0eD2P2W2O.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Maka Albarn", "Tsubaki Nakatsukasa", "Crona", "Blair"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx3588-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Soul Evans", "Black Star", "Death the Kid", "Franken Stein"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx3588-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Meliodas", "Ban", "King", "Escanor"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20789-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Elizabeth Liones", "Diane", "Merlin", "Elaine"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20789-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Alucard", "Alexander Anderson", "Walter C. Dornez", "Pip Bernadotte"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx789-Q4L0l3h4J2L6.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Seras Victoria", "Integra Hellsing", "Rip van Winkle", "Zorin Blitz"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx789-Q4L0l3h4J2L6.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shinji Ikari", "Kaworu Nagisa", "Touji Suzuhara", "Kensuke Aida"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx30-9xXn2xZ62oT7.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Asuka Langley Soryu", "Rei Ayanami", "Misato Katsuragi", "Ritsuko Akagi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx30-9xXn2xZ62oT7.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Spike Spiegel", "Jet Black", "Vicious", "Gren"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Faye Valentine", "Edward", "Julia", "Judy"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Vash the Stampede", "Nicholas D. Wolfwood", "Millions Knives", "Legato Bluesummers"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx603-c4u9s2w8k2l1.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Lelouch Lamperouge", "Suzaku Kururugi", "Lloyd Asplund", "Jeremiah Gottwald"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["C.C.", "Kallen Stadtfeld", "Shirley Fenette", "Nunnally Lamperouge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Simon", "Kamina", "Kittan", "Viral"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoko Littner", "Nia Teppelin", "Kiyoh", "Darry"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Guts", "Griffith", "Judeau", "Pippin"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Casca", "Farnese", "Schierke", "Slan"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kirito (Kazuto Kirigaya)", "Klein", "Agil", "Eugeo"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Asuna Yuuki", "Leafa", "Sinon", "Silica"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Subaru Natsuki", "Reinhard van Astrea", "Julius Juukulius", "Felix Argyle"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rem", "Ram", "Emilia", "Beatrice"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kazuma Satou", "Kyoya Mitsurugi", "Dust", "Vanir"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Megumin", "Aqua", "Darkness", "Wiz"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Sora", "Riku", "Tet", "Jibril"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shiro", "Stephanie Dola", "Izuna Hatsuse", "Kurami Zell"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rimuru Tempest", "Benimaru", "Souei", "Hakurou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Milim Nava", "Shion", "Shuna", "Hinata Sakaguchi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Naofumi Iwatani", "Motoyasu Amaki", "Ren Amaki", "Itsuki Kawasumi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Raphtalia", "Filo", "Melty Q. Melromarc", "Malty S. Melromarc"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Ainz Ooal Gown", "Demiurge", "Cocytus", "Sebas Tian"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Albedo", "Shalltear Bloodfallen", "Aura Bella Fiora", "Mare Bello Fiore"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Mob (Shigeo Kageyama)", "Reigen Arataka", "Ritsu Kageyama", "Teruki Hanazawa"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Reigen Arataka", "Mob", "Ekubo", "Toichiro Suzuki"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Denji", "Aki Hayakawa", "Kishibe", "Katanaman"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Makima", "Power", "Kobeni", "Reze"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Power", "Makima", "Himeno", "Quanxi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Senku Ishigami", "Taiju Oki", "Chrome", "Tsukasa Shishio"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kohaku", "Yuzuriha Ogawa", "Suika", "Ruri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Thorfinn", "Askeladd", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Askeladd", "Thorfinn", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Emma", "Norman", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Norman", "Emma", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Koro-sensei", "Tadaomi Karasuma", "Gakuho Asano", "Lovro Brovski"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Nagisa Shiota", "Karma Akabane", "Yuma Isogai", "Hiroto Maehara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shoyo Hinata", "Tobio Kageyama", "Daichi Sawamura", "Koshi Sugawara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Tobio Kageyama", "Shoyo Hinata", "Kei Tsukishima", "Ryunosuke Tanaka"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kuroko Tetsuya", "Taiga Kagami", "Seijuro Akashi", "Ryota Kise"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Taiga Kagami", "Daiki Aomine", "Shintaro Midorima", "Atsushi Murasakibara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoichi Isagi", "Meguru Bachira", "Rensuke Kunigami", "Hyoma Chigiri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Meguru Bachira", "Yoichi Isagi", "Seishiro Nagi", "Reo Mikage"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shinichi Izumi", "Migi", "Hideo Shimada", "Gotou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Migi", "Shinichi Izumi", "Reiko Tamura", "Kana Kimishima"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Johan Liebert", "Kenzo Tenma", "Wolfgang Grimmer", "Heinrich Lunge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kenzo Tenma", "Johan Liebert", "Julius Reichwein", "Roberto"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Spike Spiegel", "Vicious", "Jet Black", "Laughing Bull"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Faye Valentine", "Edward", "Julia", "Judy"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Vash the Stampede", "Nicholas D. Wolfwood", "Millions Knives", "Legato Bluesummers"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx603-c4u9s2w8k2l1.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Lelouch Lamperouge", "Suzaku Kururugi", "Lloyd Asplund", "Jeremiah Gottwald"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["C.C.", "Kallen Stadtfeld", "Shirley Fenette", "Nunnally Lamperouge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Simon", "Kamina", "Kittan", "Viral"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoko Littner", "Nia Teppelin", "Kiyoh", "Darry"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Guts", "Griffith", "Judeau", "Pippin"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Casca", "Farnese", "Schierke", "Slan"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kirito (Kazuto Kirigaya)", "Klein", "Agil", "Eugeo"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Asuna Yuuki", "Leafa", "Sinon", "Silica"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Subaru Natsuki", "Reinhard van Astrea", "Julius Juukulius", "Felix Argyle"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rem", "Ram", "Emilia", "Beatrice"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kazuma Satou", "Kyoya Mitsurugi", "Dust", "Vanir"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Megumin", "Aqua", "Darkness", "Wiz"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Sora", "Riku", "Tet", "Jibril"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shiro", "Stephanie Dola", "Izuna Hatsuse", "Kurami Zell"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rimuru Tempest", "Benimaru", "Souei", "Hakurou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Milim Nava", "Shion", "Shuna", "Hinata Sakaguchi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Naofumi Iwatani", "Motoyasu Amaki", "Ren Amaki", "Itsuki Kawasumi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Raphtalia", "Filo", "Melty Q. Melromarc", "Malty S. Melromarc"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Ainz Ooal Gown", "Demiurge", "Cocytus", "Sebas Tian"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Albedo", "Shalltear Bloodfallen", "Aura Bella Fiora", "Mare Bello Fiore"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Mob (Shigeo Kageyama)", "Reigen Arataka", "Ritsu Kageyama", "Teruki Hanazawa"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Reigen Arataka", "Mob", "Ekubo", "Toichiro Suzuki"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Denji", "Aki Hayakawa", "Kishibe", "Katanaman"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Makima", "Power", "Kobeni", "Reze"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Power", "Makima", "Himeno", "Quanxi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Senku Ishigami", "Taiju Oki", "Chrome", "Tsukasa Shishio"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kohaku", "Yuzuriha Ogawa", "Suika", "Ruri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Thorfinn", "Askeladd", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Askeladd", "Thorfinn", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Emma", "Norman", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Norman", "Emma", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Koro-sensei", "Tadaomi Karasuma", "Gakuho Asano", "Lovro Brovski"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Nagisa Shiota", "Karma Akabane", "Yuma Isogai", "Hiroto Maehara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shoyo Hinata", "Tobio Kageyama", "Daichi Sawamura", "Koshi Sugawara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Tobio Kageyama", "Shoyo Hinata", "Kei Tsukishima", "Ryunosuke Tanaka"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kuroko Tetsuya", "Taiga Kagami", "Seijuro Akashi", "Ryota Kise"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Taiga Kagami", "Daiki Aomine", "Shintaro Midorima", "Atsushi Murasakibara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoichi Isagi", "Meguru Bachira", "Rensuke Kunigami", "Hyoma Chigiri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Meguru Bachira", "Yoichi Isagi", "Seishiro Nagi", "Reo Mikage"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shinichi Izumi", "Migi", "Hideo Shimada", "Gotou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Migi", "Shinichi Izumi", "Reiko Tamura", "Kana Kimishima"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Johan Liebert", "Kenzo Tenma", "Wolfgang Grimmer", "Heinrich Lunge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kenzo Tenma", "Johan Liebert", "Julius Reichwein", "Roberto"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Spike Spiegel", "Vicious", "Jet Black", "Laughing Bull"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Faye Valentine", "Edward", "Julia", "Judy"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Vash the Stampede", "Nicholas D. Wolfwood", "Millions Knives", "Legato Bluesummers"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx603-c4u9s2w8k2l1.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Lelouch Lamperouge", "Suzaku Kururugi", "Lloyd Asplund", "Jeremiah Gottwald"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["C.C.", "Kallen Stadtfeld", "Shirley Fenette", "Nunnally Lamperouge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Simon", "Kamina", "Kittan", "Viral"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoko Littner", "Nia Teppelin", "Kiyoh", "Darry"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Guts", "Griffith", "Judeau", "Pippin"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Casca", "Farnese", "Schierke", "Slan"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kirito (Kazuto Kirigaya)", "Klein", "Agil", "Eugeo"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Asuna Yuuki", "Leafa", "Sinon", "Silica"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Subaru Natsuki", "Reinhard van Astrea", "Julius Juukulius", "Felix Argyle"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rem", "Ram", "Emilia", "Beatrice"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kazuma Satou", "Kyoya Mitsurugi", "Dust", "Vanir"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Megumin", "Aqua", "Darkness", "Wiz"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Sora", "Riku", "Tet", "Jibril"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shiro", "Stephanie Dola", "Izuna Hatsuse", "Kurami Zell"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rimuru Tempest", "Benimaru", "Souei", "Hakurou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Milim Nava", "Shion", "Shuna", "Hinata Sakaguchi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Naofumi Iwatani", "Motoyasu Amaki", "Ren Amaki", "Itsuki Kawasumi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Raphtalia", "Filo", "Melty Q. Melromarc", "Malty S. Melromarc"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Ainz Ooal Gown", "Demiurge", "Cocytus", "Sebas Tian"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Albedo", "Shalltear Bloodfallen", "Aura Bella Fiora", "Mare Bello Fiore"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Mob (Shigeo Kageyama)", "Reigen Arataka", "Ritsu Kageyama", "Teruki Hanazawa"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Reigen Arataka", "Mob", "Ekubo", "Toichiro Suzuki"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Denji", "Aki Hayakawa", "Kishibe", "Katanaman"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Makima", "Power", "Kobeni", "Reze"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Power", "Makima", "Himeno", "Quanxi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Senku Ishigami", "Taiju Oki", "Chrome", "Tsukasa Shishio"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kohaku", "Yuzuriha Ogawa", "Suika", "Ruri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Thorfinn", "Askeladd", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Askeladd", "Thorfinn", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Emma", "Norman", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Norman", "Emma", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Koro-sensei", "Tadaomi Karasuma", "Gakuho Asano", "Lovro Brovski"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Nagisa Shiota", "Karma Akabane", "Yuma Isogai", "Hiroto Maehara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shoyo Hinata", "Tobio Kageyama", "Daichi Sawamura", "Koshi Sugawara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Tobio Kageyama", "Shoyo Hinata", "Kei Tsukishima", "Ryunosuke Tanaka"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kuroko Tetsuya", "Taiga Kagami", "Seijuro Akashi", "Ryota Kise"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Taiga Kagami", "Daiki Aomine", "Shintaro Midorima", "Atsushi Murasakibara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoichi Isagi", "Meguru Bachira", "Rensuke Kunigami", "Hyoma Chigiri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Meguru Bachira", "Yoichi Isagi", "Seishiro Nagi", "Reo Mikage"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shinichi Izumi", "Migi", "Hideo Shimada", "Gotou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Migi", "Shinichi Izumi", "Reiko Tamura", "Kana Kimishima"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Johan Liebert", "Kenzo Tenma", "Wolfgang Grimmer", "Heinrich Lunge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kenzo Tenma", "Johan Liebert", "Julius Reichwein", "Roberto"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Spike Spiegel", "Vicious", "Jet Black", "Laughing Bull"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Faye Valentine", "Edward", "Julia", "Judy"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Vash the Stampede", "Nicholas D. Wolfwood", "Millions Knives", "Legato Bluesummers"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx603-c4u9s2w8k2l1.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Lelouch Lamperouge", "Suzaku Kururugi", "Lloyd Asplund", "Jeremiah Gottwald"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["C.C.", "Kallen Stadtfeld", "Shirley Fenette", "Nunnally Lamperouge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Simon", "Kamina", "Kittan", "Viral"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoko Littner", "Nia Teppelin", "Kiyoh", "Darry"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Guts", "Griffith", "Judeau", "Pippin"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Casca", "Farnese", "Schierke", "Slan"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kirito (Kazuto Kirigaya)", "Klein", "Agil", "Eugeo"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Asuna Yuuki", "Leafa", "Sinon", "Silica"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Subaru Natsuki", "Reinhard van Astrea", "Julius Juukulius", "Felix Argyle"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rem", "Ram", "Emilia", "Beatrice"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kazuma Satou", "Kyoya Mitsurugi", "Dust", "Vanir"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Megumin", "Aqua", "Darkness", "Wiz"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Sora", "Riku", "Tet", "Jibril"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shiro", "Stephanie Dola", "Izuna Hatsuse", "Kurami Zell"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rimuru Tempest", "Benimaru", "Souei", "Hakurou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Milim Nava", "Shion", "Shuna", "Hinata Sakaguchi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Naofumi Iwatani", "Motoyasu Amaki", "Ren Amaki", "Itsuki Kawasumi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Raphtalia", "Filo", "Melty Q. Melromarc", "Malty S. Melromarc"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Ainz Ooal Gown", "Demiurge", "Cocytus", "Sebas Tian"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Albedo", "Shalltear Bloodfallen", "Aura Bella Fiora", "Mare Bello Fiore"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Mob (Shigeo Kageyama)", "Reigen Arataka", "Ritsu Kageyama", "Teruki Hanazawa"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Reigen Arataka", "Mob", "Ekubo", "Toichiro Suzuki"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Denji", "Aki Hayakawa", "Kishibe", "Katanaman"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Makima", "Power", "Kobeni", "Reze"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Power", "Makima", "Himeno", "Quanxi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Senku Ishigami", "Taiju Oki", "Chrome", "Tsukasa Shishio"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kohaku", "Yuzuriha Ogawa", "Suika", "Ruri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Thorfinn", "Askeladd", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Askeladd", "Thorfinn", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Emma", "Norman", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Norman", "Emma", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Koro-sensei", "Tadaomi Karasuma", "Gakuho Asano", "Lovro Brovski"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Nagisa Shiota", "Karma Akabane", "Yuma Isogai", "Hiroto Maehara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shoyo Hinata", "Tobio Kageyama", "Daichi Sawamura", "Koshi Sugawara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Tobio Kageyama", "Shoyo Hinata", "Kei Tsukishima", "Ryunosuke Tanaka"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kuroko Tetsuya", "Taiga Kagami", "Seijuro Akashi", "Ryota Kise"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Taiga Kagami", "Daiki Aomine", "Shintaro Midorima", "Atsushi Murasakibara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoichi Isagi", "Meguru Bachira", "Rensuke Kunigami", "Hyoma Chigiri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Meguru Bachira", "Yoichi Isagi", "Seishiro Nagi", "Reo Mikage"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shinichi Izumi", "Migi", "Hideo Shimada", "Gotou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Migi", "Shinichi Izumi", "Reiko Tamura", "Kana Kimishima"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Johan Liebert", "Kenzo Tenma", "Wolfgang Grimmer", "Heinrich Lunge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kenzo Tenma", "Johan Liebert", "Julius Reichwein", "Roberto"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Spike Spiegel", "Vicious", "Jet Black", "Laughing Bull"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Faye Valentine", "Edward", "Julia", "Judy"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Vash the Stampede", "Nicholas D. Wolfwood", "Millions Knives", "Legato Bluesummers"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx603-c4u9s2w8k2l1.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Lelouch Lamperouge", "Suzaku Kururugi", "Lloyd Asplund", "Jeremiah Gottwald"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["C.C.", "Kallen Stadtfeld", "Shirley Fenette", "Nunnally Lamperouge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Simon", "Kamina", "Kittan", "Viral"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoko Littner", "Nia Teppelin", "Kiyoh", "Darry"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Guts", "Griffith", "Judeau", "Pippin"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Casca", "Farnese", "Schierke", "Slan"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kirito (Kazuto Kirigaya)", "Klein", "Agil", "Eugeo"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Asuna Yuuki", "Leafa", "Sinon", "Silica"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Subaru Natsuki", "Reinhard van Astrea", "Julius Juukulius", "Felix Argyle"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rem", "Ram", "Emilia", "Beatrice"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kazuma Satou", "Kyoya Mitsurugi", "Dust", "Vanir"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Megumin", "Aqua", "Darkness", "Wiz"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Sora", "Riku", "Tet", "Jibril"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shiro", "Stephanie Dola", "Izuna Hatsuse", "Kurami Zell"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rimuru Tempest", "Benimaru", "Souei", "Hakurou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Milim Nava", "Shion", "Shuna", "Hinata Sakaguchi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Naofumi Iwatani", "Motoyasu Amaki", "Ren Amaki", "Itsuki Kawasumi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Raphtalia", "Filo", "Melty Q. Melromarc", "Malty S. Melromarc"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Ainz Ooal Gown", "Demiurge", "Cocytus", "Sebas Tian"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Albedo", "Shalltear Bloodfallen", "Aura Bella Fiora", "Mare Bello Fiore"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Mob (Shigeo Kageyama)", "Reigen Arataka", "Ritsu Kageyama", "Teruki Hanazawa"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Reigen Arataka", "Mob", "Ekubo", "Toichiro Suzuki"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Denji", "Aki Hayakawa", "Kishibe", "Katanaman"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Makima", "Power", "Kobeni", "Reze"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Power", "Makima", "Himeno", "Quanxi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Senku Ishigami", "Taiju Oki", "Chrome", "Tsukasa Shishio"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kohaku", "Yuzuriha Ogawa", "Suika", "Ruri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Thorfinn", "Askeladd", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Askeladd", "Thorfinn", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Emma", "Norman", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Norman", "Emma", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Koro-sensei", "Tadaomi Karasuma", "Gakuho Asano", "Lovro Brovski"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Nagisa Shiota", "Karma Akabane", "Yuma Isogai", "Hiroto Maehara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shoyo Hinata", "Tobio Kageyama", "Daichi Sawamura", "Koshi Sugawara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Tobio Kageyama", "Shoyo Hinata", "Kei Tsukishima", "Ryunosuke Tanaka"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kuroko Tetsuya", "Taiga Kagami", "Seijuro Akashi", "Ryota Kise"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Taiga Kagami", "Daiki Aomine", "Shintaro Midorima", "Atsushi Murasakibara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoichi Isagi", "Meguru Bachira", "Rensuke Kunigami", "Hyoma Chigiri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Meguru Bachira", "Yoichi Isagi", "Seishiro Nagi", "Reo Mikage"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shinichi Izumi", "Migi", "Hideo Shimada", "Gotou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Migi", "Shinichi Izumi", "Reiko Tamura", "Kana Kimishima"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Johan Liebert", "Kenzo Tenma", "Wolfgang Grimmer", "Heinrich Lunge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kenzo Tenma", "Johan Liebert", "Julius Reichwein", "Roberto"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Spike Spiegel", "Vicious", "Jet Black", "Laughing Bull"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Faye Valentine", "Edward", "Julia", "Judy"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Vash the Stampede", "Nicholas D. Wolfwood", "Millions Knives", "Legato Bluesummers"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx603-c4u9s2w8k2l1.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Lelouch Lamperouge", "Suzaku Kururugi", "Lloyd Asplund", "Jeremiah Gottwald"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["C.C.", "Kallen Stadtfeld", "Shirley Fenette", "Nunnally Lamperouge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Simon", "Kamina", "Kittan", "Viral"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoko Littner", "Nia Teppelin", "Kiyoh", "Darry"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Guts", "Griffith", "Judeau", "Pippin"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Casca", "Farnese", "Schierke", "Slan"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kirito (Kazuto Kirigaya)", "Klein", "Agil", "Eugeo"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Asuna Yuuki", "Leafa", "Sinon", "Silica"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Subaru Natsuki", "Reinhard van Astrea", "Julius Juukulius", "Felix Argyle"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rem", "Ram", "Emilia", "Beatrice"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kazuma Satou", "Kyoya Mitsurugi", "Dust", "Vanir"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Megumin", "Aqua", "Darkness", "Wiz"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Sora", "Riku", "Tet", "Jibril"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shiro", "Stephanie Dola", "Izuna Hatsuse", "Kurami Zell"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rimuru Tempest", "Benimaru", "Souei", "Hakurou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Milim Nava", "Shion", "Shuna", "Hinata Sakaguchi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Naofumi Iwatani", "Motoyasu Amaki", "Ren Amaki", "Itsuki Kawasumi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Raphtalia", "Filo", "Melty Q. Melromarc", "Malty S. Melromarc"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Ainz Ooal Gown", "Demiurge", "Cocytus", "Sebas Tian"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Albedo", "Shalltear Bloodfallen", "Aura Bella Fiora", "Mare Bello Fiore"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Mob (Shigeo Kageyama)", "Reigen Arataka", "Ritsu Kageyama", "Teruki Hanazawa"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Reigen Arataka", "Mob", "Ekubo", "Toichiro Suzuki"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Denji", "Aki Hayakawa", "Kishibe", "Katanaman"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Makima", "Power", "Kobeni", "Reze"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Power", "Makima", "Himeno", "Quanxi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Senku Ishigami", "Taiju Oki", "Chrome", "Tsukasa Shishio"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kohaku", "Yuzuriha Ogawa", "Suika", "Ruri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Thorfinn", "Askeladd", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Askeladd", "Thorfinn", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Emma", "Norman", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Norman", "Emma", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Koro-sensei", "Tadaomi Karasuma", "Gakuho Asano", "Lovro Brovski"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Nagisa Shiota", "Karma Akabane", "Yuma Isogai", "Hiroto Maehara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shoyo Hinata", "Tobio Kageyama", "Daichi Sawamura", "Koshi Sugawara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Tobio Kageyama", "Shoyo Hinata", "Kei Tsukishima", "Ryunosuke Tanaka"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kuroko Tetsuya", "Taiga Kagami", "Seijuro Akashi", "Ryota Kise"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Taiga Kagami", "Daiki Aomine", "Shintaro Midorima", "Atsushi Murasakibara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoichi Isagi", "Meguru Bachira", "Rensuke Kunigami", "Hyoma Chigiri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Meguru Bachira", "Yoichi Isagi", "Seishiro Nagi", "Reo Mikage"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shinichi Izumi", "Migi", "Hideo Shimada", "Gotou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Migi", "Shinichi Izumi", "Reiko Tamura", "Kana Kimishima"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Johan Liebert", "Kenzo Tenma", "Wolfgang Grimmer", "Heinrich Lunge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kenzo Tenma", "Johan Liebert", "Julius Reichwein", "Roberto"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Spike Spiegel", "Vicious", "Jet Black", "Laughing Bull"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Faye Valentine", "Edward", "Julia", "Judy"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Vash the Stampede", "Nicholas D. Wolfwood", "Millions Knives", "Legato Bluesummers"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx603-c4u9s2w8k2l1.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Lelouch Lamperouge", "Suzaku Kururugi", "Lloyd Asplund", "Jeremiah Gottwald"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["C.C.", "Kallen Stadtfeld", "Shirley Fenette", "Nunnally Lamperouge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Simon", "Kamina", "Kittan", "Viral"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoko Littner", "Nia Teppelin", "Kiyoh", "Darry"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Guts", "Griffith", "Judeau", "Pippin"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Casca", "Farnese", "Schierke", "Slan"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kirito (Kazuto Kirigaya)", "Klein", "Agil", "Eugeo"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Asuna Yuuki", "Leafa", "Sinon", "Silica"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Subaru Natsuki", "Reinhard van Astrea", "Julius Juukulius", "Felix Argyle"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rem", "Ram", "Emilia", "Beatrice"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kazuma Satou", "Kyoya Mitsurugi", "Dust", "Vanir"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Megumin", "Aqua", "Darkness", "Wiz"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Sora", "Riku", "Tet", "Jibril"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shiro", "Stephanie Dola", "Izuna Hatsuse", "Kurami Zell"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rimuru Tempest", "Benimaru", "Souei", "Hakurou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Milim Nava", "Shion", "Shuna", "Hinata Sakaguchi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Naofumi Iwatani", "Motoyasu Amaki", "Ren Amaki", "Itsuki Kawasumi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Raphtalia", "Filo", "Melty Q. Melromarc", "Malty S. Melromarc"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Ainz Ooal Gown", "Demiurge", "Cocytus", "Sebas Tian"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Albedo", "Shalltear Bloodfallen", "Aura Bella Fiora", "Mare Bello Fiore"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Mob (Shigeo Kageyama)", "Reigen Arataka", "Ritsu Kageyama", "Teruki Hanazawa"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Reigen Arataka", "Mob", "Ekubo", "Toichiro Suzuki"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Denji", "Aki Hayakawa", "Kishibe", "Katanaman"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Makima", "Power", "Kobeni", "Reze"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Power", "Makima", "Himeno", "Quanxi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Senku Ishigami", "Taiju Oki", "Chrome", "Tsukasa Shishio"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kohaku", "Yuzuriha Ogawa", "Suika", "Ruri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Thorfinn", "Askeladd", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Askeladd", "Thorfinn", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Emma", "Norman", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Norman", "Emma", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Koro-sensei", "Tadaomi Karasuma", "Gakuho Asano", "Lovro Brovski"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Nagisa Shiota", "Karma Akabane", "Yuma Isogai", "Hiroto Maehara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shoyo Hinata", "Tobio Kageyama", "Daichi Sawamura", "Koshi Sugawara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Tobio Kageyama", "Shoyo Hinata", "Kei Tsukishima", "Ryunosuke Tanaka"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20464-B95W9vG1o2eT.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kuroko Tetsuya", "Taiga Kagami", "Seijuro Akashi", "Ryota Kise"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Taiga Kagami", "Daiki Aomine", "Shintaro Midorima", "Atsushi Murasakibara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11771-55Pz8585675z.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoichi Isagi", "Meguru Bachira", "Rensuke Kunigami", "Hyoma Chigiri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Meguru Bachira", "Yoichi Isagi", "Seishiro Nagi", "Reo Mikage"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132849-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shinichi Izumi", "Migi", "Hideo Shimada", "Gotou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Migi", "Shinichi Izumi", "Reiko Tamura", "Kana Kimishima"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20623-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Johan Liebert", "Kenzo Tenma", "Wolfgang Grimmer", "Heinrich Lunge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kenzo Tenma", "Johan Liebert", "Julius Reichwein", "Roberto"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Spike Spiegel", "Vicious", "Jet Black", "Laughing Bull"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Faye Valentine", "Edward", "Julia", "Judy"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1-1i5aL1k0R1J2.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Vash the Stampede", "Nicholas D. Wolfwood", "Millions Knives", "Legato Bluesummers"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx603-c4u9s2w8k2l1.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Lelouch Lamperouge", "Suzaku Kururugi", "Lloyd Asplund", "Jeremiah Gottwald"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["C.C.", "Kallen Stadtfeld", "Shirley Fenette", "Nunnally Lamperouge"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1575-5r7oN67i2G9q.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Simon", "Kamina", "Kittan", "Viral"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Yoko Littner", "Nia Teppelin", "Kiyoh", "Darry"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1654-q2u9s2y6X6k8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Guts", "Griffith", "Judeau", "Pippin"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Casca", "Farnese", "Schierke", "Slan"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx33-8k2l1m3n4o5p.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kirito (Kazuto Kirigaya)", "Klein", "Agil", "Eugeo"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Asuna Yuuki", "Leafa", "Sinon", "Silica"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11757-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Subaru Natsuki", "Reinhard van Astrea", "Julius Juukulius", "Felix Argyle"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rem", "Ram", "Emilia", "Beatrice"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21355-6671HhT2247Y.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kazuma Satou", "Kyoya Mitsurugi", "Dust", "Vanir"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Megumin", "Aqua", "Darkness", "Wiz"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Sora", "Riku", "Tet", "Jibril"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Shiro", "Stephanie Dola", "Izuna Hatsuse", "Kurami Zell"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx19815-o9S2P9R6j4L8.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Rimuru Tempest", "Benimaru", "Souei", "Hakurou"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Milim Nava", "Shion", "Shuna", "Hinata Sakaguchi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101280-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Naofumi Iwatani", "Motoyasu Amaki", "Ren Amaki", "Itsuki Kawasumi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Raphtalia", "Filo", "Melty Q. Melromarc", "Malty S. Melromarc"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Ainz Ooal Gown", "Demiurge", "Cocytus", "Sebas Tian"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Albedo", "Shalltear Bloodfallen", "Aura Bella Fiora", "Mare Bello Fiore"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20832-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Mob (Shigeo Kageyama)", "Reigen Arataka", "Ritsu Kageyama", "Teruki Hanazawa"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Reigen Arataka", "Mob", "Ekubo", "Toichiro Suzuki"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21507-O8x9S5t0L4qR.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Denji", "Aki Hayakawa", "Kishibe", "Katanaman"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Makima", "Power", "Kobeni", "Reze"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Power", "Makima", "Himeno", "Quanxi"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx127230-V2j0b4XpB4Rz.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Senku Ishigami", "Taiju Oki", "Chrome", "Tsukasa Shishio"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Kohaku", "Yuzuriha Ogawa", "Suika", "Ruri"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101165-2tUq6J12kY6h.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Thorfinn", "Askeladd", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Askeladd", "Thorfinn", "Bjorn", "Canute"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101348-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Emma", "Norman", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Norman", "Emma", "Ray", "Isabella"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101748-0S2R6T9p5z9L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Koro-sensei", "Tadaomi Karasuma", "Gakuho Asano", "Lovro Brovski"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" },
+  { "q": "Chi è questo personaggio?", "a": ["Nagisa Shiota", "Karma Akabane", "Yuma Isogai", "Hiroto Maehara"], "c": 0, "img": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20755-0o8c847r3O2L.jpg" }
+
+        ];
+
+        function addPlayer() {
+            const input = document.getElementById('player-name-input');
+            const name = input.value.trim();
+            if (!name) return;
+            if (setupPlayers.length >= 10) { alert("Limite massimo di 10 giocatori!"); return; }
+            setupPlayers.push({ name: name, color: pColors[setupPlayers.length] });
+            input.value = '';
+            
+            const listEl = document.getElementById('player-list');
+            listEl.innerHTML = setupPlayers.map((p, idx) => `
+                <div class="player-item" style="border-left: 4px solid ${p.color}">
+                    <span style="color:${p.color}; font-weight:bold;">${p.name}</span>
+                    <button style="width:auto; padding:2px 8px; background:#ff2a74;" onclick="removePlayer(${idx})">X</button>
+                </div>
+            `).join('');
+        }
+
+        function removePlayer(idx) {
+            setupPlayers.splice(idx, 1);
+            setupPlayers.forEach((p, i) => p.color = pColors[i]);
+            const listEl = document.getElementById('player-list');
+            if (setupPlayers.length === 0) { listEl.innerHTML = '<p style="color: #5a5f75;">Nessuno.</p>'; return; }
+            listEl.innerHTML = setupPlayers.map((p, i) => `<div class="player-item" style="border-left: 4px solid ${p.color}"><span style="color:${p.color}; font-weight:bold;">${p.name}</span><button style="width:auto; padding:2px 8px; background:#ff2a74;" onclick="removePlayer(${i})">X</button></div>`).join('');
+        }
+
+        let players = [];
+        let activePlayerIndex = 0;
+        let isRolling = false;
+
+        const gooseSquares = [18, 36, 54, 72, 90];
+        const questionSquares = [5, 12, 19, 26, 33, 40, 48, 56, 62, 69, 75, 83, 89, 93, 97]; 
+        const ruleSquares = [8, 15, 24, 30, 38, 47, 52, 60, 67, 76, 85, 92]; 
+        const forwardSquares = { 3: 2, 11: 3, 21: 1, 31: 4, 43: 2, 53: 3, 64: 1, 73: 2, 86: 4, 96: 1 };
+        const backwardSquares = { 4: -1, 13: -2, 23: -3, 34: -4, 46: -2, 57: -1, 68: -3, 79: -2, 88: -4, 98: -1 };
+        const malusSquares = {
+            14: { name: "La Locanda", desc: "Salta il prossimo turno.", action: "skip" },
+            22: { name: "Il Labirinto", desc: "Ritorni alla casella 10.", action: "goto", target: 10 },
+            50: { name: "La Tempesta", desc: "Retrocedi di 6 caselle.", action: "back", value: 6 },
+            65: { name: "Il Ponte Rotto", desc: "Ritorni alla casella 55.", action: "goto", target: 55 },
+            78: { name: "La Nebbia", desc: "Salta il prossimo turno.", action: "skip" },
+            95: { name: "La Prigione", desc: "Salta il prossimo turno.", action: "skip" }
+        };
+
+        const boardStructure = [];
+        for (let i = 1; i <= TOTAL_CELLS; i++) {
+            let type = "normal"; let extra = null;
+            if (i === 1) type = "start";
+            else if (i === TOTAL_CELLS) type = "finish";
+            else if (gooseSquares.includes(i)) type = "goose";
+            else if (questionSquares.includes(i)) type = "question";
+            else if (ruleSquares.includes(i)) type = "custom-rule";
+            else if (forwardSquares[i]) { type = "forward"; extra = forwardSquares[i]; }
+            else if (backwardSquares[i]) { type = "backward"; extra = backwardSquares[i]; }
+            else if (malusSquares[i]) { type = "malus"; extra = malusSquares[i]; }
+            boardStructure.push({ id: i, type: type, extra: extra });
+        }
+
+        function startGame() {
+            if (setupPlayers.length < 2) return alert("Almeno 2 giocatori!");
+            players = setupPlayers.map((p, idx) => ({ id: idx + 1, name: p.name, pos: 1, color: p.color, char: p.name.charAt(0).toUpperCase(), skipTurn: false }));
+            document.getElementById('setup-container').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            
+            const boardEl = document.getElementById('board');
+            boardStructure.forEach(data => {
+                let name = "Sentiero", desc = "";
+                if(data.type==="start") name = "Partenza ⛩️";
+                if(data.type==="finish") name = "ARRIVO 🌌";
+                if(data.type==="goose") name = "Oca (Bonus)";
+                if(data.type==="question") name = "Domanda 🏮";
+                if(data.type==="custom-rule") name = "Crea Regola 📜";
+                if(data.type==="forward") name = "Avanza +"+data.extra;
+                if(data.type==="backward") name = "Indietro "+data.extra;
+                if(data.type==="malus") name = data.extra.name;
+                
+                boardEl.innerHTML += `<div class="cell ${data.type}" id="cell-${data.id}"><div class="cell-num">${data.id}</div><div class="cell-name">${name}</div><div class="players-container" id="players-cell-${data.id}"></div></div>`;
+            });
+            updatePawns();
+            updateTurnDisplay();
+        }
+
+        function updatePawns() {
+            document.querySelectorAll('.players-container').forEach(c => c.innerHTML = '');
+            players.forEach(p => {
+                const c = document.getElementById(`players-cell-${p.pos}`);
+                if (c) c.innerHTML += `<div class="pawn" style="background:${p.color}" data-fullname="${p.name}">${p.char}</div>`;
+            });
+        }
+
+        function playTurn() {
+            if (isRolling) return;
+            isRolling = true; document.getElementById('roll-btn').disabled = true;
+            let currentPlayer = players[activePlayerIndex];
+            
+            if (currentPlayer.skipTurn) {
+                log(`<b style="color:${currentPlayer.color}">${currentPlayer.name}</b> salta il turno.`);
+                currentPlayer.skipTurn = false; setTimeout(nextTurn, 1000); return;
+            }
+            
+            let i = 0, inter = setInterval(() => { document.getElementById('dice').innerText = ["⚀","⚁","⚂","⚃","⚄","⚅"][i++%6]; }, 100);
+            setTimeout(() => {
+                clearInterval(inter);
+                const steps = Math.floor(Math.random() * 6) + 1;
+                document.getElementById('dice').innerText = ["⚀","⚁","⚂","⚃","⚄","⚅"][steps-1];
+                log(`<b style="color:${currentPlayer.color}">${currentPlayer.name}</b> fa ${steps}.`);
+                movePlayer(currentPlayer, steps);
+            }, 600);
+        }
+
+        function movePlayer(player, steps) {
+            let path = [], p = player.pos, forward = steps > 0;
+            for(let i=0; i<Math.abs(steps); i++) {
+                if(forward) { p++; if(p>TOTAL_CELLS) p = TOTAL_CELLS-1; } else { p--; if(p<1) p=1; }
+                path.push(p);
+            }
+            let idx = 0;
+            function step() {
+                if (idx < path.length) {
+                    player.pos = path[idx++]; updatePawns();
+                    document.getElementById(`cell-${player.pos}`).scrollIntoView({behavior: 'smooth', block: 'center'});
+                    setTimeout(step, 250);
+                } else setTimeout(() => applyRules(player, steps), 200);
+            }
+            if(path.length) step(); else setTimeout(() => applyRules(player, steps), 200);
+        }
+
+        function applyRules(player, steps) {
+            const cell = boardStructure[player.pos - 1];
+            if (cell.type === "finish") return log(`🏆 ${player.name} HA VINTO!`);
+            if (cell.type === "goose") { log(`✨ Oca! ${player.name} avanza di ${steps}.`); setTimeout(()=>movePlayer(player, steps), 400); return; }
+            if (cell.type === "forward") { log(`💨 ${player.name} avanza di ${cell.extra}.`); setTimeout(()=>movePlayer(player, cell.extra), 400); return; }
+            if (cell.type === "backward") { log(`⚠️ ${player.name} indietreggia.`); setTimeout(()=>movePlayer(player, cell.extra), 400); return; }
+            if (cell.type === "question") return triggerQuiz(player);
+            if (cell.type === "custom-rule") {
+                setTimeout(() => {
+                    let rule = prompt(`📜 ${player.name}, crea una regola:`);
+                    if(rule) document.getElementById('rules-list').innerHTML += `<li><b>${player.name}:</b> ${rule}</li>`;
+                    nextTurn();
+                }, 200);
+                return;
+            }
+            if (cell.type === "malus") {
+                log(`❌ ${player.name} su ${cell.extra.name}.`);
+                if(cell.extra.action==="skip") player.skipTurn = true;
+                if(cell.extra.action==="goto") { player.pos = cell.extra.target; updatePawns(); }
+                if(cell.extra.action==="back") setTimeout(()=>movePlayer(player, -cell.extra.value), 400);
+                if(cell.extra.action !== "back") setTimeout(nextTurn, 800);
+                return;
+            }
+            nextTurn();
+        }
+
+function triggerQuiz(player) {
+            const modal = document.getElementById('quiz-modal');
+            const qText = document.getElementById('quiz-question');
+            const optionsBox = document.getElementById('quiz-options-container');
+            const imgBox = document.getElementById('quiz-image');
+            
+            const quiz = quizDatabase[Math.floor(Math.random() * quizDatabase.length)];
+            
+            if (quiz.img) {
+                // IL TRUCCO DEFINITIVO:
+                // Usiamo il proxy weserv con il parametro 'ssl' e 'n=true' per bypassare i blocchi di referer
+                imgBox.src = "https://images.weserv.nl/?url=" + encodeURIComponent(quiz.img) + "&n=true&ssl=true";
+                imgBox.style.display = 'block';
+                
+                // Debug: stampa in console se l'immagine sta arrivando
+                console.log("Caricamento immagine da:", imgBox.src);
+            } else {
+                imgBox.style.display = 'none';
+            }
+
+            qText.innerText = `[Per ${player.name}]: ${quiz.q}`;
+            optionsBox.innerHTML = '';
+
+            quiz.a.forEach((optionText, index) => {
+                const optBtn = document.createElement('div');
+                optBtn.className = 'quiz-option';
+                optBtn.innerText = `${index + 1}. ${optionText}`;
+                optBtn.onclick = () => {
+                    modal.style.display = 'none';
+                    if (index === quiz.c) {
+                        addLog(`✅ <b>Esatto!</b> ${player.name} resta lì.`);
+                        nextTurn();
+                    } else {
+                        addLog(`❌ <b>Errato!</b> ${player.name} indietreggia di 2 passi.`);
+                        movePlayer(player, -2);
+                    }
+                };
+                optionsBox.appendChild(optBtn);
+            });
+            modal.style.display = 'flex';
+        }
+
+        function answer(chosen, correct) {
+            document.getElementById('quiz-modal').style.display = 'none';
+            if(chosen === correct) { log(`✅ Esatto!`); nextTurn(); }
+            else { log(`❌ Errato! -2 passi.`); movePlayer(players[activePlayerIndex], -2); }
+        }
+
+        function nextTurn() { activePlayerIndex = (activePlayerIndex + 1) % players.length; updateTurnDisplay(); isRolling = false; document.getElementById('roll-btn').disabled = false; }
+        function updateTurnDisplay() { document.getElementById('turn-display').innerHTML = `Tocca a: <b style="color:${players[activePlayerIndex].color}">${players[activePlayerIndex].name}</b>`; }
+        function log(t) { const l = document.getElementById('log'); l.innerHTML += `<div class="log-entry">${t}</div>`; l.scrollTop = l.scrollHeight; }
+    </script>
+</body>
+</html>
