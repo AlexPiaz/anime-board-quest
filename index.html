@@ -2,8 +2,8 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Board Quest | Multi-Pack Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Board Quest | Legend Quiz Edition</title>
     <style>
         :root {
             --bg-color: #08090f; --panel-color: #121420; --accent-pink: #ff2a74;
@@ -16,204 +16,591 @@
             font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-color);
             margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
             background-image: radial-gradient(circle at 50% 10%, #1a153a 0%, #08090f 100%);
-            height: 100vh; overflow: hidden;
+            min-height: 100vh;
+            position: relative;
         }
 
-        h1 { font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px var(--accent-blue); margin: 5px 0 15px 0; text-align: center; }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 90px 20px, #ddd, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 150px 200px, #ff2a74, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 250px 150px, #00f0ff, rgba(0,0,0,0));
+            background-repeat: no-repeat;
+            background-size: 200px 200px;
+            opacity: 0.3;
+            pointer-events: none;
+            animation: stars 20s linear infinite;
+            z-index: 0;
+        }
 
-        #setup-container { background: var(--panel-color); border: 2px solid var(--accent-blue); padding: 30px; border-radius: 20px; max-width: 500px; width: 100%; text-align: center; margin-top: 40px; }
-        .setup-row { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; }
-        input[type="text"] { flex: 1; min-width: 150px; padding: 12px; border-radius: 10px; border: 2px solid var(--accent-purple); background: #08090f; color: #fff; font-size: 1rem; }
+        @keyframes stars {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-200px); }
+        }
 
-        /* STILI PER LA SELEZIONE DEI PACCHETTI */
-        .packs-container { display: flex; gap: 15px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
-        .pack-label { background: #191d30; border: 2px solid var(--accent-blue); padding: 10px 20px; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .pack-label:hover { background: #2d3454; }
-        .pack-label input { accent-color: var(--accent-pink); width: 18px; height: 18px; cursor: pointer; }
+        .game-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(90deg, 
+                rgba(255,42,116,0.95) 0%, 
+                rgba(112,0,255,0.95) 50%, 
+                rgba(0,240,255,0.95) 100%);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+        }
 
-        #game-container { display: none; flex-direction: row; gap: 20px; width: 100%; height: calc(100vh - 80px); }
-        #board-wrapper { flex: 1; overflow: auto; background: rgba(18, 20, 32, 0.85); border-radius: 20px; border: 2px solid var(--accent-purple); height: 100%; padding: 20px;}
-        #board { display: grid; grid-template-columns: repeat(10, 130px); grid-template-rows: repeat(10, 125px); gap: 8px; width: max-content; margin: 0 auto; }
+        .banner-text { font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        .banner-icon { font-size: 1.2rem; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+        .main-content {
+            width: 100%;
+            margin-top: 60px;
+            position: relative;
+            z-index: 1;
+            overflow-x: auto;
+        }
+
+        /* Top bar allineata centralmente in colonna */
+        .top-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 10px;
+            padding: 0 10px;
+        }
+
+        h1 { 
+            font-size: 2.2rem; 
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            text-shadow: 0 0 20px var(--accent-blue), 0 0 40px var(--accent-purple);
+            margin: 0;
+            text-align: center;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px var(--accent-blue), 0 0 40px var(--accent-purple); }
+            50% { text-shadow: 0 0 30px var(--accent-pink), 0 0 60px var(--accent-blue); }
+        }
+
+        /* Bottone regole RIMPICCIOLITO E CENTRATO */
+        .rules-btn {
+            background: linear-gradient(135deg, var(--accent-yellow), #ff9900);
+            color: #000;
+            border: none;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: max-content; /* Largo quanto la parola */
+            height: max-content; /* Alto quanto la parola */
+            box-shadow: 0 0 10px rgba(255,190,11,0.5);
+            transition: all 0.3s;
+        }
+        .rules-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,190,11,0.8); }
+
+        .rules-popup {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            width: 300px;
+            background: rgba(18, 20, 32, 0.98);
+            border: 2px solid var(--accent-yellow);
+            border-radius: 12px;
+            padding: 12px;
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            display: none;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            animation: slideInRight 0.3s ease-out;
+        }
+        .rules-popup.show { display: block; }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .rules-popup h3 {
+            color: var(--accent-yellow);
+            text-align: center;
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+        }
+        .close-rules {
+            background: none;
+            border: none;
+            color: var(--accent-yellow);
+            float: right;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0;
+            width: auto;
+            position: absolute;
+            top: 8px;
+            right: 12px;
+        }
+        .close-rules:hover { transform: none; box-shadow: none; color: var(--accent-pink); }
+        .rules-popup .rules-content { font-size: 0.75rem; line-height: 1.4; }
+        .rules-popup .rules-section { margin-bottom: 10px; border-left: 2px solid var(--accent-blue); padding-left: 8px; }
+        .rules-popup .rules-section h4 { color: var(--accent-blue); margin: 0 0 4px 0; font-size: 0.8rem; }
+        .rules-popup .rules-section ul { padding-left: 15px; margin: 4px 0; }
+        .rule-example { background: rgba(0,0,0,0.3); border-radius: 6px; padding: 6px; margin-top: 6px; font-size: 0.7rem; }
+
+        .center-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+
+        #setup-container { 
+            background: rgba(18, 20, 32, 0.95); 
+            border: 2px solid var(--accent-blue); 
+            padding: 20px; 
+            border-radius: 16px; 
+            width: 100%; 
+            text-align: center; 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(0,240,255,0.2);
+        }
+
+        .setup-row { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+        input[type="text"] { 
+            flex: 1; 
+            min-width: 140px; 
+            padding: 8px; 
+            border-radius: 8px; 
+            border: 2px solid var(--accent-purple); 
+            background: #08090f; 
+            color: #fff; 
+            font-size: 0.85rem;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-pink);
+            box-shadow: 0 0 10px rgba(255,42,116,0.5);
+        }
+
+        .packs-container { display: flex; gap: 8px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+        .pack-label { 
+            background: linear-gradient(135deg, #191d30, #0f1120); 
+            border: 2px solid var(--accent-blue); 
+            padding: 5px 12px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            gap: 4px; 
+            font-size: 0.8rem;
+        }
+        .pack-label:hover { background: linear-gradient(135deg, #2d3454, #1a1f35); transform: translateY(-2px); }
+        .pack-label input { accent-color: var(--accent-pink); width: 14px; height: 14px; }
+
+        #game-container { 
+            display: none; 
+            width: 100%; 
+            min-width: fit-content;
+        }
         
-        /* GRAFICA CASELLE */
-        .cell { background: #191d30; border: 2px solid #2d3454; border-radius: 10px; position: relative; display: flex; flex-direction: column; align-items: center; padding: 6px; }
-        .cell-num { position: absolute; top: 4px; left: 4px; background: rgba(0, 0, 0, 0.8); padding: 2px 6px; border-radius: 4px; color: var(--accent-blue); font-size: 0.70rem; font-weight: bold; z-index: 10; }
-        .cell.start .cell-num { background: #00ff66; color: #000; }
-        .cell-name { font-size: 0.8rem; font-weight: bold; color: #ffffff; margin-top: 18px; text-align: center; width: 100%; }
-        .cell-desc { font-size: 0.65rem; color: #a0a5c0; text-align: center; margin-top: 4px; padding: 0 2px; width: 100%; line-height: 1.2; }
+        .game-layout {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        #board-wrapper { 
+            flex: 3; 
+            overflow-x: auto; 
+            background: rgba(18, 20, 32, 0.85); 
+            border-radius: 16px; 
+            border: 2px solid var(--accent-purple); 
+            padding: 15px;
+        }
+        
+        /* TABELLONE INGRANDITO */
+        #board { 
+            display: grid; 
+            grid-template-columns: repeat(10, 115px); /* Incrementato da 105px */
+            grid-template-rows: repeat(10, 110px); /* Incrementato da 100px */
+            gap: 6px; 
+            width: max-content; 
+            margin: 0 auto;
+        }
+        
+        .cell { 
+            background: linear-gradient(135deg, #191d30, #0f1120); 
+            border: 2px solid #2d3454; 
+            border-radius: 8px; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 4px;
+            transition: all 0.3s;
+        }
+        .cell:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,240,255,0.3); z-index: 2; }
+        .cell-num { position: absolute; top: 2px; left: 4px; background: rgba(0, 0, 0, 0.8); padding: 2px 5px; border-radius: 4px; color: var(--accent-blue); font-size: 0.6rem; font-weight: bold; }
+        .cell-name { font-size: 0.7rem; font-weight: bold; margin-top: 16px; text-align: center; width: 100%; } /* Font leggermente aumentato */
+        .cell-desc { font-size: 0.6rem; color: #a0a5c0; text-align: center; margin-top: 2px; }
 
-        .cell.start { border-color: #00ff66; background: #082d18; }
-        .cell.finish { border-color: var(--accent-pink); background: #4a061d; }
-        .cell.goose { border-color: var(--accent-yellow); background: #3a2b02; }
+        .cell.start { border-color: #00ff66; background: linear-gradient(135deg, #082d18, #041a0c); }
+        .cell.finish { border-color: var(--accent-pink); background: linear-gradient(135deg, #4a061d, #2a0310); }
+        .cell.goose { border-color: var(--accent-yellow); background: linear-gradient(135deg, #3a2b02, #1f1601); }
         .cell.goose .cell-name { color: var(--accent-yellow); }
-        .cell.goose .cell-desc { color: #ffe066; }
-        .cell.malus { border-color: #ff3b3b; background: #380a0e; }
-        .cell.malus .cell-name { color: #ff8080; }
-        .cell.malus .cell-desc { color: #ffb3b3; }
-        .cell.question { border-color: #ff781f; background: #3d1c07; }
-        .cell.question .cell-name { color: #ff781f; }
-        .cell.question .cell-desc { color: #ffb880; }
-        .cell.custom-rule { border-color: #ad00ff; background: #26023a; }
-        .cell.custom-rule .cell-name { color: #ad00ff; }
-        .cell.custom-rule .cell-desc { color: #d680ff; }
-        .cell.forward { border-color: #00ff66; background: #0b3d17; }
-        .cell.forward .cell-desc { color: #80ffb3; }
-        .cell.backward { border-color: #ff3366; background: #3d0b16; }
-        .cell.backward .cell-desc { color: #ff80a6; }
+        .cell.malus { border-color: #ff3b3b; background: linear-gradient(135deg, #380a0e, #1f0406); }
+        .cell.question { border-color: #ff781f; background: linear-gradient(135deg, #3d1c07, #220f04); }
+        .cell.custom-rule { border-color: #ad00ff; background: linear-gradient(135deg, #26023a, #12011c); }
+        .cell.forward { border-color: #00ff66; background: linear-gradient(135deg, #0b3d17, #05220c); }
+        .cell.backward { border-color: #ff3366; background: linear-gradient(135deg, #3d0b16, #1f0409); }
 
-        .players-container { display: flex; gap: 3px; justify-content: center; flex-wrap: wrap; margin-top: auto; min-height: 20px; width: 100%; margin-bottom: 5px; }
+        .players-container { display: flex; gap: 2px; justify-content: center; flex-wrap: wrap; margin-top: auto; min-height: 20px; width: 100%; margin-bottom: 2px; }
         
-        /* PEDINE */
         .pawn { 
-            width: 16px; height: 16px; border-radius: 50%; border: 1px solid #fff; 
-            box-shadow: 0 0 6px rgba(255,255,255,0.8); display: flex; align-items: center; 
-            justify-content: center; font-size: 0.6rem; font-weight: bold; color: white; 
-            cursor: pointer; position: relative; 
-            transition: all 0.3s ease-in-out;
-            animation: idleBounce 2s infinite ease-in-out;
+            width: 16px; /* Pedine un pelo più grandi */
+            height: 16px; 
+            border-radius: 50%; 
+            border: 1px solid #fff; 
+            box-shadow: 0 0 4px rgba(255,255,255,0.8); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 0.55rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            animation: idleBounce 2s infinite;
         }
-        @keyframes idleBounce {
-            0%, 100% { transform: translateY(0); box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-            50% { transform: translateY(-4px); box-shadow: 0 6px 8px rgba(0,0,0,0.3); }
-        }
-        .pawn:hover::after { content: attr(data-fullname); position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; z-index: 600; border: 1px solid var(--accent-blue); box-shadow: 0 0 10px var(--accent-blue); }
+        @keyframes idleBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        .pawn:hover::after { content: attr(data-fullname); position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; padding: 2px 6px; font-size: 0.6rem; border-radius: 4px; border: 1px solid var(--accent-blue); white-space: nowrap; z-index: 10;}
 
-        #side-panels { display: flex; flex-direction: column; gap: 15px; width: 320px; height: 100%; flex-shrink: 0; }
-        .panel { background: var(--panel-color); border: 2px solid var(--accent-blue); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; }
-        #controls { border-color: var(--accent-pink); height: 45%; min-height: 350px; }
+        #side-panels { 
+            flex: 1.2; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            min-width: 280px;
+        }
+        .panel { background: rgba(18, 20, 32, 0.95); border: 2px solid var(--accent-blue); border-radius: 16px; padding: 12px; backdrop-filter: blur(5px); }
+        #controls { border-color: var(--accent-pink); }
         
-        #custom-rules-panel { border-color: #ad00ff; flex: 1; background: #150d22; overflow: hidden; display: flex; flex-direction: column; min-height: 250px;}
-        #rules-list { overflow-y: auto; padding: 0; margin: 0; flex: 1; list-style-type: none; }
-        #rules-list li { background: rgba(173, 0, 255, 0.15); border-left: 4px solid #ad00ff; padding: 10px; margin-bottom: 10px; border-radius: 4px 8px 8px 4px; font-size: 0.95rem; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.4; }
+        #custom-rules-panel { 
+            border-color: #ad00ff; 
+            flex: 1; 
+            background: rgba(21, 13, 34, 0.95); 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 300px;
+        }
+        #custom-rules-panel h3 { margin: 0 0 10px 0; font-size: 1rem; display: flex; align-items: center; gap: 6px; }
+        #rules-list { 
+            overflow-y: auto; 
+            padding: 0; 
+            margin: 0; 
+            flex: 1; 
+            list-style-type: none; 
+            max-height: 350px;
+        }
+        #rules-list li { 
+            background: rgba(173, 0, 255, 0.15); 
+            border-left: 3px solid #ad00ff; 
+            padding: 8px; 
+            margin-bottom: 8px; 
+            border-radius: 4px 6px 6px 4px; 
+            font-size: 0.85rem; 
+            word-wrap: break-word;
+        }
         
-        .turn-indicator { font-size: 1.15rem; text-align: center; padding: 10px; background: #08090f; border-radius: 8px; border-left: 5px solid var(--accent-blue); font-weight: bold; margin-bottom: 12px; }
+        .turn-indicator { 
+            font-size: 0.9rem; 
+            text-align: center; 
+            padding: 8px; 
+            background: linear-gradient(135deg, #08090f, #121420); 
+            border-radius: 8px; 
+            border-left: 4px solid var(--accent-blue); 
+            font-weight: bold; 
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0%, 100% { border-left-color: var(--accent-blue); } 50% { border-left-color: var(--accent-pink); } }
 
         #dice { 
-            width: 60px; height: 60px; background: white; color: #111; border-radius: 14px; 
-            display: flex; align-items: center; justify-content: center; font-size: 2.8rem; 
-            font-weight: bold; margin: 0 auto 12px auto; box-shadow: 0 0 15px rgba(255,255,255,0.4); 
-            flex-shrink: 0; transition: transform 0.1s; 
+            width: 55px; 
+            height: 55px; 
+            background: linear-gradient(135deg, white, #e0e0e0); 
+            color: #111; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 2.2rem; 
+            font-weight: bold; 
+            margin: 0 auto 10px auto; 
+            box-shadow: 0 0 12px rgba(255,255,255,0.4); 
+            cursor: pointer;
         }
-        .rolling { animation: rollDice3D 0.5s infinite cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+        #dice:hover { transform: scale(1.05); }
+        .rolling { animation: rollDice3D 0.5s infinite; }
         @keyframes rollDice3D {
-            0% { transform: rotateX(0deg) rotateY(0deg) scale(1); }
-            50% { transform: rotateX(180deg) rotateY(180deg) scale(1.3); }
-            100% { transform: rotateX(360deg) rotateY(360deg) scale(1); }
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            50% { transform: rotateX(180deg) rotateY(180deg) scale(1.2); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
         }
 
-        button { background: linear-gradient(45deg, var(--accent-pink), var(--accent-purple)); border: none; color: white; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; transition: opacity 0.3s; }
-        button:disabled { opacity: 0.4; cursor: not-allowed; }
-        button.add-btn { background: linear-gradient(45deg, #00f0ff, #7000ff); width: auto; flex: 1; }
+        button { 
+            background: linear-gradient(45deg, var(--accent-pink), var(--accent-purple)); 
+            border: none; 
+            color: white; 
+            padding: 8px; 
+            font-size: 0.85rem; 
+            font-weight: bold; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            width: 100%; 
+            transition: all 0.3s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,42,116,0.4); }
+        button.add-btn { background: linear-gradient(45deg, #00f0ff, #7000ff); width: auto; padding: 6px 15px; }
+        button.restart-btn { background: linear-gradient(45deg, #ff6600, #ff2a74); margin-top: 8px; }
+        button.clear-btn { background: linear-gradient(45deg, #ff4444, #cc0000); margin-top: 5px; font-size: 0.8rem; }
 
-        #log { background: #08090f; border-radius: 8px; padding: 10px; font-size: 0.8rem; border: 1px solid #2d3454; margin-top: 12px; flex: 1; overflow-y: auto; }
-        .log-entry { margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 4px; }
-        .player-item { display: flex; justify-content: space-between; align-items: center; background: #191d30; padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; }
+        #log { background: rgba(8, 9, 15, 0.9); border-radius: 8px; padding: 8px; font-size: 0.7rem; border: 1px solid #2d3454; margin-top: 10px; max-height: 180px; overflow-y: auto; }
+        .log-entry { margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 3px; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-5px); } to { opacity: 1; transform: translateX(0); } }
+        
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #191d30, #0f1120);
+            padding: 6px 10px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+        }
+        .player-item button { background: #ff2a74; width: auto; padding: 2px 10px; font-size: 0.7rem; }
+
+        /* CREDITI AGGIORNATI */
+        .credit-footer {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            border-left: 3px solid var(--accent-blue);
+            z-index: 100;
+            text-align: center;
+        }
+        .credit-footer .telegram-link { color: var(--accent-blue); text-decoration: none; font-weight: bold;}
+        .credit-footer .telegram-link:hover { color: var(--accent-pink); }
+
+        .cell.question::after, .cell.goose::after, .cell.custom-rule::after {
+            content: '✨';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            font-size: 10px;
+            animation: sparkle 2s infinite;
+        }
+        @keyframes sparkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         #quiz-modal { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); 
-            z-index: 1000; justify-content: center; align-items: center; 
-            padding: 10px;
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.95); 
+            backdrop-filter: blur(10px); 
+            z-index: 2000; 
+            justify-content: center; 
+            align-items: center; 
         }
         .modal-content { 
-            background: var(--panel-color); border: 3px solid #ff781f; padding: 25px; 
-            border-radius: 20px; max-width: 500px; width: 100%; text-align: center; 
-            max-height: 95vh; overflow-y: auto; box-shadow: 0 0 30px rgba(255, 120, 31, 0.5);
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            background: linear-gradient(135deg, var(--panel-color), #0a0c14);
+            border: 3px solid #ff781f; 
+            padding: 20px; 
+            border-radius: 16px; 
+            max-width: 400px; 
+            width: 90%; 
+            text-align: center; 
         }
-        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        #quiz-image { width: 100%; max-height: 200px; object-fit: contain; border-radius: 10px; border: 3px solid var(--accent-blue); margin-bottom: 15px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); display: none; }
-        
         .quiz-option { 
-            background: #191d30; border: 1px solid #ff781f; color: white; padding: 12px; 
-            margin: 8px 0; border-radius: 8px; cursor: pointer; text-align: left; 
-            font-weight: bold; font-size: 1rem; transition: all 0.2s ease-in-out; 
+            background: linear-gradient(135deg, #191d30, #0f1120); 
+            border: 1px solid #ff781f; 
+            padding: 8px; 
+            margin: 6px 0; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            font-size: 0.85rem;
         }
-        .quiz-option:hover { background: #ff781f; color: black; transform: translateX(10px); }
+        .quiz-option:hover { background: linear-gradient(135deg, #ff781f, #ffaa44); color: black; transform: translateX(5px); }
 
+        .feedback-toast {
+            position: fixed;
+            bottom: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            z-index: 3000;
+            animation: toastFade 2s ease-out forwards;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .feedback-toast.correct { border-left: 4px solid #00ff66; color: #00ff66; }
+        .feedback-toast.wrong { border-left: 4px solid #ff4444; color: #ff8888; }
+        @keyframes toastFade {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            85% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            #board { grid-template-columns: repeat(10, 95px); grid-template-rows: repeat(10, 90px); gap: 5px; }
+            .cell-name { font-size: 0.65rem; margin-top: 14px; }
+        }
+        @media (max-width: 1000px) {
+            .game-layout { flex-direction: column; }
+            #side-panels { width: 100%; }
+            #board { grid-template-columns: repeat(10, 85px); grid-template-rows: repeat(10, 80px); }
+        }
         @media (max-width: 850px) {
-            body { height: auto; min-height: 100vh; overflow-y: auto; }
-            h1 { font-size: 1.5rem; }
-            #game-container { flex-direction: column; height: auto; }
-            #board-wrapper { height: 55vh; min-height: 400px; padding: 10px; }
-            #side-panels { width: 100%; height: auto; }
-            #controls { height: 400px; } 
-            #custom-rules-panel { height: 350px; }
-            #board { grid-template-columns: repeat(10, 110px); grid-template-rows: repeat(10, 110px); }
-            .cell-name { font-size: 0.75rem; margin-top: 14px; }
-            .cell-desc { font-size: 0.6rem; }
+            h1 { font-size: 1.8rem; }
+            #board { grid-template-columns: repeat(10, 70px); grid-template-rows: repeat(10, 65px); }
+            .cell-name { font-size: 0.55rem; margin-top: 8px; }
+            .credit-footer { font-size: 0.65rem; padding: 6px 10px; }
+        }
+        @media (max-width: 750px) {
+            #board { grid-template-columns: repeat(10, 60px); grid-template-rows: repeat(10, 55px); }
+            .cell-name { font-size: 0.5rem; margin-top: 6px; }
+            .cell-desc { font-size: 0.45rem; }
+        }
+        @media (max-width: 650px) {
+            #board { grid-template-columns: repeat(10, 55px); grid-template-rows: repeat(10, 50px); }
         }
     </style>
 </head>
 <body>
 
-    <h1>Board Quest</h1>
-
-    <div id="setup-container">
-        <h2>Aggiungi Giocatori (Da 1 a 10)</h2>
-        <div class="setup-row">
-            <input type="text" id="player-name-input" placeholder="Nome Giocatore" maxlength="15">
-            <button class="add-btn" onclick="addPlayer()">Inserisci</button>
-        </div>
-        <div id="player-list"><p style="color: #5a5f75;">Nessun giocatore inserito.</p></div>
-        
-        <h3 style="margin-top: 30px; color: var(--accent-blue);">Scegli con quale pacchetto di domande vuoi giocare</h3>
-<div class="packs-container">
-    <label class="pack-label">
-        <input type="checkbox" id="pack-anime" checked> 🐉 Anime
-    </label>
-    <label class="pack-label">
-        <input type="checkbox" id="pack-cultura"> 🌍 Cultura Generale
-    </label>
-    <label class="pack-label">
-        <input type="checkbox" id="pack-sport"> ⚽ Sport
-    </label>
-    <label class="pack-label">
-        <input type="checkbox" id="pack-videogiochi"> 🎮 Videogiochi
-    </label>
-</div>
-
-        <button id="start-btn" style="background: #00ff66; color: #000; font-size: 1.1rem; margin-top: 15px;" onclick="startGame()">Comincia la Partita! ⚔️</button>
+    <div class="game-banner">
+        <span class="banner-icon">🎲</span>
+        <span class="banner-text">LEGEND QUIZ - BOARD QUEST</span>
+        <span class="banner-icon">🏆</span>
     </div>
 
-    <div id="game-container">
-        <div id="board-wrapper"><div id="board"></div></div>
-        <div id="side-panels">
-            <div class="panel" id="controls">
-                <div class="turn-indicator" id="turn-display">Pannello</div>
-                <div id="dice">⚀</div>
-                <button id="roll-btn" onclick="playTurn()">Lancia Dado!</button>
-                <div id="log"></div>
+    <div class="main-content">
+        <div class="top-bar">
+            <h1>🎮 Board Quest 🎮</h1>
+            <button class="rules-btn" onclick="toggleRules()">📜 Regole</button>
+        </div>
+
+        <div id="rules-popup" class="rules-popup">
+            <button class="close-rules" onclick="toggleRules()">✖</button>
+            <h3>📜 REGOLE DEL GIOCO</h3>
+            <div class="rules-content">
+                <div class="rules-section"><h4>🎯 Obiettivo</h4><p>Raggiungi per primo la casella 100 (ARRIVO)!</p></div>
+                <div class="rules-section"><h4>🎲 Come si gioca</h4><p>1️⃣ Lancia il dado<br>2️⃣ Avanza del numero ottenuto<br>3️⃣ Applica l'effetto della casella</p></div>
+                <div class="rules-section"><h4>✨ Caselle Speciali</h4><ul><li>🦆 <strong style="color:#ffbe0b">OCA</strong> - Avanza di nuovo</li><li>❓ <strong style="color:#ff781f">DOMANDA</strong> - Rispondi o -2 passi</li><li>📜 <strong style="color:#ad00ff">LEGGE</strong> - Crea una regola</li><li>⚡ <strong style="color:#00ff66">AVANZA</strong> - Salti avanti</li><li>🔻 <strong style="color:#ff3366">INDIETRO</strong> - Retrocedi</li><li>⛔ <strong style="color:#ff3b3b">MALUS</strong> - Salta turno</li></ul></div>
+                <div class="rules-section"><h4>❓ Domande</h4><p>✅ Corretta → Resti sulla casella<br>❌ Sbagliata → -2 passi</p></div>
+                <div class="rule-example">💡 <strong>Esempio:</strong> Su OCA con dado 4 → avanzi di 4, poi avanzi ancora di 4!</div>
             </div>
-            <div class="panel" id="custom-rules-panel">
-                <h3>📜 Leggi Attive</h3>
-                <ul id="rules-list"></ul>
+        </div>
+
+        <div class="center-container" id="setup-container">
+            <h2>👥 Aggiungi Giocatori (1-10)</h2>
+            <div class="setup-row">
+                <input type="text" id="player-name-input" placeholder="Nome Giocatore" maxlength="15">
+                <button class="add-btn" onclick="addPlayer()">➕ Inserisci</button>
+            </div>
+            <div id="player-list"><p style="color: #5a5f75;">Nessun giocatore inserito.</p></div>
+            <button class="clear-btn" onclick="clearAllPlayers()">🗑️ Cancella tutti</button>
+            
+            <h3 style="margin-top: 20px; color: var(--accent-blue);">📚 Scegli i pacchetti di domande</h3>
+            <div class="packs-container">
+                <label class="pack-label"><input type="checkbox" id="pack-anime" checked> 🐉 Anime</label>
+                <label class="pack-label"><input type="checkbox" id="pack-cultura"> 🌍 Cultura</label>
+                <label class="pack-label"><input type="checkbox" id="pack-sport"> ⚽ Sport</label>
+                <label class="pack-label"><input type="checkbox" id="pack-videogiochi"> 🎮 Videogiochi</label>
+            </div>
+
+            <button id="start-btn" onclick="startGame()" style="background: linear-gradient(45deg, #00ff66, #00cc55); color: #000; margin-top: 15px;">🚀 Comincia la Partita! ⚔️</button>
+        </div>
+
+        <div id="game-container">
+            <div class="game-layout">
+                <div id="board-wrapper"><div id="board"></div></div>
+                <div id="side-panels">
+                    <div class="panel" id="controls">
+                        <div class="turn-indicator" id="turn-display">Pannello</div>
+                        <div id="dice">⚀</div>
+                        <button id="roll-btn" onclick="playTurn()">🎲 Lancia Dado!</button>
+                        <button class="restart-btn" onclick="restartGame()">🔄 Ricomincia Partita</button>
+                        <div id="log"></div>
+                    </div>
+                    <div class="panel" id="custom-rules-panel">
+                        <h3>📜 Leggi Attive</h3>
+                        <ul id="rules-list"></ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="quiz-modal">
         <div class="modal-content">
-            <h2 style="color: #ff781f; margin-top: 0; font-size: 1.4rem;">DOMANDA</h2>
-            <img id="quiz-image" src="" alt="Immagine Quiz">
-            <p id="quiz-question" style="font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; color: var(--accent-yellow);"></p>
+            <h2 style="color: #ff781f; margin-top: 0; font-size: 1.2rem;">❓ DOMANDA</h2>
+            <p id="quiz-question" style="font-size: 0.9rem; margin-bottom: 15px; font-weight: bold; color: var(--accent-yellow);"></p>
             <div id="quiz-options-container"></div>
-            <p style="font-size: 0.8rem; color: #ff3b3b; margin-top: 15px;">Sbagliare costa -2 passi.</p>
+            <p style="font-size: 0.7rem; color: #ff3b3b; margin-top: 12px;">⚠️ Sbagliare costa -2 passi ⚠️</p>
         </div>
     </div>
 
+    <div class="credit-footer">
+        Contattare per eventuali problematiche o suggerimenti <a href="https://t.me/ToroAlex03" target="_blank" class="telegram-link">@ToroAlex03</a> su Telegram
+    </div>
+
     <script>
-        const TOTAL_CELLS = 100;
-        const pColors = ["#ff477e", "#00f0ff", "#9d4edd", "#ffbe0b", "#00ff66", "#ff6600", "#ff33cc", "#99ccff", "#cc99ff", "#ffffff"];
-        let setupPlayers = [];
+        // ============================================================
+        // 📝 QUI INSERISCI LE TUE DOMANDE!
+        // ============================================================
+        // Formato domanda: { q: "testo domanda", a: ["opzione1", "opzione2", "opzione3", "opzione4"], c: indice_corretto(0-3) }
+        // ============================================================
 
-        // LA VARIABILE CHE CONTERRÀ LE DOMANDE UNITE
-        let quizDatabase = [];
-
-        // PACCHETTO ANIME
         const packAnime = [
-               
-           { "q": "Quale studio di animazione ha prodotto 'La città incantata'?", "a": ["Toei Animation", "Madhouse", "Studio Ghibli", "Kyoto Animation"], "c": 2, "img": "" },
+            { "q": "Quale studio di animazione ha prodotto 'La città incantata'?", "a": ["Toei Animation", "Madhouse", "Studio Ghibli", "Kyoto Animation"], "c": 2, "img": "" },
             { "q": "In 'Fullmetal Alchemist', qual è il principio cardine dell'alchimia?", "a": ["Magia infinita", "Scambio equivalente", "Trasmutazione oscura", "Potere ereditario"], "c": 1, "img": "" },
             { "q": "Cosa sono gli 'Angeli' in 'Neon Genesis Evangelion'?", "a": ["Robot alieni", "Mutanti", "Spettri", "Entità divine"], "c": 3, "img": "" },
             { "q": "In 'Berserk', come si chiama la spada gigante di Guts?", "a": ["Ammazzadraghi", "Slayer", "Iron Blade", "Dark Edge"], "c": 0, "img": "" },
@@ -1836,13 +2223,11 @@
     "a": ["Digimon", "Yu-Gi-Oh!", "Pokémon", "Monster Rancher"],
     "c": 2,
     "img": ""
-  }
+  },
         ];
 
-        // PACCHETTO CULTURA GENERALE
         const packCultura = [
-        
-    { "q": "Quale è l'elemento chimico più abbondante nell'universo?", "a": ["Ossigeno", "Idrogeno", "Carbonio", "Azoto"], "c": 1, "img": "" },
+            { "q": "Quale è l'elemento chimico più abbondante nell'universo?", "a": ["Ossigeno", "Idrogeno", "Carbonio", "Azoto"], "c": 1, "img": "" },
     { "q": "In che anno è avvenuta la Rivoluzione Francese?", "a": ["1789", "1815", "1776", "1848"], "c": 0, "img": "" },
     { "q": "Chi ha scritto 'Il nome della rosa'?", "a": ["Italo Calvino", "Umberto Eco", "Primo Levi", "Luigi Pirandello"], "c": 1, "img": "" },
     { "q": "Qual è il fiume più lungo del mondo?", "a": ["Nilo", "Rio delle Amazzoni", "Gange", "Mississippi"], "c": 1, "img": "" },
@@ -2293,11 +2678,11 @@
     { "q": "Cosa mangia Popeye?", "a": ["Carote", "Spinaci", "Mele", "Carne"], "c": 1, "img": "" },
     { "q": "Chi è il regista di 'Pulp Fiction'?", "a": ["Tarantino", "Scorsese", "Spielberg", "Scott"], "c": 0, "img": "" },
     { "q": "Quale è il colore dei Jedi?", "a": ["Rosso", "Blu/Verde", "Nero", "Bianco"], "c": 1, "img": "" },
-    { "q": "Come si chiama l'astronave di Star Trek?", "a": ["Enterprise", "Falcon", "Galactica", "Destiny"], "c": 0, "img": "" }
+    { "q": "Come si chiama l'astronave di Star Trek?", "a": ["Enterprise", "Falcon", "Galactica", "Destiny"], "c": 0, "img": "" },
 ];
-//PACCHETTTO SPORT
-const packSport = [
-    { "q": "Chi ha vinto più titoli Mondiali di Formula 1 (pareggio al 2026)?", "a": ["Michael Schumacher", "Lewis Hamilton", "Ayrton Senna", "Max Verstappen"], "c": 0, "img": "" },
+
+        const packSport = [
+            { "q": "Chi ha vinto più titoli Mondiali di Formula 1 (pareggio al 2026)?", "a": ["Michael Schumacher", "Lewis Hamilton", "Ayrton Senna", "Max Verstappen"], "c": 0, "img": "" },
     { "q": "In quale sport si usa il termine 'Birdie'?", "a": ["Tennis", "Golf", "Baseball", "Cricket"], "c": 1, "img": "" },
     { "q": "Quanti giocatori compongono una squadra di rugby a 15?", "a": ["11", "13", "15", "18"], "c": 2, "img": "" },
     { "q": "Quale nazione ha vinto più Mondiali di calcio maschile?", "a": ["Italia", "Germania", "Brasile", "Argentina"], "c": 2, "img": "" },
@@ -2577,9 +2962,10 @@ const packSport = [
   { "q": "In quale sport esiste il 'tie-break'?", "a": ["Tennis", "Volley", "Calcio", "Sia A che B"], "c": 3, "img": "" },
   { "q": "Come si chiama l'area da cui si lancia nel baseball?", "a": ["Monte di lancio", "Diamante", "Base", "Box"], "c": 0, "img": "" },
   { "q": "Cosa significa 'Love' nel punteggio del tennis?", "a": ["0", "15", "30", "40"], "c": 0, "img": "" },
-];
-const packVideogiochi = [
-  { "q": "Quale azienda ha creato la serie 'Pokémon'?", "a": ["Nintendo", "Sega", "Ubisoft", "Sony"], "c": 0, "img": "" },
+        ];
+
+        const packVideogiochi = [
+            { "q": "Quale azienda ha creato la serie 'Pokémon'?", "a": ["Nintendo", "Sega", "Ubisoft", "Sony"], "c": 0, "img": "" },
   { "q": "In 'The Sims', come si chiamano i personaggi?", "a": ["Mii", "Sim", "Avatar", "Personaggi"], "c": 1, "img": "" },
   { "q": "Quale di questi NON è un gioco di corse?", "a": ["Mario Kart", "Need for Speed", "Forza", "Tetris"], "c": 3, "img": "" },
   { "q": "Come si chiama l'isola di 'Fortnite'?", "a": ["Battle Island", "L'isola", "Mappa", "Non ha nome"], "c": 3, "img": "" },
@@ -2822,37 +3208,19 @@ const packVideogiochi = [
   { "q": "Quale gioco ha una modalità 'Creativa' per costruire?", "a": ["Minecraft", "FIFA", "Mario", "Zelda"], "c": 0, "img": "" },
   { "q": "Quale console ha il gioco 'Super Smash Bros'?", "a": ["Nintendo", "Sony", "Microsoft", "Sega"], "c": 0, "img": "" },
   { "q": "Come si chiama il protagonista di 'Prince of Persia'?", "a": ["Il Principe", "Aladdin", "Ali Babà", "Sinbad"], "c": 0, "img": "" },
-];
-        function addPlayer() {
-            const input = document.getElementById('player-name-input');
-            const name = input.value.trim();
-            if (!name) return;
-            if (setupPlayers.length >= 10) { alert("Limite massimo di 10 giocatori!"); return; }
-            setupPlayers.push({ name: name, color: pColors[setupPlayers.length] });
-            input.value = '';
-            
-            const listEl = document.getElementById('player-list');
-            listEl.innerHTML = setupPlayers.map((p, idx) => `
-                <div class="player-item" style="border-left: 4px solid ${p.color}">
-                    <span style="color:${p.color}; font-weight:bold;">${p.name}</span>
-                    <button style="width:auto; padding:2px 8px; background:#ff2a74;" onclick="removePlayer(${idx})">X</button>
-                </div>
-            `).join('');
-        }
+        ];
 
-        function removePlayer(idx) {
-            setupPlayers.splice(idx, 1);
-            setupPlayers.forEach((p, i) => p.color = pColors[i]);
-            const listEl = document.getElementById('player-list');
-            if (setupPlayers.length === 0) { listEl.innerHTML = '<p style="color: #5a5f75;">Nessuno.</p>'; return; }
-            listEl.innerHTML = setupPlayers.map((p, i) => `<div class="player-item" style="border-left: 4px solid ${p.color}"><span style="color:${p.color}; font-weight:bold;">${p.name}</span><button style="width:auto; padding:2px 8px; background:#ff2a74;" onclick="removePlayer(${i})">X</button></div>`).join('');
-        }
+        // ============================================================
+        // FINE SEZIONE DOMANDE - NON MODIFICARE SOTTO
+        // ============================================================
 
+        const TOTAL_CELLS = 100;
+        const pColors = ["#ff477e", "#00f0ff", "#9d4edd", "#ffbe0b", "#00ff66", "#ff6600", "#ff33cc", "#99ccff", "#cc99ff", "#ffffff"];
+        let setupPlayers = [];
+        let quizDatabase = [];
         let players = [];
         let activePlayerIndex = 0;
         let isRolling = false;
-        
-        // VARIABILI PER IL DADO (Anti-Ripetizione)
         let lastRoll = 0;
         let rollCount = 0;
 
@@ -2884,58 +3252,107 @@ const packVideogiochi = [
             boardStructure.push({ id: i, type: type, extra: extra });
         }
 
+        function toggleRules() {
+            document.getElementById('rules-popup').classList.toggle('show');
+        }
+
+        function clearAllPlayers() {
+            if (setupPlayers.length > 0 && confirm("Cancellare tutti i giocatori?")) {
+                setupPlayers = [];
+                updatePlayerList();
+                saveToLocalStorage();
+            }
+        }
+
+        function addPlayer() {
+            const input = document.getElementById('player-name-input');
+            const name = input.value.trim();
+            if (!name) { alert("Inserisci un nome valido!"); return; }
+            if (setupPlayers.length >= 10) { alert("Limite massimo di 10 giocatori!"); return; }
+            setupPlayers.push({ name: name, color: pColors[setupPlayers.length] });
+            input.value = '';
+            updatePlayerList();
+            saveToLocalStorage();
+        }
+
+        function updatePlayerList() {
+            const listEl = document.getElementById('player-list');
+            if (setupPlayers.length === 0) {
+                listEl.innerHTML = '<p style="color: #5a5f75;">Nessun giocatore.</p>';
+                return;
+            }
+            listEl.innerHTML = setupPlayers.map((p, idx) => `
+                <div class="player-item" style="border-left: 4px solid ${p.color}">
+                    <span style="color:${p.color}; font-weight:bold;">${p.name}</span>
+                    <button onclick="removePlayer(${idx})">✖</button>
+                </div>
+            `).join('');
+        }
+
+        function removePlayer(idx) {
+            setupPlayers.splice(idx, 1);
+            setupPlayers.forEach((p, i) => p.color = pColors[i]);
+            updatePlayerList();
+            saveToLocalStorage();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('boardQuest_setupPlayers', JSON.stringify(setupPlayers));
+            const packChecks = {
+                anime: document.getElementById('pack-anime').checked,
+                cultura: document.getElementById('pack-cultura').checked,
+                sport: document.getElementById('pack-sport').checked,
+                videogiochi: document.getElementById('pack-videogiochi').checked
+            };
+            localStorage.setItem('boardQuest_packSelections', JSON.stringify(packChecks));
+        }
+
+        function loadFromLocalStorage() {
+            const savedPacks = localStorage.getItem('boardQuest_packSelections');
+            if (savedPacks) {
+                const packs = JSON.parse(savedPacks);
+                document.getElementById('pack-anime').checked = packs.anime;
+                document.getElementById('pack-cultura').checked = packs.cultura;
+                document.getElementById('pack-sport').checked = packs.sport;
+                document.getElementById('pack-videogiochi').checked = packs.videogiochi;
+            }
+        }
+
         function startGame() {
             if (setupPlayers.length < 1) return alert("Devi inserire almeno 1 giocatore!");
 
-            // CONTROLLO PACCHETTI SELEZIONATI
             let selectedPacks = [];
-            if (document.getElementById('pack-anime').checked) {
-                selectedPacks = selectedPacks.concat(packAnime);
-            }
-            if (document.getElementById('pack-cultura').checked) {
-                selectedPacks = selectedPacks.concat(packCultura);
-            }
-            if (document.getElementById('pack-sport').checked) {
-                selectedPacks = selectedPacks.concat(packSport);
-            }
-            if (document.getElementById('pack-videogiochi').checked) {
-                selectedPacks = selectedPacks.concat(packVideogiochi);
-            }
+            if (document.getElementById('pack-anime').checked) selectedPacks = selectedPacks.concat(packAnime);
+            if (document.getElementById('pack-cultura').checked) selectedPacks = selectedPacks.concat(packCultura);
+            if (document.getElementById('pack-sport').checked) selectedPacks = selectedPacks.concat(packSport);
+            if (document.getElementById('pack-videogiochi').checked) selectedPacks = selectedPacks.concat(packVideogiochi);
 
-            if (selectedPacks.length === 0) {
-                return alert("Devi selezionare almeno un pacchetto di domande!");
-            }
+            if (selectedPacks.length === 0) return alert("Seleziona almeno un pacchetto di domande!");
 
-            // CARICA IL DATABASE
             quizDatabase = [...selectedPacks];
-
             players = setupPlayers.map((p, idx) => ({ id: idx + 1, name: p.name, pos: 1, color: p.color, char: p.name.charAt(0).toUpperCase(), skipTurn: false }));
+            activePlayerIndex = 0;
+
             document.getElementById('setup-container').style.display = 'none';
-            document.getElementById('game-container').style.display = 'flex';
-            
+            document.getElementById('game-container').style.display = 'block';
+
             const boardEl = document.getElementById('board');
+            boardEl.innerHTML = '';
             boardStructure.forEach(data => {
-                let name = "Sentiero"; let desc = "";
-                
+                let name = "Sentiero", desc = "";
                 if (data.type === "start") { name = "Partenza ⛩️"; desc = "Inizio"; }
                 else if (data.type === "finish") { name = "ARRIVO 🌌"; desc = "Vittoria!"; }
                 else if (data.type === "goose") { name = "Oca ✨"; desc = "Avanza di nuovo"; }
                 else if (data.type === "question") { name = "Domanda 🏮"; desc = "Rispondi o -2"; }
                 else if (data.type === "custom-rule") { name = "Legge 📜"; desc = "Crea una regola"; }
-                else if (data.type === "forward") { name = "Avanza"; desc = "+" + data.extra + " caselle"; }
-                else if (data.type === "backward") { name = "Indietro"; desc = "-" + Math.abs(data.extra) + " caselle"; }
+                else if (data.type === "forward") { name = "Avanza"; desc = "+" + data.extra; }
+                else if (data.type === "backward") { name = "Indietro"; desc = "-" + Math.abs(data.extra); }
                 else if (data.type === "malus") { name = data.extra.name; desc = data.extra.desc; }
-
-                boardEl.innerHTML += `
-                    <div class="cell ${data.type}" id="cell-${data.id}">
-                        <div class="cell-num">${data.id}</div>
-                        <div class="cell-name">${name}</div>
-                        <div class="cell-desc">${desc}</div>
-                        <div class="players-container" id="players-cell-${data.id}"></div>
-                    </div>`;
+                boardEl.innerHTML += `<div class="cell ${data.type}" id="cell-${data.id}"><div class="cell-num">${data.id}</div><div class="cell-name">${name}</div><div class="cell-desc">${desc}</div><div class="players-container" id="players-cell-${data.id}"></div></div>`;
             });
             updatePawns();
             updateTurnDisplay();
+            log("🎮 Partita iniziata! Buon divertimento!");
         }
 
         function updatePawns() {
@@ -2946,41 +3363,43 @@ const packVideogiochi = [
             });
         }
 
+        function showFeedback(msg, isCorrect) {
+            const toast = document.createElement('div');
+            toast.className = `feedback-toast ${isCorrect ? 'correct' : 'wrong'}`;
+            toast.innerHTML = isCorrect ? '✅ ' + msg : '❌ ' + msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
         function playTurn() {
             if (isRolling) return;
-            isRolling = true; document.getElementById('roll-btn').disabled = true;
+            isRolling = true;
+            document.getElementById('roll-btn').disabled = true;
             let currentPlayer = players[activePlayerIndex];
             
             if (currentPlayer.skipTurn) {
-                log(`<b style="color:${currentPlayer.color}">${currentPlayer.name}</b> salta il turno.`);
-                currentPlayer.skipTurn = false; setTimeout(nextTurn, 1000); return;
+                log(`⏸️ ${currentPlayer.name} salta il turno.`);
+                currentPlayer.skipTurn = false;
+                setTimeout(nextTurn, 1000);
+                return;
             }
             
             document.getElementById('dice').classList.add("rolling");
-            let i = 0, inter = setInterval(() => { document.getElementById('dice').innerText = ["⚀","⚁","⚂","⚃","⚄","⚅"][i++%6]; }, 100);
+            let i = 0, inter = setInterval(() => { document.getElementById('dice').innerText = ["⚀","⚁","⚂","⚃","⚄","⚅"][i++%6]; }, 80);
             
             setTimeout(() => {
                 clearInterval(inter);
                 document.getElementById('dice').classList.remove("rolling");
-                
-                // LOGICA DADO ANTI-RIPETIZIONE
                 let steps = Math.floor(Math.random() * 6) + 1;
                 if (steps === lastRoll) {
                     rollCount++;
-                    if (rollCount >= 2) { 
-                        // Se è uscito lo stesso numero 2 volte, forza un numero diverso
-                        steps = (steps % 6) + 1; 
-                        rollCount = 0;
-                    }
-                } else {
-                    rollCount = 0;
-                }
+                    if (rollCount >= 2) { steps = (steps % 6) + 1; rollCount = 0; }
+                } else { rollCount = 0; }
                 lastRoll = steps;
-
                 document.getElementById('dice').innerText = ["⚀","⚁","⚂","⚃","⚄","⚅"][steps-1];
-                log(`<b style="color:${currentPlayer.color}">${currentPlayer.name}</b> fa ${steps}.`);
+                log(`🎲 ${currentPlayer.name} fa ${steps}.`);
                 movePlayer(currentPlayer, steps);
-            }, 600);
+            }, 500);
         }
 
         function movePlayer(player, steps, chain = true) {
@@ -2992,30 +3411,30 @@ const packVideogiochi = [
             let idx = 0;
             function step() {
                 if (idx < path.length) {
-                    player.pos = path[idx++]; updatePawns();
+                    player.pos = path[idx++];
+                    updatePawns();
                     document.getElementById(`cell-${player.pos}`).scrollIntoView({behavior: 'smooth', block: 'center'});
-                    setTimeout(step, 250);
+                    setTimeout(step, 200);
                 } else {
                     if (chain) setTimeout(() => applyRules(player, steps), 200);
                     else setTimeout(nextTurn, 200);
                 }
             }
-            if(path.length) step(); else {
-                if (chain) setTimeout(() => applyRules(player, steps), 200);
-                else setTimeout(nextTurn, 200);
-            }
+            if(path.length) step();
+            else { if (chain) setTimeout(() => applyRules(player, steps), 200); else setTimeout(nextTurn, 200); }
         }
 
         function applyRules(player, steps) {
             const cell = boardStructure[player.pos - 1];
-            if (cell.type === "finish") return log(`🏆 ${player.name} HA VINTO!`);
-            
+            if (cell.type === "finish") {
+                log(`🏆🏆🏆 ${player.name} HA VINTO! 🏆🏆🏆`);
+                setTimeout(() => { if (confirm(`${player.name} ha vinto! Nuova partita?`)) restartGame(); }, 500);
+                return;
+            }
             if (cell.type === "goose") { log(`✨ Oca! ${player.name} avanza di ${steps}.`); setTimeout(()=>movePlayer(player, steps, true), 400); return; }
             if (cell.type === "forward") { log(`💨 ${player.name} avanza di ${cell.extra}.`); setTimeout(()=>movePlayer(player, cell.extra, true), 400); return; }
-            if (cell.type === "backward") { log(`⚠️ ${player.name} indietreggia.`); setTimeout(()=>movePlayer(player, cell.extra, true), 400); return; }
-            
+            if (cell.type === "backward") { log(`⚠️ ${player.name} indietreggia di ${Math.abs(cell.extra)}.`); setTimeout(()=>movePlayer(player, cell.extra, true), 400); return; }
             if (cell.type === "question") return triggerQuiz(player);
-            
             if (cell.type === "custom-rule") {
                 setTimeout(() => {
                     let rule = prompt(`📜 ${player.name}, crea una regola:`);
@@ -3025,7 +3444,7 @@ const packVideogiochi = [
                 return;
             }
             if (cell.type === "malus") {
-                log(`❌ ${player.name} su ${cell.extra.name}.`);
+                log(`❌ ${player.name} su ${cell.extra.name}. ${cell.extra.desc}`);
                 if(cell.extra.action==="skip") { player.skipTurn = true; setTimeout(nextTurn, 800); }
                 if(cell.extra.action==="goto") { player.pos = cell.extra.target; updatePawns(); setTimeout(()=>applyRules(player, 0), 400); }
                 if(cell.extra.action==="back") { setTimeout(()=>movePlayer(player, -cell.extra.value, true), 400); }
@@ -3038,52 +3457,62 @@ const packVideogiochi = [
             const modal = document.getElementById('quiz-modal');
             const qText = document.getElementById('quiz-question');
             const optionsBox = document.getElementById('quiz-options-container');
-            const imgBox = document.getElementById('quiz-image');
             
-            if (quizDatabase.length === 0) {
-                log(`⚠️ Tutte le domande sono esaurite! ${player.name} è fortunato e resta qui.`);
-                nextTurn();
-                return;
-            }
-
+            if (quizDatabase.length === 0) { log(`⚠️ Domande esaurite!`); nextTurn(); return; }
+            
             const quizIndex = Math.floor(Math.random() * quizDatabase.length);
             const quiz = quizDatabase[quizIndex];
             quizDatabase.splice(quizIndex, 1);
             
-            if (quiz.img && quiz.img !== "") {
-                imgBox.src = quiz.img;
-                imgBox.style.display = 'block';
-            } else {
-                imgBox.style.display = 'none';
-            }
-
-            qText.innerText = `[Per ${player.name}]: ${quiz.q}`;
+            qText.innerText = `📌 [${player.name}]: ${quiz.q}`;
             optionsBox.innerHTML = '';
-
-            quiz.a.forEach((optionText, index) => {
-                const optBtn = document.createElement('div');
-                optBtn.className = 'quiz-option';
-                optBtn.innerText = `${index + 1}. ${optionText}`;
-                
-                optBtn.onclick = () => {
+            
+            quiz.a.forEach((opt, idx) => {
+                const btn = document.createElement('div');
+                btn.className = 'quiz-option';
+                btn.innerText = `${idx+1}. ${opt}`;
+                btn.onclick = () => {
                     modal.style.display = 'none';
-                    if (index === quiz.c) { 
-                        log(`✅ <b>Esatto!</b> ${player.name} resta lì.`);
+                    if (idx === quiz.c) {
+                        showFeedback(`Corretto!`, true);
+                        log(`✅ ${player.name} risponde correttamente!`);
                         nextTurn();
                     } else {
-                        log(`❌ <b>Errato!</b> ${player.name} indietreggia di 2 passi.`);
-                        movePlayer(player, -2, false); 
+                        const correct = quiz.a[quiz.c];
+                        showFeedback(`Sbagliato! Era: "${correct}". -2 passi`, false);
+                        log(`❌ ${player.name} sbaglia. Risposta: "${correct}".`);
+                        movePlayer(player, -2, false);
                     }
                 };
-                optionsBox.appendChild(optBtn);
+                optionsBox.appendChild(btn);
             });
-            
             modal.style.display = 'flex';
         }
 
-        function nextTurn() { activePlayerIndex = (activePlayerIndex + 1) % players.length; updateTurnDisplay(); isRolling = false; document.getElementById('roll-btn').disabled = false; }
-        function updateTurnDisplay() { document.getElementById('turn-display').innerHTML = `Tocca a: <b style="color:${players[activePlayerIndex].color}">${players[activePlayerIndex].name}</b>`; }
-        function log(t) { const l = document.getElementById('log'); l.innerHTML += `<div class="log-entry">${t}</div>`; l.scrollTop = l.scrollHeight; }
+        function nextTurn() { 
+            activePlayerIndex = (activePlayerIndex + 1) % players.length; 
+            updateTurnDisplay(); 
+            isRolling = false; 
+            document.getElementById('roll-btn').disabled = false; 
+        }
+        
+        function updateTurnDisplay() { 
+            document.getElementById('turn-display').innerHTML = `🎯 Tocca a: <b style="color:${players[activePlayerIndex].color}">${players[activePlayerIndex].name}</b>`; 
+        }
+        
+        function log(t) { 
+            const l = document.getElementById('log'); 
+            l.innerHTML += `<div class="log-entry">${t}</div>`; 
+            l.scrollTop = l.scrollHeight; 
+        }
+        
+        function restartGame() { 
+            if (confirm("Ricominciare la partita?")) location.reload(); 
+        }
+
+        loadFromLocalStorage();
+        updatePlayerList();
     </script>
 </body>
+</html>
 </html>
