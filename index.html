@@ -64,7 +64,7 @@
             margin-top: 60px;
             position: relative;
             z-index: 1;
-            padding-bottom: 40px; /* Spazio per il footer */
+            padding-bottom: 20px; 
         }
 
         .top-bar {
@@ -108,7 +108,6 @@
         }
         .rules-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,190,11,0.8); }
 
-        /* Popup Regole - Responsive */
         .rules-popup {
             position: fixed;
             top: 60px;
@@ -144,7 +143,6 @@
         .rules-popup .rules-section ul { padding-left: 15px; margin: 4px 0; }
         .rule-example { background: rgba(0,0,0,0.3); border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1);}
 
-        /* Setup Container */
         .center-container {
             width: 100%;
             max-width: 650px;
@@ -193,7 +191,7 @@
         .pack-label:hover { background: linear-gradient(135deg, #2d3454, #1a1f35); transform: translateY(-2px); }
         .pack-label input { accent-color: var(--accent-pink); width: 16px; height: 16px; margin:0;}
 
-        /* Game Layout */
+        /* ---- LAYOUT GIOCO ---- */
         #game-container { display: none; width: 100%; }
         
         .game-layout {
@@ -205,27 +203,19 @@
         
         #board-wrapper { 
             flex: 3; 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch; /* Per scorrimento fluido su iOS */
+            width: 100%;
             background: rgba(18, 20, 32, 0.85); 
             border-radius: 16px; 
             border: 2px solid var(--accent-purple); 
             padding: 15px;
         }
         
-        /* Personalizzazione Scrollbar Tabellone */
-        #board-wrapper::-webkit-scrollbar { height: 10px; }
-        #board-wrapper::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 8px;}
-        #board-wrapper::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 8px; }
-        #board-wrapper::-webkit-scrollbar-thumb:hover { background: var(--accent-pink); }
-
+        /* Modifica chiave: Usiamo 1fr per far stringere le caselle e riempire la riga */
         #board { 
             display: grid; 
-            grid-template-columns: repeat(10, 115px); 
-            grid-template-rows: repeat(10, 110px); 
+            grid-template-columns: repeat(10, minmax(0, 1fr)); 
             gap: 6px; 
-            width: max-content; 
-            margin: 0 auto;
+            width: 100%; 
         }
         
         .cell { 
@@ -238,11 +228,14 @@
             align-items: center; 
             padding: 4px;
             transition: all 0.3s;
+            aspect-ratio: 1 / 1.1; /* Mantiene la casella proporzionale anche stringendosi */
+            overflow: hidden; /* Evita che testo troppo grande sbordi dalla cella */
         }
-        .cell:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,240,255,0.3); z-index: 2; }
-        .cell-num { position: absolute; top: 2px; left: 4px; background: rgba(0, 0, 0, 0.8); padding: 2px 5px; border-radius: 4px; color: var(--accent-blue); font-size: 0.65rem; font-weight: bold; }
-        .cell-name { font-size: 0.7rem; font-weight: bold; margin-top: 16px; text-align: center; width: 100%; line-height: 1.1; }
-        .cell-desc { font-size: 0.55rem; color: #a0a5c0; text-align: center; margin-top: 4px; }
+        .cell:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(0,240,255,0.4); z-index: 2; }
+        
+        .cell-num { position: absolute; top: 2px; left: 4px; background: rgba(0, 0, 0, 0.8); padding: 2px 4px; border-radius: 4px; color: var(--accent-blue); font-size: 0.65rem; font-weight: bold; }
+        .cell-name { font-size: 0.75rem; font-weight: bold; margin-top: auto; text-align: center; width: 100%; line-height: 1.1; word-wrap: break-word;}
+        .cell-desc { font-size: 0.6rem; color: #a0a5c0; text-align: center; margin-bottom: auto; margin-top: 2px;}
 
         .cell.start { border-color: #00ff66; background: linear-gradient(135deg, #082d18, #041a0c); }
         .cell.finish { border-color: var(--accent-pink); background: linear-gradient(135deg, #4a061d, #2a0310); }
@@ -254,18 +247,18 @@
         .cell.forward { border-color: #00ff66; background: linear-gradient(135deg, #0b3d17, #05220c); }
         .cell.backward { border-color: #ff3366; background: linear-gradient(135deg, #3d0b16, #1f0409); }
 
-        .players-container { display: flex; gap: 3px; justify-content: center; flex-wrap: wrap; margin-top: auto; min-height: 22px; width: 100%; margin-bottom: 2px; }
+        .players-container { display: flex; gap: 2px; justify-content: center; flex-wrap: wrap; margin-top: auto; min-height: 15px; width: 100%; margin-bottom: 2px; }
         
         .pawn { 
-            width: 18px; 
-            height: 18px; 
+            width: 14px; 
+            height: 14px; 
             border-radius: 50%; 
             border: 1px solid #fff; 
             box-shadow: 0 0 4px rgba(255,255,255,0.8); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            font-size: 0.6rem; 
+            font-size: 0.5rem; 
             font-weight: bold; 
             cursor: pointer; 
             animation: idleBounce 2s infinite;
@@ -374,7 +367,7 @@
             font-size: 0.8rem; 
             border: 1px solid #2d3454; 
             margin-top: 15px; 
-            flex-grow: 1; /* Riempe lo spazio rimasto nel pannello */
+            flex-grow: 1; 
             min-height: 120px;
             max-height: 200px;
             overflow-y: auto; 
@@ -389,18 +382,9 @@
         }
         .player-item button { background: #ff2a74; width: auto; padding: 4px 12px; font-size: 0.8rem; }
 
-        .credit-footer {
-            position: fixed; bottom: 10px; right: 10px;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-            padding: 8px 14px; border-radius: 10px; font-size: 0.8rem;
-            border-left: 3px solid var(--accent-blue); z-index: 100; text-align: center;
-        }
-        .credit-footer .telegram-link { color: var(--accent-blue); text-decoration: none; font-weight: bold;}
-        .credit-footer .telegram-link:hover { color: var(--accent-pink); }
-
         .cell.question::after, .cell.goose::after, .cell.custom-rule::after {
-            content: '✨'; position: absolute; top: -4px; right: -4px;
-            font-size: 12px; animation: sparkle 2s infinite;
+            content: '✨'; position: absolute; top: -2px; right: -2px;
+            font-size: 10px; animation: sparkle 2s infinite;
         }
         @keyframes sparkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
@@ -413,7 +397,7 @@
             background: linear-gradient(135deg, var(--panel-color), #0a0c14);
             border: 3px solid #ff781f; padding: 25px; border-radius: 16px; 
             max-width: 500px; width: 100%; text-align: center;
-            max-height: 90vh; overflow-y: auto; /* Per non uscire dallo schermo su mobile */
+            max-height: 90vh; overflow-y: auto; 
         }
         .quiz-option { 
             background: linear-gradient(135deg, #191d30, #0f1120); border: 1px solid #ff781f; 
@@ -438,26 +422,21 @@
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
         }
 
-        /* ================= RESPONSIVE DESIGN (Media Queries) ================= */
+        /* ================= RESPONSIVE DESIGN PER ADATTAMENTO PERFETTO ================= */
         
-        /* Tablet Grande */
-        @media (max-width: 1200px) {
-            #board { grid-template-columns: repeat(10, 100px); grid-template-rows: repeat(10, 95px); }
-        }
-
-        /* Tablet Medio - Cambia Layout Pannelli */
+        /* Tablet: Layout a colonna ma tabellone spazioso */
         @media (max-width: 1000px) {
             .game-layout { flex-direction: column; align-items: center;}
-            #board-wrapper { width: 100%; max-width: 800px; }
+            #board-wrapper { width: 100%; max-width: 100%; }
+            #board { gap: 4px; }
             #side-panels { 
-                flex-direction: row; /* Pannelli affiancati sotto il tabellone */
+                flex-direction: row; 
                 width: 100%; 
-                max-width: 800px; 
             }
             .panel { flex: 1; }
         }
 
-        /* Smartphone e schermi piccoli */
+        /* Telefono: 10 colonne obbligatorie fluid, font scalati */
         @media (max-width: 750px) {
             .game-banner { height: 45px; }
             .banner-text { font-size: 0.8rem; }
@@ -466,7 +445,6 @@
             h1 { font-size: 1.6rem; letter-spacing: 2px;}
             .top-bar { margin-bottom: 15px; }
 
-            /* Il popup regole diventa un modal centrato */
             .rules-popup {
                 top: 50%; left: 50%; right: auto;
                 transform: translate(-50%, -50%);
@@ -474,29 +452,22 @@
                 animation: fadeIn 0.3s ease-out;
             }
 
-            #side-panels { flex-direction: column; } /* Ritorna a colonna per i telefoni */
+            #side-panels { flex-direction: column; width: 100%; } 
             
-            /* Il tabellone rimpicciolisce le celle, ma sfrutterà lo scroll orizzontale */
-            #board { grid-template-columns: repeat(10, 75px); grid-template-rows: repeat(10, 75px); gap: 4px; }
-            .cell-name { font-size: 0.55rem; margin-top: 10px; }
-            .cell-desc { font-size: 0.45rem; }
-            .cell-num { font-size: 0.55rem; padding: 1px 4px;}
+            #board-wrapper { padding: 5px; border-radius: 8px;}
+            #board { gap: 2px; }
+            .cell { border-radius: 4px; padding: 2px;}
             
-            .credit-footer { 
-                position: static; /* Sui telefoni lo togliamo da fixed per non coprire bottoni */
-                margin-top: 20px; 
-                width: 100%; 
-                border-left: none; 
-                border-top: 2px solid var(--accent-blue);
-                border-radius: 0;
-            }
-            .main-content { padding-bottom: 0; }
+            /* Testo ridotto e descrizioni nascoste per salvare spazio */
+            .cell-name { font-size: clamp(0.4rem, 2vw, 0.6rem); margin-top: 10px; }
+            .cell-desc { display: none; }
+            .cell-num { font-size: 0.45rem; padding: 1px 3px; top: 1px; left: 1px;}
+            .pawn { width: 10px; height: 10px; font-size: 0.4rem; }
         }
 
-        /* Schermi minuscoli */
-        @media (max-width: 450px) {
-            #board { grid-template-columns: repeat(10, 65px); grid-template-rows: repeat(10, 65px); }
-            .cell-name { font-size: 0.5rem; margin-top: 8px;}
+        /* Schermi minuscoli (vecchi telefoni) */
+        @media (max-width: 400px) {
+            .cell-name { margin-top: 8px; }
         }
 
     </style>
@@ -576,19 +547,13 @@
         </div>
     </div>
 
-    <div class="credit-footer">
-        Contattare per eventuali problematiche o suggerimenti <a href="https://t.me/ToroAlex03" target="_blank" class="telegram-link">@ToroAlex03</a> su Telegram
-    </div>
-
     <script>
         // ============================================================
         // 📝 QUI INSERISCI LE TUE DOMANDE!
         // ============================================================
-        // Formato domanda: { q: "testo domanda", a: ["opzione1", "opzione2", "opzione3", "opzione4"], c: indice_corretto(0-3) }
-        // ============================================================
 
         const packAnime = [
-                { "q": "Quale studio di animazione ha prodotto 'La città incantata'?", "a": ["Toei Animation", "Madhouse", "Studio Ghibli", "Kyoto Animation"], "c": 2, "img": "" },
+                       { "q": "Quale studio di animazione ha prodotto 'La città incantata'?", "a": ["Toei Animation", "Madhouse", "Studio Ghibli", "Kyoto Animation"], "c": 2, "img": "" },
             { "q": "In 'Fullmetal Alchemist', qual è il principio cardine dell'alchimia?", "a": ["Magia infinita", "Scambio equivalente", "Trasmutazione oscura", "Potere ereditario"], "c": 1, "img": "" },
             { "q": "Cosa sono gli 'Angeli' in 'Neon Genesis Evangelion'?", "a": ["Robot alieni", "Mutanti", "Spettri", "Entità divine"], "c": 3, "img": "" },
             { "q": "In 'Berserk', come si chiama la spada gigante di Guts?", "a": ["Ammazzadraghi", "Slayer", "Iron Blade", "Dark Edge"], "c": 0, "img": "" },
@@ -2215,7 +2180,7 @@
         ];
 
         const packCultura = [
-    { "q": "Quale è l'elemento chimico più abbondante nell'universo?", "a": ["Ossigeno", "Idrogeno", "Carbonio", "Azoto"], "c": 1, "img": "" },
+                 { "q": "Quale è l'elemento chimico più abbondante nell'universo?", "a": ["Ossigeno", "Idrogeno", "Carbonio", "Azoto"], "c": 1, "img": "" },
     { "q": "In che anno è avvenuta la Rivoluzione Francese?", "a": ["1789", "1815", "1776", "1848"], "c": 0, "img": "" },
     { "q": "Chi ha scritto 'Il nome della rosa'?", "a": ["Italo Calvino", "Umberto Eco", "Primo Levi", "Luigi Pirandello"], "c": 1, "img": "" },
     { "q": "Qual è il fiume più lungo del mondo?", "a": ["Nilo", "Rio delle Amazzoni", "Gange", "Mississippi"], "c": 1, "img": "" },
@@ -2670,7 +2635,7 @@
         ];
 
         const packSport = [
-   { "q": "Chi ha vinto più titoli Mondiali di Formula 1 (pareggio al 2026)?", "a": ["Michael Schumacher", "Lewis Hamilton", "Ayrton Senna", "Max Verstappen"], "c": 0, "img": "" },
+                     { "q": "Chi ha vinto più titoli Mondiali di Formula 1 (pareggio al 2026)?", "a": ["Michael Schumacher", "Lewis Hamilton", "Ayrton Senna", "Max Verstappen"], "c": 0, "img": "" },
     { "q": "In quale sport si usa il termine 'Birdie'?", "a": ["Tennis", "Golf", "Baseball", "Cricket"], "c": 1, "img": "" },
     { "q": "Quanti giocatori compongono una squadra di rugby a 15?", "a": ["11", "13", "15", "18"], "c": 2, "img": "" },
     { "q": "Quale nazione ha vinto più Mondiali di calcio maschile?", "a": ["Italia", "Germania", "Brasile", "Argentina"], "c": 2, "img": "" },
@@ -2953,7 +2918,7 @@
         ];
 
         const packVideogiochi = [
-                      { "q": "Quale azienda ha creato la serie 'Pokémon'?", "a": ["Nintendo", "Sega", "Ubisoft", "Sony"], "c": 0, "img": "" },
+                    { "q": "Quale azienda ha creato la serie 'Pokémon'?", "a": ["Nintendo", "Sega", "Ubisoft", "Sony"], "c": 0, "img": "" },
   { "q": "In 'The Sims', come si chiamano i personaggi?", "a": ["Mii", "Sim", "Avatar", "Personaggi"], "c": 1, "img": "" },
   { "q": "Quale di questi NON è un gioco di corse?", "a": ["Mario Kart", "Need for Speed", "Forza", "Tetris"], "c": 3, "img": "" },
   { "q": "Come si chiama l'isola di 'Fortnite'?", "a": ["Battle Island", "L'isola", "Mappa", "Non ha nome"], "c": 3, "img": "" },
@@ -3199,7 +3164,7 @@
         ];
 
         // ============================================================
-        // FINE SEZIONE DOMANDE - NON MODIFICARE SOTTO
+        // FINE SEZIONE DOMANDE
         // ============================================================
 
         const TOTAL_CELLS = 100;
@@ -3356,7 +3321,7 @@
             toast.className = `feedback-toast ${isCorrect ? 'correct' : 'wrong'}`;
             toast.innerHTML = isCorrect ? '✅ ' + msg : '❌ ' + msg;
             document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
+            setTimeout(() => toast.remove(), 2000);
         }
 
         function playTurn() {
@@ -3387,7 +3352,7 @@
                 document.getElementById('dice').innerText = ["⚀","⚁","⚂","⚃","⚄","⚅"][steps-1];
                 log(`🎲 ${currentPlayer.name} fa ${steps}.`);
                 movePlayer(currentPlayer, steps);
-            }, 600);
+            }, 500);
         }
 
         function movePlayer(player, steps, chain = true) {
@@ -3401,15 +3366,6 @@
                 if (idx < path.length) {
                     player.pos = path[idx++];
                     updatePawns();
-                    
-                    // Scroll automatico del tabellone verso la pedina (centrato rispetto al div)
-                    const cell = document.getElementById(`cell-${player.pos}`);
-                    const wrapper = document.getElementById('board-wrapper');
-                    wrapper.scrollTo({
-                        left: cell.offsetLeft - (wrapper.clientWidth / 2) + (cell.clientWidth / 2),
-                        behavior: 'smooth'
-                    });
-
                     setTimeout(step, 200);
                 } else {
                     if (chain) setTimeout(() => applyRules(player, steps), 200);
@@ -3449,7 +3405,6 @@
             nextTurn();
         }
 
-        // Funzione per mescolare le risposte
         function shuffleAnswers(questionObj) {
             let original = questionObj.a.map((text, index) => ({ text: text, isCorrect: (index === questionObj.c) }));
             return original.sort(() => Math.random() - 0.5);
@@ -3482,7 +3437,6 @@
                         log(`✅ ${player.name} risponde correttamente!`);
                         nextTurn();
                     } else {
-                        // Troviamo il testo corretto per mostrarlo nel toast
                         const correctText = shuffled.find(o => o.isCorrect).text;
                         showFeedback(`Sbagliato! Era: "${correctText}". -2 passi`, false);
                         log(`❌ ${player.name} sbaglia. Risposta corretta: "${correctText}".`);
