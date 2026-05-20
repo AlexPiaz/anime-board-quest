@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Board Quest | Legend Quiz Edition</title>
     <style>
         :root {
@@ -18,15 +18,13 @@
             background-image: radial-gradient(circle at 50% 10%, #1a153a 0%, #08090f 100%);
             min-height: 100vh;
             position: relative;
+            overflow-x: hidden;
         }
 
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-image: 
                 radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
                 radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
@@ -48,44 +46,36 @@
 
         .game-banner {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50px;
-            background: linear-gradient(90deg, 
-                rgba(255,42,116,0.95) 0%, 
-                rgba(112,0,255,0.95) 50%, 
-                rgba(0,240,255,0.95) 100%);
+            top: 0; left: 0; right: 0; height: 50px;
+            background: linear-gradient(90deg, rgba(255,42,116,0.95) 0%, rgba(112,0,255,0.95) 50%, rgba(0,240,255,0.95) 100%);
             z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
+            display: flex; align-items: center; justify-content: center; gap: 15px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             backdrop-filter: blur(5px);
         }
 
-        .banner-text { font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        .banner-text { font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; text-align: center;}
         .banner-icon { font-size: 1.2rem; animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
         .main-content {
             width: 100%;
+            max-width: 1400px;
             margin-top: 60px;
             position: relative;
             z-index: 1;
-            overflow-x: auto;
+            padding-bottom: 40px; /* Spazio per il footer */
         }
 
-        /* Top bar allineata centralmente in colonna */
         .top-bar {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin-bottom: 25px;
-            gap: 10px;
+            margin-bottom: 20px;
+            gap: 12px;
             padding: 0 10px;
+            text-align: center;
         }
 
         h1 { 
@@ -94,7 +84,6 @@
             letter-spacing: 4px; 
             text-shadow: 0 0 20px var(--accent-blue), 0 0 40px var(--accent-purple);
             margin: 0;
-            text-align: center;
             animation: glow 3s ease-in-out infinite;
         }
 
@@ -103,23 +92,23 @@
             50% { text-shadow: 0 0 30px var(--accent-pink), 0 0 60px var(--accent-blue); }
         }
 
-        /* Bottone regole RIMPICCIOLITO E CENTRATO */
         .rules-btn {
             background: linear-gradient(135deg, var(--accent-yellow), #ff9900);
             color: #000;
             border: none;
             border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 0.8rem;
+            padding: 5px 15px;
+            font-size: 0.85rem;
             font-weight: bold;
             cursor: pointer;
-            width: max-content; /* Largo quanto la parola */
-            height: max-content; /* Alto quanto la parola */
+            width: max-content;
+            height: max-content;
             box-shadow: 0 0 10px rgba(255,190,11,0.5);
             transition: all 0.3s;
         }
         .rules-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,190,11,0.8); }
 
+        /* Popup Regole - Responsive */
         .rules-popup {
             position: fixed;
             top: 60px;
@@ -128,7 +117,7 @@
             background: rgba(18, 20, 32, 0.98);
             border: 2px solid var(--accent-yellow);
             border-radius: 12px;
-            padding: 12px;
+            padding: 15px;
             backdrop-filter: blur(15px);
             z-index: 1000;
             display: none;
@@ -142,110 +131,98 @@
             from { opacity: 0; transform: translateX(50px); }
             to { opacity: 1; transform: translateX(0); }
         }
-        .rules-popup h3 {
-            color: var(--accent-yellow);
-            text-align: center;
-            margin: 0 0 10px 0;
-            font-size: 1rem;
-        }
+        .rules-popup h3 { color: var(--accent-yellow); text-align: center; margin: 0 0 12px 0; font-size: 1.1rem; }
         .close-rules {
-            background: none;
-            border: none;
-            color: var(--accent-yellow);
-            float: right;
-            font-size: 1rem;
-            cursor: pointer;
-            padding: 0;
-            width: auto;
-            position: absolute;
-            top: 8px;
-            right: 12px;
+            background: none; border: none; color: var(--accent-yellow);
+            font-size: 1.2rem; cursor: pointer; padding: 0;
+            position: absolute; top: 10px; right: 12px;
         }
-        .close-rules:hover { transform: none; box-shadow: none; color: var(--accent-pink); }
-        .rules-popup .rules-content { font-size: 0.75rem; line-height: 1.4; }
-        .rules-popup .rules-section { margin-bottom: 10px; border-left: 2px solid var(--accent-blue); padding-left: 8px; }
-        .rules-popup .rules-section h4 { color: var(--accent-blue); margin: 0 0 4px 0; font-size: 0.8rem; }
+        .close-rules:hover { color: var(--accent-pink); }
+        .rules-popup .rules-content { font-size: 0.8rem; line-height: 1.4; }
+        .rules-popup .rules-section { margin-bottom: 12px; border-left: 2px solid var(--accent-blue); padding-left: 8px; }
+        .rules-popup .rules-section h4 { color: var(--accent-blue); margin: 0 0 4px 0; font-size: 0.85rem; }
         .rules-popup .rules-section ul { padding-left: 15px; margin: 4px 0; }
-        .rule-example { background: rgba(0,0,0,0.3); border-radius: 6px; padding: 6px; margin-top: 6px; font-size: 0.7rem; }
+        .rule-example { background: rgba(0,0,0,0.3); border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1);}
 
+        /* Setup Container */
         .center-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto;
-            padding: 0 10px;
         }
 
         #setup-container { 
             background: rgba(18, 20, 32, 0.95); 
             border: 2px solid var(--accent-blue); 
-            padding: 20px; 
+            padding: 25px 20px; 
             border-radius: 16px; 
             width: 100%; 
             text-align: center; 
             backdrop-filter: blur(10px);
             box-shadow: 0 0 40px rgba(0,240,255,0.2);
         }
+        #setup-container h2 { margin-top: 0; font-size: 1.3rem; }
 
-        .setup-row { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+        .setup-row { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; justify-content: center;}
         input[type="text"] { 
             flex: 1; 
-            min-width: 140px; 
-            padding: 8px; 
+            min-width: 180px; 
+            padding: 10px; 
             border-radius: 8px; 
             border: 2px solid var(--accent-purple); 
             background: #08090f; 
             color: #fff; 
-            font-size: 0.85rem;
+            font-size: 0.95rem;
         }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--accent-pink);
-            box-shadow: 0 0 10px rgba(255,42,116,0.5);
-        }
+        input[type="text"]:focus { outline: none; border-color: var(--accent-pink); box-shadow: 0 0 10px rgba(255,42,116,0.5); }
 
-        .packs-container { display: flex; gap: 8px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+        .packs-container { display: flex; gap: 10px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
         .pack-label { 
             background: linear-gradient(135deg, #191d30, #0f1120); 
-            border: 2px solid var(--accent-blue); 
-            padding: 5px 12px; 
+            border: 1px solid var(--accent-blue); 
+            padding: 8px 14px; 
             border-radius: 8px; 
             cursor: pointer; 
             transition: all 0.3s; 
             font-weight: bold; 
             display: flex; 
             align-items: center; 
-            gap: 4px; 
-            font-size: 0.8rem;
+            gap: 6px; 
+            font-size: 0.85rem;
         }
         .pack-label:hover { background: linear-gradient(135deg, #2d3454, #1a1f35); transform: translateY(-2px); }
-        .pack-label input { accent-color: var(--accent-pink); width: 14px; height: 14px; }
+        .pack-label input { accent-color: var(--accent-pink); width: 16px; height: 16px; margin:0;}
 
-        #game-container { 
-            display: none; 
-            width: 100%; 
-            min-width: fit-content;
-        }
+        /* Game Layout */
+        #game-container { display: none; width: 100%; }
         
         .game-layout {
             display: flex;
             gap: 20px;
             width: 100%;
+            align-items: flex-start;
         }
         
         #board-wrapper { 
             flex: 3; 
             overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; /* Per scorrimento fluido su iOS */
             background: rgba(18, 20, 32, 0.85); 
             border-radius: 16px; 
             border: 2px solid var(--accent-purple); 
             padding: 15px;
         }
         
-        /* TABELLONE INGRANDITO */
+        /* Personalizzazione Scrollbar Tabellone */
+        #board-wrapper::-webkit-scrollbar { height: 10px; }
+        #board-wrapper::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 8px;}
+        #board-wrapper::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 8px; }
+        #board-wrapper::-webkit-scrollbar-thumb:hover { background: var(--accent-pink); }
+
         #board { 
             display: grid; 
-            grid-template-columns: repeat(10, 115px); /* Incrementato da 105px */
-            grid-template-rows: repeat(10, 110px); /* Incrementato da 100px */
+            grid-template-columns: repeat(10, 115px); 
+            grid-template-rows: repeat(10, 110px); 
             gap: 6px; 
             width: max-content; 
             margin: 0 auto;
@@ -263,9 +240,9 @@
             transition: all 0.3s;
         }
         .cell:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,240,255,0.3); z-index: 2; }
-        .cell-num { position: absolute; top: 2px; left: 4px; background: rgba(0, 0, 0, 0.8); padding: 2px 5px; border-radius: 4px; color: var(--accent-blue); font-size: 0.6rem; font-weight: bold; }
-        .cell-name { font-size: 0.7rem; font-weight: bold; margin-top: 16px; text-align: center; width: 100%; } /* Font leggermente aumentato */
-        .cell-desc { font-size: 0.6rem; color: #a0a5c0; text-align: center; margin-top: 2px; }
+        .cell-num { position: absolute; top: 2px; left: 4px; background: rgba(0, 0, 0, 0.8); padding: 2px 5px; border-radius: 4px; color: var(--accent-blue); font-size: 0.65rem; font-weight: bold; }
+        .cell-name { font-size: 0.7rem; font-weight: bold; margin-top: 16px; text-align: center; width: 100%; line-height: 1.1; }
+        .cell-desc { font-size: 0.55rem; color: #a0a5c0; text-align: center; margin-top: 4px; }
 
         .cell.start { border-color: #00ff66; background: linear-gradient(135deg, #082d18, #041a0c); }
         .cell.finish { border-color: var(--accent-pink); background: linear-gradient(135deg, #4a061d, #2a0310); }
@@ -277,24 +254,24 @@
         .cell.forward { border-color: #00ff66; background: linear-gradient(135deg, #0b3d17, #05220c); }
         .cell.backward { border-color: #ff3366; background: linear-gradient(135deg, #3d0b16, #1f0409); }
 
-        .players-container { display: flex; gap: 2px; justify-content: center; flex-wrap: wrap; margin-top: auto; min-height: 20px; width: 100%; margin-bottom: 2px; }
+        .players-container { display: flex; gap: 3px; justify-content: center; flex-wrap: wrap; margin-top: auto; min-height: 22px; width: 100%; margin-bottom: 2px; }
         
         .pawn { 
-            width: 16px; /* Pedine un pelo più grandi */
-            height: 16px; 
+            width: 18px; 
+            height: 18px; 
             border-radius: 50%; 
             border: 1px solid #fff; 
             box-shadow: 0 0 4px rgba(255,255,255,0.8); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            font-size: 0.55rem; 
+            font-size: 0.6rem; 
             font-weight: bold; 
             cursor: pointer; 
             animation: idleBounce 2s infinite;
         }
         @keyframes idleBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
-        .pawn:hover::after { content: attr(data-fullname); position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; padding: 2px 6px; font-size: 0.6rem; border-radius: 4px; border: 1px solid var(--accent-blue); white-space: nowrap; z-index: 10;}
+        .pawn:hover::after { content: attr(data-fullname); position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); background: #000; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid var(--accent-blue); white-space: nowrap; z-index: 10;}
 
         #side-panels { 
             flex: 1.2; 
@@ -303,8 +280,8 @@
             gap: 15px; 
             min-width: 280px;
         }
-        .panel { background: rgba(18, 20, 32, 0.95); border: 2px solid var(--accent-blue); border-radius: 16px; padding: 12px; backdrop-filter: blur(5px); }
-        #controls { border-color: var(--accent-pink); }
+        .panel { background: rgba(18, 20, 32, 0.95); border: 2px solid var(--accent-blue); border-radius: 16px; padding: 15px; backdrop-filter: blur(5px); }
+        #controls { border-color: var(--accent-pink); display: flex; flex-direction: column; }
         
         #custom-rules-panel { 
             border-color: #ad00ff; 
@@ -312,54 +289,54 @@
             background: rgba(21, 13, 34, 0.95); 
             display: flex; 
             flex-direction: column; 
-            min-height: 300px;
+            min-height: 250px;
         }
-        #custom-rules-panel h3 { margin: 0 0 10px 0; font-size: 1rem; display: flex; align-items: center; gap: 6px; }
+        #custom-rules-panel h3 { margin: 0 0 12px 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; color: var(--accent-purple);}
         #rules-list { 
             overflow-y: auto; 
             padding: 0; 
             margin: 0; 
             flex: 1; 
             list-style-type: none; 
-            max-height: 350px;
+            max-height: 400px;
         }
         #rules-list li { 
             background: rgba(173, 0, 255, 0.15); 
             border-left: 3px solid #ad00ff; 
-            padding: 8px; 
+            padding: 10px; 
             margin-bottom: 8px; 
-            border-radius: 4px 6px 6px 4px; 
-            font-size: 0.85rem; 
+            border-radius: 4px 8px 8px 4px; 
+            font-size: 0.9rem; 
             word-wrap: break-word;
         }
         
         .turn-indicator { 
-            font-size: 0.9rem; 
+            font-size: 1rem; 
             text-align: center; 
-            padding: 8px; 
+            padding: 10px; 
             background: linear-gradient(135deg, #08090f, #121420); 
             border-radius: 8px; 
             border-left: 4px solid var(--accent-blue); 
             font-weight: bold; 
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse { 0%, 100% { border-left-color: var(--accent-blue); } 50% { border-left-color: var(--accent-pink); } }
 
         #dice { 
-            width: 55px; 
-            height: 55px; 
+            width: 70px; 
+            height: 70px; 
             background: linear-gradient(135deg, white, #e0e0e0); 
             color: #111; 
-            border-radius: 12px; 
+            border-radius: 15px; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            font-size: 2.2rem; 
+            font-size: 3rem; 
             font-weight: bold; 
-            margin: 0 auto 10px auto; 
-            box-shadow: 0 0 12px rgba(255,255,255,0.4); 
+            margin: 0 auto 15px auto; 
+            box-shadow: 0 0 15px rgba(255,255,255,0.4); 
             cursor: pointer;
         }
         #dice:hover { transform: scale(1.05); }
@@ -374,8 +351,8 @@
             background: linear-gradient(45deg, var(--accent-pink), var(--accent-purple)); 
             border: none; 
             color: white; 
-            padding: 8px; 
-            font-size: 0.85rem; 
+            padding: 12px; 
+            font-size: 0.95rem; 
             font-weight: bold; 
             border-radius: 8px; 
             cursor: pointer; 
@@ -383,100 +360,74 @@
             transition: all 0.3s;
         }
         button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,42,116,0.4); }
-        button.add-btn { background: linear-gradient(45deg, #00f0ff, #7000ff); width: auto; padding: 6px 15px; }
-        button.restart-btn { background: linear-gradient(45deg, #ff6600, #ff2a74); margin-top: 8px; }
-        button.clear-btn { background: linear-gradient(45deg, #ff4444, #cc0000); margin-top: 5px; font-size: 0.8rem; }
+        button:active { transform: translateY(0); }
+        
+        button.add-btn { background: linear-gradient(45deg, #00f0ff, #7000ff); width: auto; padding: 10px 20px; }
+        button.restart-btn { background: linear-gradient(45deg, #ff6600, #ff2a74); margin-top: 10px; }
+        button.clear-btn { background: linear-gradient(45deg, #ff4444, #cc0000); margin-top: 10px; font-size: 0.9rem; }
+        button.start-btn { font-size: 1.1rem; padding: 15px; }
 
-        #log { background: rgba(8, 9, 15, 0.9); border-radius: 8px; padding: 8px; font-size: 0.7rem; border: 1px solid #2d3454; margin-top: 10px; max-height: 180px; overflow-y: auto; }
-        .log-entry { margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 3px; animation: fadeIn 0.3s; }
+        #log { 
+            background: rgba(8, 9, 15, 0.9); 
+            border-radius: 8px; 
+            padding: 10px; 
+            font-size: 0.8rem; 
+            border: 1px solid #2d3454; 
+            margin-top: 15px; 
+            flex-grow: 1; /* Riempe lo spazio rimasto nel pannello */
+            min-height: 120px;
+            max-height: 200px;
+            overflow-y: auto; 
+        }
+        .log-entry { margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 4px; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-5px); } to { opacity: 1; transform: translateX(0); } }
         
         .player-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             background: linear-gradient(135deg, #191d30, #0f1120);
-            padding: 6px 10px;
-            margin-bottom: 6px;
-            border-radius: 6px;
+            padding: 8px 12px; margin-bottom: 8px; border-radius: 8px;
         }
-        .player-item button { background: #ff2a74; width: auto; padding: 2px 10px; font-size: 0.7rem; }
+        .player-item button { background: #ff2a74; width: auto; padding: 4px 12px; font-size: 0.8rem; }
 
-        /* CREDITI AGGIORNATI */
         .credit-footer {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
-            padding: 8px 14px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            border-left: 3px solid var(--accent-blue);
-            z-index: 100;
-            text-align: center;
+            position: fixed; bottom: 10px; right: 10px;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            padding: 8px 14px; border-radius: 10px; font-size: 0.8rem;
+            border-left: 3px solid var(--accent-blue); z-index: 100; text-align: center;
         }
         .credit-footer .telegram-link { color: var(--accent-blue); text-decoration: none; font-weight: bold;}
         .credit-footer .telegram-link:hover { color: var(--accent-pink); }
 
         .cell.question::after, .cell.goose::after, .cell.custom-rule::after {
-            content: '✨';
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            font-size: 10px;
-            animation: sparkle 2s infinite;
+            content: '✨'; position: absolute; top: -4px; right: -4px;
+            font-size: 12px; animation: sparkle 2s infinite;
         }
         @keyframes sparkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         #quiz-modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.95); 
-            backdrop-filter: blur(10px); 
-            z-index: 2000; 
-            justify-content: center; 
-            align-items: center; 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); z-index: 2000; 
+            justify-content: center; align-items: center; padding: 15px;
         }
         .modal-content { 
             background: linear-gradient(135deg, var(--panel-color), #0a0c14);
-            border: 3px solid #ff781f; 
-            padding: 20px; 
-            border-radius: 16px; 
-            max-width: 400px; 
-            width: 90%; 
-            text-align: center; 
+            border: 3px solid #ff781f; padding: 25px; border-radius: 16px; 
+            max-width: 500px; width: 100%; text-align: center;
+            max-height: 90vh; overflow-y: auto; /* Per non uscire dallo schermo su mobile */
         }
         .quiz-option { 
-            background: linear-gradient(135deg, #191d30, #0f1120); 
-            border: 1px solid #ff781f; 
-            padding: 8px; 
-            margin: 6px 0; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            font-size: 0.85rem;
+            background: linear-gradient(135deg, #191d30, #0f1120); border: 1px solid #ff781f; 
+            padding: 12px; margin: 8px 0; border-radius: 8px; cursor: pointer; 
+            transition: all 0.3s; font-size: 0.95rem; font-weight: bold;
         }
         .quiz-option:hover { background: linear-gradient(135deg, #ff781f, #ffaa44); color: black; transform: translateX(5px); }
 
         .feedback-toast {
-            position: fixed;
-            bottom: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            z-index: 3000;
-            animation: toastFade 2s ease-out forwards;
-            pointer-events: none;
-            white-space: nowrap;
+            position: fixed; bottom: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95); padding: 12px 24px; border-radius: 30px;
+            font-size: 1rem; font-weight: bold; z-index: 3000;
+            animation: toastFade 2.5s ease-out forwards; pointer-events: none; white-space: nowrap;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
         .feedback-toast.correct { border-left: 4px solid #00ff66; color: #00ff66; }
         .feedback-toast.wrong { border-left: 4px solid #ff4444; color: #ff8888; }
@@ -487,30 +438,67 @@
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
         }
 
-        /* Responsive */
+        /* ================= RESPONSIVE DESIGN (Media Queries) ================= */
+        
+        /* Tablet Grande */
         @media (max-width: 1200px) {
-            #board { grid-template-columns: repeat(10, 95px); grid-template-rows: repeat(10, 90px); gap: 5px; }
-            .cell-name { font-size: 0.65rem; margin-top: 14px; }
+            #board { grid-template-columns: repeat(10, 100px); grid-template-rows: repeat(10, 95px); }
         }
+
+        /* Tablet Medio - Cambia Layout Pannelli */
         @media (max-width: 1000px) {
-            .game-layout { flex-direction: column; }
-            #side-panels { width: 100%; }
-            #board { grid-template-columns: repeat(10, 85px); grid-template-rows: repeat(10, 80px); }
+            .game-layout { flex-direction: column; align-items: center;}
+            #board-wrapper { width: 100%; max-width: 800px; }
+            #side-panels { 
+                flex-direction: row; /* Pannelli affiancati sotto il tabellone */
+                width: 100%; 
+                max-width: 800px; 
+            }
+            .panel { flex: 1; }
         }
-        @media (max-width: 850px) {
-            h1 { font-size: 1.8rem; }
-            #board { grid-template-columns: repeat(10, 70px); grid-template-rows: repeat(10, 65px); }
-            .cell-name { font-size: 0.55rem; margin-top: 8px; }
-            .credit-footer { font-size: 0.65rem; padding: 6px 10px; }
-        }
+
+        /* Smartphone e schermi piccoli */
         @media (max-width: 750px) {
-            #board { grid-template-columns: repeat(10, 60px); grid-template-rows: repeat(10, 55px); }
-            .cell-name { font-size: 0.5rem; margin-top: 6px; }
+            .game-banner { height: 45px; }
+            .banner-text { font-size: 0.8rem; }
+            .banner-icon { font-size: 1rem; }
+            
+            h1 { font-size: 1.6rem; letter-spacing: 2px;}
+            .top-bar { margin-bottom: 15px; }
+
+            /* Il popup regole diventa un modal centrato */
+            .rules-popup {
+                top: 50%; left: 50%; right: auto;
+                transform: translate(-50%, -50%);
+                width: 90%; max-width: 350px;
+                animation: fadeIn 0.3s ease-out;
+            }
+
+            #side-panels { flex-direction: column; } /* Ritorna a colonna per i telefoni */
+            
+            /* Il tabellone rimpicciolisce le celle, ma sfrutterà lo scroll orizzontale */
+            #board { grid-template-columns: repeat(10, 75px); grid-template-rows: repeat(10, 75px); gap: 4px; }
+            .cell-name { font-size: 0.55rem; margin-top: 10px; }
             .cell-desc { font-size: 0.45rem; }
+            .cell-num { font-size: 0.55rem; padding: 1px 4px;}
+            
+            .credit-footer { 
+                position: static; /* Sui telefoni lo togliamo da fixed per non coprire bottoni */
+                margin-top: 20px; 
+                width: 100%; 
+                border-left: none; 
+                border-top: 2px solid var(--accent-blue);
+                border-radius: 0;
+            }
+            .main-content { padding-bottom: 0; }
         }
-        @media (max-width: 650px) {
-            #board { grid-template-columns: repeat(10, 55px); grid-template-rows: repeat(10, 50px); }
+
+        /* Schermi minuscoli */
+        @media (max-width: 450px) {
+            #board { grid-template-columns: repeat(10, 65px); grid-template-rows: repeat(10, 65px); }
+            .cell-name { font-size: 0.5rem; margin-top: 8px;}
         }
+
     </style>
 </head>
 <body>
@@ -523,8 +511,8 @@
 
     <div class="main-content">
         <div class="top-bar">
-            <h1>🎮 Board Quest 🎮</h1>
-            <button class="rules-btn" onclick="toggleRules()">📜 Regole</button>
+            <h1>BOARD QUEST</h1>
+            <button class="rules-btn" onclick="toggleRules()">Regole</button>
         </div>
 
         <div id="rules-popup" class="rules-popup">
@@ -556,7 +544,7 @@
                 <label class="pack-label"><input type="checkbox" id="pack-videogiochi"> 🎮 Videogiochi</label>
             </div>
 
-            <button id="start-btn" onclick="startGame()" style="background: linear-gradient(45deg, #00ff66, #00cc55); color: #000; margin-top: 15px;">🚀 Comincia la Partita! ⚔️</button>
+            <button id="start-btn" class="start-btn" onclick="startGame()" style="background: linear-gradient(45deg, #00ff66, #00cc55); color: #000; margin-top: 15px;">🚀 Comincia la Partita! ⚔️</button>
         </div>
 
         <div id="game-container">
@@ -566,7 +554,7 @@
                     <div class="panel" id="controls">
                         <div class="turn-indicator" id="turn-display">Pannello</div>
                         <div id="dice">⚀</div>
-                        <button id="roll-btn" onclick="playTurn()">🎲 Lancia Dado!</button>
+                        <button id="roll-btn" class="start-btn" onclick="playTurn()">🎲 Lancia Dado!</button>
                         <button class="restart-btn" onclick="restartGame()">🔄 Ricomincia Partita</button>
                         <div id="log"></div>
                     </div>
@@ -581,10 +569,10 @@
 
     <div id="quiz-modal">
         <div class="modal-content">
-            <h2 style="color: #ff781f; margin-top: 0; font-size: 1.2rem;">❓ DOMANDA</h2>
-            <p id="quiz-question" style="font-size: 0.9rem; margin-bottom: 15px; font-weight: bold; color: var(--accent-yellow);"></p>
+            <h2 style="color: #ff781f; margin-top: 0; font-size: 1.4rem;">❓ DOMANDA</h2>
+            <p id="quiz-question" style="font-size: 1.1rem; margin-bottom: 20px; font-weight: bold; color: var(--accent-yellow);"></p>
             <div id="quiz-options-container"></div>
-            <p style="font-size: 0.7rem; color: #ff3b3b; margin-top: 12px;">⚠️ Sbagliare costa -2 passi ⚠️</p>
+            <p style="font-size: 0.8rem; color: #ff3b3b; margin-top: 15px; font-weight: bold;">⚠️ Sbagliare costa -2 passi ⚠️</p>
         </div>
     </div>
 
@@ -600,7 +588,7 @@
         // ============================================================
 
         const packAnime = [
-            { "q": "Quale studio di animazione ha prodotto 'La città incantata'?", "a": ["Toei Animation", "Madhouse", "Studio Ghibli", "Kyoto Animation"], "c": 2, "img": "" },
+                { "q": "Quale studio di animazione ha prodotto 'La città incantata'?", "a": ["Toei Animation", "Madhouse", "Studio Ghibli", "Kyoto Animation"], "c": 2, "img": "" },
             { "q": "In 'Fullmetal Alchemist', qual è il principio cardine dell'alchimia?", "a": ["Magia infinita", "Scambio equivalente", "Trasmutazione oscura", "Potere ereditario"], "c": 1, "img": "" },
             { "q": "Cosa sono gli 'Angeli' in 'Neon Genesis Evangelion'?", "a": ["Robot alieni", "Mutanti", "Spettri", "Entità divine"], "c": 3, "img": "" },
             { "q": "In 'Berserk', come si chiama la spada gigante di Guts?", "a": ["Ammazzadraghi", "Slayer", "Iron Blade", "Dark Edge"], "c": 0, "img": "" },
@@ -2227,7 +2215,7 @@
         ];
 
         const packCultura = [
-            { "q": "Quale è l'elemento chimico più abbondante nell'universo?", "a": ["Ossigeno", "Idrogeno", "Carbonio", "Azoto"], "c": 1, "img": "" },
+    { "q": "Quale è l'elemento chimico più abbondante nell'universo?", "a": ["Ossigeno", "Idrogeno", "Carbonio", "Azoto"], "c": 1, "img": "" },
     { "q": "In che anno è avvenuta la Rivoluzione Francese?", "a": ["1789", "1815", "1776", "1848"], "c": 0, "img": "" },
     { "q": "Chi ha scritto 'Il nome della rosa'?", "a": ["Italo Calvino", "Umberto Eco", "Primo Levi", "Luigi Pirandello"], "c": 1, "img": "" },
     { "q": "Qual è il fiume più lungo del mondo?", "a": ["Nilo", "Rio delle Amazzoni", "Gange", "Mississippi"], "c": 1, "img": "" },
@@ -2679,10 +2667,10 @@
     { "q": "Chi è il regista di 'Pulp Fiction'?", "a": ["Tarantino", "Scorsese", "Spielberg", "Scott"], "c": 0, "img": "" },
     { "q": "Quale è il colore dei Jedi?", "a": ["Rosso", "Blu/Verde", "Nero", "Bianco"], "c": 1, "img": "" },
     { "q": "Come si chiama l'astronave di Star Trek?", "a": ["Enterprise", "Falcon", "Galactica", "Destiny"], "c": 0, "img": "" },
-];
+        ];
 
         const packSport = [
-            { "q": "Chi ha vinto più titoli Mondiali di Formula 1 (pareggio al 2026)?", "a": ["Michael Schumacher", "Lewis Hamilton", "Ayrton Senna", "Max Verstappen"], "c": 0, "img": "" },
+   { "q": "Chi ha vinto più titoli Mondiali di Formula 1 (pareggio al 2026)?", "a": ["Michael Schumacher", "Lewis Hamilton", "Ayrton Senna", "Max Verstappen"], "c": 0, "img": "" },
     { "q": "In quale sport si usa il termine 'Birdie'?", "a": ["Tennis", "Golf", "Baseball", "Cricket"], "c": 1, "img": "" },
     { "q": "Quanti giocatori compongono una squadra di rugby a 15?", "a": ["11", "13", "15", "18"], "c": 2, "img": "" },
     { "q": "Quale nazione ha vinto più Mondiali di calcio maschile?", "a": ["Italia", "Germania", "Brasile", "Argentina"], "c": 2, "img": "" },
@@ -2965,7 +2953,7 @@
         ];
 
         const packVideogiochi = [
-            { "q": "Quale azienda ha creato la serie 'Pokémon'?", "a": ["Nintendo", "Sega", "Ubisoft", "Sony"], "c": 0, "img": "" },
+                      { "q": "Quale azienda ha creato la serie 'Pokémon'?", "a": ["Nintendo", "Sega", "Ubisoft", "Sony"], "c": 0, "img": "" },
   { "q": "In 'The Sims', come si chiamano i personaggi?", "a": ["Mii", "Sim", "Avatar", "Personaggi"], "c": 1, "img": "" },
   { "q": "Quale di questi NON è un gioco di corse?", "a": ["Mario Kart", "Need for Speed", "Forza", "Tetris"], "c": 3, "img": "" },
   { "q": "Come si chiama l'isola di 'Fortnite'?", "a": ["Battle Island", "L'isola", "Mappa", "Non ha nome"], "c": 3, "img": "" },
@@ -3368,7 +3356,7 @@
             toast.className = `feedback-toast ${isCorrect ? 'correct' : 'wrong'}`;
             toast.innerHTML = isCorrect ? '✅ ' + msg : '❌ ' + msg;
             document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2000);
+            setTimeout(() => toast.remove(), 2500);
         }
 
         function playTurn() {
@@ -3399,7 +3387,7 @@
                 document.getElementById('dice').innerText = ["⚀","⚁","⚂","⚃","⚄","⚅"][steps-1];
                 log(`🎲 ${currentPlayer.name} fa ${steps}.`);
                 movePlayer(currentPlayer, steps);
-            }, 500);
+            }, 600);
         }
 
         function movePlayer(player, steps, chain = true) {
@@ -3413,7 +3401,15 @@
                 if (idx < path.length) {
                     player.pos = path[idx++];
                     updatePawns();
-                    document.getElementById(`cell-${player.pos}`).scrollIntoView({behavior: 'smooth', block: 'center'});
+                    
+                    // Scroll automatico del tabellone verso la pedina (centrato rispetto al div)
+                    const cell = document.getElementById(`cell-${player.pos}`);
+                    const wrapper = document.getElementById('board-wrapper');
+                    wrapper.scrollTo({
+                        left: cell.offsetLeft - (wrapper.clientWidth / 2) + (cell.clientWidth / 2),
+                        behavior: 'smooth'
+                    });
+
                     setTimeout(step, 200);
                 } else {
                     if (chain) setTimeout(() => applyRules(player, steps), 200);
@@ -3453,6 +3449,12 @@
             nextTurn();
         }
 
+        // Funzione per mescolare le risposte
+        function shuffleAnswers(questionObj) {
+            let original = questionObj.a.map((text, index) => ({ text: text, isCorrect: (index === questionObj.c) }));
+            return original.sort(() => Math.random() - 0.5);
+        }
+
         function triggerQuiz(player) {
             const modal = document.getElementById('quiz-modal');
             const qText = document.getElementById('quiz-question');
@@ -3467,20 +3469,23 @@
             qText.innerText = `📌 [${player.name}]: ${quiz.q}`;
             optionsBox.innerHTML = '';
             
-            quiz.a.forEach((opt, idx) => {
+            let shuffled = shuffleAnswers(quiz);
+
+            shuffled.forEach((opt) => {
                 const btn = document.createElement('div');
                 btn.className = 'quiz-option';
-                btn.innerText = `${idx+1}. ${opt}`;
+                btn.innerText = opt.text;
                 btn.onclick = () => {
                     modal.style.display = 'none';
-                    if (idx === quiz.c) {
-                        showFeedback(`Corretto!`, true);
+                    if (opt.isCorrect) {
+                        showFeedback(`Risposta Esatta!`, true);
                         log(`✅ ${player.name} risponde correttamente!`);
                         nextTurn();
                     } else {
-                        const correct = quiz.a[quiz.c];
-                        showFeedback(`Sbagliato! Era: "${correct}". -2 passi`, false);
-                        log(`❌ ${player.name} sbaglia. Risposta: "${correct}".`);
+                        // Troviamo il testo corretto per mostrarlo nel toast
+                        const correctText = shuffled.find(o => o.isCorrect).text;
+                        showFeedback(`Sbagliato! Era: "${correctText}". -2 passi`, false);
+                        log(`❌ ${player.name} sbaglia. Risposta corretta: "${correctText}".`);
                         movePlayer(player, -2, false);
                     }
                 };
@@ -3514,5 +3519,4 @@
         updatePlayerList();
     </script>
 </body>
-</html>
 </html>
