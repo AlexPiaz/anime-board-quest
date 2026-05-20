@@ -10,20 +10,22 @@
             --accent-blue: #00f0ff; --accent-purple: #7000ff; --accent-yellow: #ffbe0b; --text-color: #ffffff;
         }
 
+        * { box-sizing: border-box; }
+
         body {
             font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-color);
             margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
             background-image: radial-gradient(circle at 50% 10%, #1a153a 0%, #08090f 100%);
-            height: 100vh; box-sizing: border-box; overflow: hidden;
+            height: 100vh; overflow: hidden;
         }
 
-        h1 { font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px var(--accent-blue); margin: 5px 0 15px 0; }
+        h1 { font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px var(--accent-blue); margin: 5px 0 15px 0; text-align: center; }
 
         #setup-container { background: var(--panel-color); border: 2px solid var(--accent-blue); padding: 30px; border-radius: 20px; max-width: 500px; width: 100%; text-align: center; margin-top: 40px; }
-        .setup-row { display: flex; gap: 12px; margin: 20px 0; }
-        input[type="text"] { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid var(--accent-purple); background: #08090f; color: #fff; font-size: 1rem; }
+        .setup-row { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; }
+        input[type="text"] { flex: 1; min-width: 150px; padding: 12px; border-radius: 10px; border: 2px solid var(--accent-purple); background: #08090f; color: #fff; font-size: 1rem; }
 
-        #game-container { display: none; flex-direction: row; gap: 20px; width: 100%; height: calc(100vh - 80px); box-sizing: border-box; }
+        #game-container { display: none; flex-direction: row; gap: 20px; width: 100%; height: calc(100vh - 80px); }
         #board-wrapper { flex: 1; overflow: auto; background: rgba(18, 20, 32, 0.85); border-radius: 20px; border: 2px solid var(--accent-purple); height: 100%; padding: 20px;}
         #board { display: grid; grid-template-columns: repeat(10, 130px); grid-template-rows: repeat(10, 125px); gap: 8px; width: max-content; margin: 0 auto; }
         
@@ -72,10 +74,13 @@
 
         #side-panels { display: flex; flex-direction: column; gap: 15px; width: 320px; height: 100%; flex-shrink: 0; }
         .panel { background: var(--panel-color); border: 2px solid var(--accent-blue); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; }
-        #controls { border-color: var(--accent-pink); height: 45%; }
-        #custom-rules-panel { border-color: #ad00ff; flex: 1; background: #150d22; }
+        #controls { border-color: var(--accent-pink); height: 45%; min-height: 350px; }
+        
+        /* REGOLE CUSTOM E TESTO LUNGO */
+        #custom-rules-panel { border-color: #ad00ff; flex: 1; background: #150d22; overflow: hidden; display: flex; flex-direction: column; min-height: 250px;}
         #rules-list { overflow-y: auto; padding: 0; margin: 0; flex: 1; list-style-type: none; }
-        #rules-list li { background: rgba(173, 0, 255, 0.15); border-left: 4px solid #ad00ff; padding: 10px; margin-bottom: 10px; border-radius: 4px 8px 8px 4px; font-size: 0.95rem; }
+        #rules-list li { background: rgba(173, 0, 255, 0.15); border-left: 4px solid #ad00ff; padding: 10px; margin-bottom: 10px; border-radius: 4px 8px 8px 4px; font-size: 0.95rem; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.4; }
+        
         .turn-indicator { font-size: 1.15rem; text-align: center; padding: 10px; background: #08090f; border-radius: 8px; border-left: 5px solid var(--accent-blue); font-weight: bold; margin-bottom: 12px; }
 
         /* DADO CON ANIMAZIONE 3D */
@@ -96,7 +101,7 @@
 
         button { background: linear-gradient(45deg, var(--accent-pink), var(--accent-purple)); border: none; color: white; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; transition: opacity 0.3s; }
         button:disabled { opacity: 0.4; cursor: not-allowed; }
-        button.add-btn { background: linear-gradient(45deg, #00f0ff, #7000ff); width: auto; }
+        button.add-btn { background: linear-gradient(45deg, #00f0ff, #7000ff); width: auto; flex: 1; }
 
         #log { background: #08090f; border-radius: 8px; padding: 10px; font-size: 0.8rem; border: 1px solid #2d3454; margin-top: 12px; flex: 1; overflow-y: auto; }
         .log-entry { margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 4px; }
@@ -107,10 +112,11 @@
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); 
             z-index: 1000; justify-content: center; align-items: center; 
+            padding: 10px;
         }
         .modal-content { 
             background: var(--panel-color); border: 3px solid #ff781f; padding: 25px; 
-            border-radius: 20px; max-width: 500px; width: 90%; text-align: center; 
+            border-radius: 20px; max-width: 500px; width: 100%; text-align: center; 
             max-height: 95vh; overflow-y: auto; box-shadow: 0 0 30px rgba(255, 120, 31, 0.5);
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
@@ -118,7 +124,7 @@
             0% { transform: scale(0.5); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        #quiz-image { width: 100%; max-height: 280px; object-fit: contain; border-radius: 10px; border: 3px solid var(--accent-blue); margin-bottom: 15px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); display: none; }
+        #quiz-image { width: 100%; max-height: 200px; object-fit: contain; border-radius: 10px; border: 3px solid var(--accent-blue); margin-bottom: 15px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); display: none; }
         
         .quiz-option { 
             background: #191d30; border: 1px solid #ff781f; color: white; padding: 12px; 
@@ -128,6 +134,39 @@
         .quiz-option:hover { 
             background: #ff781f; color: black; 
             transform: translateX(10px); 
+        }
+
+        /* 📱 RESPONSIVE DESIGN PER TELEFONI E TABLET 📱 */
+        @media (max-width: 850px) {
+            body {
+                height: auto;           /* Permette alla pagina di scorrere */
+                min-height: 100vh;
+                overflow-y: auto;       /* Attiva la barra di scorrimento globale */
+            }
+            h1 { font-size: 1.5rem; }
+            #game-container {
+                flex-direction: column; /* Impila il tabellone sopra i pannelli */
+                height: auto;
+            }
+            #board-wrapper {
+                height: 55vh;           /* Il tabellone occupa circa metà schermo visibile */
+                min-height: 400px;
+                padding: 10px;
+            }
+            #side-panels {
+                width: 100%;            /* I pannelli prendono tutta la larghezza */
+                height: auto;
+            }
+            #controls { height: 400px; } /* Altezza fissa per far scorrere bene il log su mobile */
+            #custom-rules-panel { height: 350px; }
+            
+            #board {
+                /* Rimpicciolisce leggermente le caselle su mobile per vedere più tabellone */
+                grid-template-columns: repeat(10, 110px);
+                grid-template-rows: repeat(10, 110px);
+            }
+            .cell-name { font-size: 0.75rem; margin-top: 14px; }
+            .cell-desc { font-size: 0.6rem; }
         }
     </style>
 </head>
@@ -1396,7 +1435,7 @@
   },
   {
     "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Romance, Slice of Life\n• Tags: Hori, Miyamura, segreti scolastici, tatuaggi e piercing, amore dolcissimo",
-    "a": ["Horimiya", "Kimi ni Todoke", "Ao Haru Ride", "Toradora!"],
+    "a": ["Horimiya", "Ao Haru Ride", "Kimi ni Todoke", "Kaguya-sama"],
     "c": 0,
     "img": ""
   },
@@ -2014,7 +2053,7 @@
                         nextTurn();
                     } else {
                         log(`❌ <b>Errato!</b> ${player.name} indietreggia di 2 passi.`);
-                        movePlayer(player, -2, true); 
+                        movePlayer(player, -2, false); 
                     }
                 };
                 optionsBox.appendChild(optBtn);
