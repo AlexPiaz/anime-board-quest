@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Board Quest </title>
+    <title>Board Quest | Multi-Pack Edition</title>
     <style>
         :root {
             --bg-color: #08090f; --panel-color: #121420; --accent-pink: #ff2a74;
@@ -24,6 +24,12 @@
         #setup-container { background: var(--panel-color); border: 2px solid var(--accent-blue); padding: 30px; border-radius: 20px; max-width: 500px; width: 100%; text-align: center; margin-top: 40px; }
         .setup-row { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; }
         input[type="text"] { flex: 1; min-width: 150px; padding: 12px; border-radius: 10px; border: 2px solid var(--accent-purple); background: #08090f; color: #fff; font-size: 1rem; }
+
+        /* STILI PER LA SELEZIONE DEI PACCHETTI */
+        .packs-container { display: flex; gap: 15px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .pack-label { background: #191d30; border: 2px solid var(--accent-blue); padding: 10px 20px; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .pack-label:hover { background: #2d3454; }
+        .pack-label input { accent-color: var(--accent-pink); width: 18px; height: 18px; cursor: pointer; }
 
         #game-container { display: none; flex-direction: row; gap: 20px; width: 100%; height: calc(100vh - 80px); }
         #board-wrapper { flex: 1; overflow: auto; background: rgba(18, 20, 32, 0.85); border-radius: 20px; border: 2px solid var(--accent-purple); height: 100%; padding: 20px;}
@@ -57,7 +63,7 @@
 
         .players-container { display: flex; gap: 3px; justify-content: center; flex-wrap: wrap; margin-top: auto; min-height: 20px; width: 100%; margin-bottom: 5px; }
         
-        /* PEDINE CON ANIMAZIONE DI RESPIRO */
+        /* PEDINE */
         .pawn { 
             width: 16px; height: 16px; border-radius: 50%; border: 1px solid #fff; 
             box-shadow: 0 0 6px rgba(255,255,255,0.8); display: flex; align-items: center; 
@@ -76,23 +82,19 @@
         .panel { background: var(--panel-color); border: 2px solid var(--accent-blue); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; }
         #controls { border-color: var(--accent-pink); height: 45%; min-height: 350px; }
         
-        /* REGOLE CUSTOM E TESTO LUNGO */
         #custom-rules-panel { border-color: #ad00ff; flex: 1; background: #150d22; overflow: hidden; display: flex; flex-direction: column; min-height: 250px;}
         #rules-list { overflow-y: auto; padding: 0; margin: 0; flex: 1; list-style-type: none; }
         #rules-list li { background: rgba(173, 0, 255, 0.15); border-left: 4px solid #ad00ff; padding: 10px; margin-bottom: 10px; border-radius: 4px 8px 8px 4px; font-size: 0.95rem; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.4; }
         
         .turn-indicator { font-size: 1.15rem; text-align: center; padding: 10px; background: #08090f; border-radius: 8px; border-left: 5px solid var(--accent-blue); font-weight: bold; margin-bottom: 12px; }
 
-        /* DADO CON ANIMAZIONE 3D */
         #dice { 
             width: 60px; height: 60px; background: white; color: #111; border-radius: 14px; 
             display: flex; align-items: center; justify-content: center; font-size: 2.8rem; 
             font-weight: bold; margin: 0 auto 12px auto; box-shadow: 0 0 15px rgba(255,255,255,0.4); 
             flex-shrink: 0; transition: transform 0.1s; 
         }
-        .rolling { 
-            animation: rollDice3D 0.5s infinite cubic-bezier(0.17, 0.67, 0.83, 0.67); 
-        }
+        .rolling { animation: rollDice3D 0.5s infinite cubic-bezier(0.17, 0.67, 0.83, 0.67); }
         @keyframes rollDice3D {
             0% { transform: rotateX(0deg) rotateY(0deg) scale(1); }
             50% { transform: rotateX(180deg) rotateY(180deg) scale(1.3); }
@@ -107,7 +109,6 @@
         .log-entry { margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 4px; }
         .player-item { display: flex; justify-content: space-between; align-items: center; background: #191d30; padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; }
 
-        /* QUIZ MODAL ANIMATO E BLUR */
         #quiz-modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); 
@@ -120,10 +121,7 @@
             max-height: 95vh; overflow-y: auto; box-shadow: 0 0 30px rgba(255, 120, 31, 0.5);
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         #quiz-image { width: 100%; max-height: 200px; object-fit: contain; border-radius: 10px; border: 3px solid var(--accent-blue); margin-bottom: 15px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); display: none; }
         
         .quiz-option { 
@@ -131,40 +129,17 @@
             margin: 8px 0; border-radius: 8px; cursor: pointer; text-align: left; 
             font-weight: bold; font-size: 1rem; transition: all 0.2s ease-in-out; 
         }
-        .quiz-option:hover { 
-            background: #ff781f; color: black; 
-            transform: translateX(10px); 
-        }
+        .quiz-option:hover { background: #ff781f; color: black; transform: translateX(10px); }
 
-        /* 📱 RESPONSIVE DESIGN PER TELEFONI E TABLET 📱 */
         @media (max-width: 850px) {
-            body {
-                height: auto;           /* Permette alla pagina di scorrere */
-                min-height: 100vh;
-                overflow-y: auto;       /* Attiva la barra di scorrimento globale */
-            }
+            body { height: auto; min-height: 100vh; overflow-y: auto; }
             h1 { font-size: 1.5rem; }
-            #game-container {
-                flex-direction: column; /* Impila il tabellone sopra i pannelli */
-                height: auto;
-            }
-            #board-wrapper {
-                height: 55vh;           /* Il tabellone occupa circa metà schermo visibile */
-                min-height: 400px;
-                padding: 10px;
-            }
-            #side-panels {
-                width: 100%;            /* I pannelli prendono tutta la larghezza */
-                height: auto;
-            }
-            #controls { height: 400px; } /* Altezza fissa per far scorrere bene il log su mobile */
+            #game-container { flex-direction: column; height: auto; }
+            #board-wrapper { height: 55vh; min-height: 400px; padding: 10px; }
+            #side-panels { width: 100%; height: auto; }
+            #controls { height: 400px; } 
             #custom-rules-panel { height: 350px; }
-            
-            #board {
-                /* Rimpicciolisce leggermente le caselle su mobile per vedere più tabellone */
-                grid-template-columns: repeat(10, 110px);
-                grid-template-rows: repeat(10, 110px);
-            }
+            #board { grid-template-columns: repeat(10, 110px); grid-template-rows: repeat(10, 110px); }
             .cell-name { font-size: 0.75rem; margin-top: 14px; }
             .cell-desc { font-size: 0.6rem; }
         }
@@ -172,16 +147,27 @@
 </head>
 <body>
 
-    <h1>Anime Board Quest</h1>
+    <h1>Board Quest</h1>
 
     <div id="setup-container">
-        <h2>Aggiungi Giocatori (Da 2 a 10)</h2>
+        <h2>Iscrivi Giocatori (Da 1 a 10)</h2>
         <div class="setup-row">
             <input type="text" id="player-name-input" placeholder="Nome Giocatore" maxlength="15">
             <button class="add-btn" onclick="addPlayer()">Inserisci</button>
         </div>
         <div id="player-list"><p style="color: #5a5f75;">Nessun giocatore inserito.</p></div>
-        <button id="start-btn" style="background: #00ff66; color: #000; font-size: 1.1rem; margin-top: 25px;" onclick="startGame()">Comincia la Partita! ⚔️</button>
+        
+        <h3 style="margin-top: 30px; color: var(--accent-blue);">Scegli i Pacchetti Domande</h3>
+        <div class="packs-container">
+            <label class="pack-label">
+                <input type="checkbox" id="pack-anime" checked> 🐉 Anime
+            </label>
+            <label class="pack-label">
+                <input type="checkbox" id="pack-cultura"> 🌍 Cultura Generale
+            </label>
+        </div>
+
+        <button id="start-btn" style="background: #00ff66; color: #000; font-size: 1.1rem; margin-top: 15px;" onclick="startGame()">Comincia la Partita! ⚔️</button>
     </div>
 
     <div id="game-container">
@@ -202,8 +188,8 @@
 
     <div id="quiz-modal">
         <div class="modal-content">
-            <h2 style="color: #ff781f; margin-top: 0; font-size: 1.4rem;">DOMANDA ANIME</h2>
-            <img id="quiz-image" src="" alt="Personaggio Anime">
+            <h2 style="color: #ff781f; margin-top: 0; font-size: 1.4rem;">DOMANDA</h2>
+            <img id="quiz-image" src="" alt="Immagine Quiz">
             <p id="quiz-question" style="font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; color: var(--accent-yellow);"></p>
             <div id="quiz-options-container"></div>
             <p style="font-size: 0.8rem; color: #ff3b3b; margin-top: 15px;">Sbagliare costa -2 passi.</p>
@@ -215,8 +201,12 @@
         const pColors = ["#ff477e", "#00f0ff", "#9d4edd", "#ffbe0b", "#00ff66", "#ff6600", "#ff33cc", "#99ccff", "#cc99ff", "#ffffff"];
         let setupPlayers = [];
 
-        // DATABASE DOMANDE
-        let quizDatabase = [
+        // LA VARIABILE CHE CONTERRÀ LE DOMANDE UNITE
+        let quizDatabase = [];
+
+        // PACCHETTO ANIME
+        const packAnime = [
+               
            { "q": "Quale studio di animazione ha prodotto 'La città incantata'?", "a": ["Toei Animation", "Madhouse", "Studio Ghibli", "Kyoto Animation"], "c": 2, "img": "" },
             { "q": "In 'Fullmetal Alchemist', qual è il principio cardine dell'alchimia?", "a": ["Magia infinita", "Scambio equivalente", "Trasmutazione oscura", "Potere ereditario"], "c": 1, "img": "" },
             { "q": "Cosa sono gli 'Angeli' in 'Neon Genesis Evangelion'?", "a": ["Robot alieni", "Mutanti", "Spettri", "Entità divine"], "c": 3, "img": "" },
@@ -282,1565 +272,1570 @@
   { "q": "In 'Death Parade', tramite quale inusuale metodo i defunti vengono giudicati dagli Arbitri?", "a": ["Una bilancia delle anime", "Giochi da bar come freccette o biliardo", "Un interrogatorio sotto tortura", "Un processo in tribunale"], "c": 1, "img": "" },
   { "q": "Chi è lo spietato Boss mafioso di 'JoJo: Vento Aureo' (Parte 5), dotato dello stand King Crimson?", "a": ["Dio Brando", "Yoshikage Kira", "Diavolo", "Enrico Pucci"], "c": 2, "img": "" },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: JoJo's Animation (David Production)\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Adventure, Supernatural\n• Tags: Vampires, Pillar Men, Hamon, Jonathan Joestar",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: JoJo's Animation (David Production)\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Adventure, Supernatural",
     "a": ["Castlevania", "Le Bizzarre Avventure di JoJo (Parte 1 e 2)", "Hellsing Ultimate", "Demon Slayer"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Fantasy\n• Tags: Meliodas, Elizabeth, Holy Knights, Pig Hawk, Sins",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Fantasy",
     "a": ["Fairy Tail", "Black Clover", "The Seven Deadly Sins", "Overlord"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Wit Studio\n• Source: Manga\n• Score: 8.4\n• Generi: Action, Drama, Suspense\n• Tags: Levi Ackerman, Beast Titan, Marley, Basement, Walls",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Wit Studio\n• Source: Manga\n• Score: 8.4\n• Generi: Action, Drama, Suspense",
     "a": ["L'Attacco dei Giganti (Stagione 3)", "Vinland Saga", "Kabaneri of the Iron Fortress", "Seraph of the End"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: White Fox\n• Source: Light Novel\n• Score: 8.2\n• Generi: Drama, Fantasy, Suspense\n• Tags: Isekai, Subaru Natsuki, Return by Death, Emilia, Rem",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: White Fox\n• Source: Light Novel\n• Score: 8.2\n• Generi: Drama, Fantasy, Suspense",
     "a": ["Konosuba", "Sword Art Online", "The Rising of the Shield Hero", "Re:Zero - Starting Life in Another World"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Studio Deen\n• Source: Light Novel\n• Score: 8.1\n• Generi: Adventure, Comedy, Fantasy\n• Tags: Isekai, Kazuma, Aqua, Megumin, Explosion, Parody",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Studio Deen\n• Source: Light Novel\n• Score: 8.1\n• Generi: Adventure, Comedy, Fantasy",
     "a": ["Konosuba: God's Blessing on This Wonderful World!", "That Time I Got Reincarnated as a Slime", "Overlord", "Log Horizon"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: A-1 Pictures\n• Source: Light Novel\n• Score: 7.2\n• Generi: Action, Adventure, Fantasy, Romance\n• Tags: Kirito, Asuna, Aincrad, Virtual Reality, MMORPG",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: A-1 Pictures\n• Source: Light Novel\n• Score: 7.2\n• Generi: Action, Adventure, Fantasy, Romance",
     "a": ["Log Horizon", "Accel World", "Sword Art Online", "No Game No Life"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Shaft\n• Source: Original\n• Score: 8.3\n• Generi: Drama, Mahou Shoujo, Suspense\n• Tags: Madoka, Homura, Kyubey, Witches, Dark Magical Girl",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Shaft\n• Source: Original\n• Score: 8.3\n• Generi: Drama, Mahou Shoujo, Suspense",
     "a": ["Sailor Moon", "Puella Magi Madoka Magica", "Yuki Yuna is a Hero", "Magical Girl Site"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Bones\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Comedy, Supernatural\n• Tags: Yato, Hiyori, Yukine, Shinki, Gods, Phantom",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Bones\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Comedy, Supernatural",
     "a": ["Noragami", "Soul Eater", "Bleach", "Blue Exorcist"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.6\n• Generi: Action, Fantasy\n• Tags: Yuji Itadori, Sukuna, Satoru Gojo, Curses, Jujutsu Sorcerers",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.6\n• Generi: Action, Fantasy",
     "a": ["Chainsaw Man", "Demon Slayer", "Jujutsu Kaisen", "Tokyo Ghoul"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2022\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Comedy, Horror\n• Tags: Denji, Pochita, Makima, Power, Devil Hunters, Gore",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2022\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Comedy, Horror",
     "a": ["Jujutsu Kaisen", "Tokyo Ghoul", "Dorohedoro", "Chainsaw Man"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: White Fox\n• Source: Manga\n• Score: 7.5\n• Generi: Action, Fantasy\n• Tags: Tatsumi, Akame, Night Raid, Teigu, Imperial Arms, Gore",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: White Fox\n• Source: Manga\n• Score: 7.5\n• Generi: Action, Fantasy",
     "a": ["Akame ga Kill!", "Kill la Kill", "Fate/Zero", "Attack on Titan"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: ufotable\n• Source: Light Novel\n• Score: 8.3\n• Generi: Action, Supernatural\n• Tags: Holy Grail War, Kiritsugu Emiya, Saber, Gilgamesh, Masters and Servants",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: ufotable\n• Source: Light Novel\n• Score: 8.3\n• Generi: Action, Supernatural",
     "a": ["Fate/stay night: Unlimited Blade Works", "Fate/Zero", "Kara no Kyoukai", "Tsukihime"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.4\n• Generi: Sports\n• Tags: Volleyball, Hinata Shoyo, Kageyama, Karasuno, Crow",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.4\n• Generi: Sports",
     "a": ["Kuroko's Basketball", "Haikyu!!", "Free!", "Ace of Diamond"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.1\n• Generi: Sports\n• Tags: Basketball, Tetsuya Kuroko, Kagami, Generation of Miracles, Seirin",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.1\n• Generi: Sports",
     "a": ["Slam Dunk", "Ahiru no Sora", "Kuroko's Basketball", "Haikyu!!"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: David Production\n• Source: Manga\n• Score: 7.7\n• Generi: Action, Supernatural\n• Tags: Shinra Kusakabe, Fire Force, Infernals, Pyrokinesis, Company 8",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: David Production\n• Source: Manga\n• Score: 7.7\n• Generi: Action, Supernatural",
     "a": ["Soul Eater", "Blue Exorcist", "My Hero Academia", "Fire Force"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Madhouse\n• Source: Manga\n• Score: 7.5\n• Generi: Supernatural, Suspense\n• Tags: Gambling, Kaiji, Tonegawa, Debt, Psychological Games",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Madhouse\n• Source: Manga\n• Score: 7.5\n• Generi: Supernatural, Suspense",
     "a": ["Gyakkyou Burai Kaiji: Ultimate Survivor", "Kakegurui", "No Game No Life", "Death Note"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: MAPPA\n• Source: Manga\n• Score: 7.2\n• Generi: Drama, Mystery, Psychological\n• Tags: Gambling, Hyakkaou Private Academy, Yumeko Jabami, Compulsive Gambler",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: MAPPA\n• Source: Manga\n• Score: 7.2\n• Generi: Drama, Mystery, Psychological",
     "a": ["Kaiji", "Kakegurui", "No Game No Life", "Death Parade"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: CloverWorks\n• Source: Original\n• Score: 7.2\n• Generi: Action, Drama, Sci-Fi\n• Tags: Mecha, Zero Two, Hiro, Klaxosaurs, Franxx, Plantation",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: CloverWorks\n• Source: Original\n• Score: 7.2\n• Generi: Action, Drama, Sci-Fi",
     "a": ["Neon Genesis Evangelion", "Gurren Lagann", "Code Geass", "Darling in the Franxx"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Trigger\n• Source: Original\n• Score: 8.0\n• Generi: Action, Comedy, Sci-Fi\n• Tags: Ryuko Matoi, Senketsu, Honnouji Academy, Life Fibers, Kamui, Scissors",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Trigger\n• Source: Original\n• Score: 8.0\n• Generi: Action, Comedy, Sci-Fi",
     "a": ["Kill la Kill", "Gurren Lagann", "Soul Eater", "Akame ga Kill!"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Adventure, Drama\n• Tags: New York, Ash Lynx, Eiji Okumura, Mafia, Drug, BL undertones",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Adventure, Drama",
     "a": ["Bungou Stray Dogs", "Banana Fish", "Durarara!!", "91 Days"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Bones\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Supernatural\n• Tags: Atsushi Nakajima, Osamu Dazai, Armed Detective Agency, Yokohama, Authors",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Bones\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Supernatural",
     "a": ["Bungou Stray Dogs", "Noragami", "K Project", "Durarara!!"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2010\n• Studio: Brain's Base\n• Source: Light Novel\n• Score: 8.1\n• Generi: Action, Mystery, Supernatural\n• Tags: Ikebukuro, Mikado, Celty, Dullahan, Izaya Orihara, Shizuo, Dollars",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2010\n• Studio: Brain's Base\n• Source: Light Novel\n• Score: 8.1\n• Generi: Action, Mystery, Supernatural",
     "a": ["Baccano!", "Durarara!!", "K Project", "Tokyo Ghoul"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Shuka\n• Source: Manga\n• Score: 8.4\n• Generi: Action, Drama\n• Tags: Prohibition Era, Mafia, Angelo Lagusa, Nero Vanetti, Revenge, Lawless",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Shuka\n• Source: Manga\n• Score: 8.4\n• Generi: Action, Drama",
     "a": ["91 Days", "Banana Fish", "Baccano!", "Bungou Stray Dogs"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: Bones\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Fantasy, Supernatural\n• Tags: Maka Albarn, Soul Eater Evans, Death Weapon Meister Academy, Shinigami, Kishin",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: Bones\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Fantasy, Supernatural",
     "a": ["Blue Exorcist", "D.Gray-man", "Soul Eater", "Bleach"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 7.5\n• Generi: Action, Fantasy\n• Tags: Rin Okumura, Satan, True Cross Academy, Exorcists, Blue Flames Kurikara",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 7.5\n• Generi: Action, Fantasy",
     "a": ["Soul Eater", "Blue Exorcist", "D.Gray-man", "Twin Star Exorcists"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: David Production\n• Source: Manga\n• Score: 8.1\n• Generi: Adventure, Comedy, Sci-Fi\n• Tags: Senku Ishigami, Petrification, Stone World, Kingdom of Science, Ten Billion Percent",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: David Production\n• Source: Manga\n• Score: 8.1\n• Generi: Adventure, Comedy, Sci-Fi",
     "a": ["Dr. STONE", "Cells at Work!", "Steins;Gate", "Promare"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: Studio Bind\n• Source: Light Novel\n• Score: 8.4\n• Generi: Drama, Fantasy\n• Tags: Isekai, Rudeus Greyrat, Roxy, Sylphiette, Eris, Magic, Rebirth",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: Studio Bind\n• Source: Light Novel\n• Score: 8.4\n• Generi: Drama, Fantasy",
     "a": ["Re:Zero", "Mushoku Tensei: Jobless Reincarnation", "That Time I Got Reincarnated as a Slime", "Overlord"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Eight Bit\n• Source: Light Novel\n• Score: 8.1\n• Generi: Action, Adventure, Comedy, Fantasy\n• Tags: Isekai, Rimuru Tempest, Veldora, Slime, Jura Tempest Federation, Great Sage",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Eight Bit\n• Source: Light Novel\n• Score: 8.1\n• Generi: Action, Adventure, Comedy, Fantasy",
     "a": ["Mushoku Tensei", "Overlord", "That Time I Got Reincarnated as a Slime", "Log Horizon"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Madhouse\n• Source: Light Novel\n• Score: 7.9\n• Generi: Action, Fantasy\n• Tags: Isekai, Ainz Ooal Gown, Momonga, Great Tomb of Nazarick, Albedo, YGGDRASIL",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Madhouse\n• Source: Light Novel\n• Score: 7.9\n• Generi: Action, Fantasy",
     "a": ["Log Horizon", "Sword Art Online", "How Not to Summon a Demon Lord", "Overlord"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: Kinema Citrus\n• Source: Light Novel\n• Score: 8.0\n• Generi: Action, Adventure, Fantasy\n• Tags: Isekai, Naofumi Iwatani, Raphtalia, Filo, Shield, Waves of Calamity",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: Kinema Citrus\n• Source: Light Novel\n• Score: 8.0\n• Generi: Action, Adventure, Fantasy",
     "a": ["The Rising of the Shield Hero", "Arifureta", "Goblin Slayer", "Is It Wrong to Try to Pick Up Girls in a Dungeon?"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Madhouse\n• Source: Light Novel\n• Score: 8.1\n• Generi: Comedy, Fantasy\n• Tags: Blank, Sora, Shiro, Disboard, Tet, Games, No Violence",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Madhouse\n• Source: Light Novel\n• Score: 8.1\n• Generi: Comedy, Fantasy",
     "a": ["Log Horizon", "No Game No Life", "Sword Art Online", "Kakegurui"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: White Fox\n• Source: Light Novel\n• Score: 7.4\n• Generi: Action, Fantasy\n• Tags: Orcbolg, Priestess, Guild, Dark Fantasy, Goblins Only, Gore",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: White Fox\n• Source: Light Novel\n• Score: 7.4\n• Generi: Action, Fantasy",
     "a": ["Goblin Slayer", "Berserk", "Claymore", "The Rising of the Shield Hero"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 7.6\n• Generi: Action, Adventure, Fantasy\n• Tags: Bell Cranel, Hestia, Dungeon, Orario, Minotaur, Familia",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 7.6\n• Generi: Action, Adventure, Fantasy",
     "a": ["Sword Art Online", "Konosuba", "Is It Wrong to Try to Pick Up Girls in a Dungeon? (DanMachi)", "Mushoku Tensei"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 8.0\n• Generi: Comedy, Slice of Life\n• Tags: Hachiken, Ooezo Agricultural High School, Farming, Animals, Hokkaido, Food",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 8.0\n• Generi: Comedy, Slice of Life",
     "a": ["Silver Spoon (Gin no Saji)", "Barakamon", "Non Non Biyori", "Golden Kamuy"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Kinema Citrus\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Slice of Life\n• Tags: Seishuu Handa, Calligraphy, Goto Islands, Naru, Rural Life",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Kinema Citrus\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Slice of Life",
     "a": ["Silver Spoon", "Barakamon", "Usagi Drop", "Sweetness and Lightning"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Romance\n• Tags: Mai Sakurajima, Sakuta Azusagawa, Puberty Syndrome, Bunny Girl, Drama",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Romance",
     "a": ["Bakemonogatari", "Oregairu", "Rascal Does Not Dream of Bunny Girl Senpai", "Toradora!"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 8.1\n• Generi: Drama, Romance\n• Tags: Taiga Aisaka, Ryuuji Takasu, Palmtop Tiger, High School, Tsundere",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 8.1\n• Generi: Drama, Romance",
     "a": ["Clannad", "Toradora!", "Lovely Complex", "Golden Time"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Kyoto Animation\n• Source: Light Novel\n• Score: 7.7\n• Generi: Fantasy, Romance\n• Tags: Mirai Kuriyama, Akihito Kanbara, Spirit World Warriors, Youmu, Glasses, Blood Magic",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Kyoto Animation\n• Source: Light Novel\n• Score: 7.7\n• Generi: Fantasy, Romance",
     "a": ["Beyond the Boundary (Kyoukai no Kanata)", "Noragami", "Blue Exorcist", "Soul Eater"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Kyoto Animation\n• Source: Light Novel\n• Score: 8.6\n• Generi: Drama, Fantasy\n• Tags: Auto Memories Doll, Gilbert, Letters, War Veteran, Prosthetic Arms, Masterpiece",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Kyoto Animation\n• Source: Light Novel\n• Score: 8.6\n• Generi: Drama, Fantasy",
     "a": ["A Silent Voice", "Your Lie in April", "Anohana", "Violet Evergarden"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: A-1 Pictures\n• Source: Original\n• Score: 8.3\n• Generi: Drama, Supernatural\n• Tags: Menma, Jintan, Super Peace Busters, Ghost, Childhood Friends, Tears",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: A-1 Pictures\n• Source: Original\n• Score: 8.3\n• Generi: Drama, Supernatural",
     "a": ["Anohana: The Flower We Saw That Day", "Your Lie in April", "Clannad: After Story", "Angel Beats!"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.5\n• Generi: Drama, Romance, Sports\n• Tags: Chihayafuru, Karuta, Poetry, Cards, Josei, Childhood Friends",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.5\n• Generi: Drama, Romance, Sports",
     "a": ["March comes in like a lion", "Chihayafuru", "Hikaru no Go", "Your Lie in April"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Studio Pierrot\n• Source: Manga\n• Score: 8.1\n• Generi: Action, Comedy, Fantasy\n• Tags: Asta, Yuno, Magic Knights, Grimoire, Anti-Magic, Black Bulls",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Studio Pierrot\n• Source: Manga\n• Score: 8.1\n• Generi: Action, Comedy, Fantasy",
     "a": ["Fairy Tail", "My Hero Academia", "Black Clover", "Bleach"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Bones\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Sci-Fi\n• Tags: Izuku Midoriya, All Might, Quirk, UA Academy, Superheroes",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Bones\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Sci-Fi",
     "a": ["My Hero Academia", "One Punch Man", "Mob Psycho 100", "Tiger & Bunny"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.4\n• Generi: Action, Drama, Fantasy\n• Tags: Gabimaru, Sagiri, Elixir of Life, Ninja, Executioners, Shinnen",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.4\n• Generi: Action, Drama, Fantasy",
     "a": ["Hell's Paradise (Jigokuraku)", "Demon Slayer", "Dororo", "Chainsaw Man"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: Tezuka Productions / MAPPA\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Supernatural\n• Tags: Hyakkimaru, Daigo, Prosthetic Body, Demons, Sengoku Period, Osamu Tezuka",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: Tezuka Productions / MAPPA\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Supernatural",
     "a": ["Berserk", "Samurai Champloo", "InuYasha", "Dororo"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Trigger\n• Source: Original\n• Score: 7.5\n• Generi: Action, Sci-Fi\n• Tags: Kaiju, Gridman, Mecha, Yuta Hibiki, Akane Shinjo, Computer World",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Trigger\n• Source: Original\n• Score: 7.5\n• Generi: Action, Sci-Fi",
     "a": ["Darling in the Franxx", "SSSS.GRIDMAN", "Evangelion", "Promare"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: David Production\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Supernatural\n• Tags: Jotaro Kujo, DIO, Egypt, Stardust Crusaders, Stands, Star Platinum",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: David Production\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Supernatural",
     "a": ["Le Bizzarre Avventure di JoJo (Parte 3)", "Golden Kamuy", "Hunter x Hunter", "Fist of the North Star"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Sunrise\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Comedy, Sci-Fi\n• Tags: Gintoki Sakata, Shinsengumi, Amanto, Yorozuya, Parody, Edo Period",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Sunrise\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Comedy, Sci-Fi",
     "a": ["Gintama", "Rurouni Kenshin", "Bleach", "Samurai Champloo"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: WIT Studio\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Supernatural\n• Tags: Vampires, Yuichiro, Mikaela, Moon Demon Company, Seraph, Apocalypse",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: WIT Studio\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Supernatural",
     "a": ["Blue Exorcist", "Seraph of the End (Owari no Seraph)", "Tokyo Ghoul", "Hellsing Ultimate"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: White Fox\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Sci-Fi\n• Tags: Koko Hekmatyar, Jonah, Arms Dealers, Bodyguards, Military, Global Business",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: White Fox\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Sci-Fi",
     "a": ["Black Lagoon", "91 Days", "Jormungand", "Bungou Stray Dogs"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: OLM\n• Source: Original\n• Score: 8.6\n• Generi: Mystery, Suspense\n• Tags: Hiroshi Odokawa, Anthropomorphic, Taxi Driver, Tokyo, Missing Girl, Masterpiece",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: OLM\n• Source: Original\n• Score: 8.6\n• Generi: Mystery, Suspense",
     "a": ["Beastars", "Aggretsuko", "Odd Taxi", "Durarara!!"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: Orange\n• Source: Manga\n• Score: 7.9\n• Generi: Drama, Mystery, Psychological\n• Tags: Legoshi, Louis, Haru, Cherryton Academy, Anthropomorphic, Herbivores vs Carnivores",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: Orange\n• Source: Manga\n• Score: 7.9\n• Generi: Drama, Mystery, Psychological",
     "a": ["Beastars", "Odd Taxi", "Zootopia", "Bna"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Wit Studio\n• Source: Manga\n• Score: 7.8\n• Generi: Romance, Slice of Life\n• Tags: Akira Tachibana, Masami Kondo, Track Team, Age Gap, Rainy Days, Cafe",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Wit Studio\n• Source: Manga\n• Score: 7.8\n• Generi: Romance, Slice of Life",
     "a": ["After the Rain (Koi wa Ameagari no You ni)", "Ao Haru Ride", "Your Lie in April", "Scum's Wish"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Lerche\n• Source: Light Novel\n• Score: 7.8\n• Generi: Drama, Suspense\n• Tags: Kiyotaka Ayanokoji, Advanced Nurturing High School, Class D, Mind Games, Points System",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Lerche\n• Source: Light Novel\n• Score: 7.8\n• Generi: Drama, Suspense",
     "a": ["Classroom of the Elite", "Oregairu", "Assassination Classroom", "The Promised Neverland"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Lerche\n• Source: Manga\n• Score: 8.1\n• Generi: Action, Comedy\n• Tags: Koro-sensei, Kunugigaoka Class 3-E, Assassination, Moon, Nagisa, Karma",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Lerche\n• Source: Manga\n• Score: 8.1\n• Generi: Action, Comedy",
     "a": ["Classroom of the Elite", "My Hero Academia", "Mob Psycho 100", "Assassination Classroom"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 8.2\n• Generi: Drama, Romance\n• Tags: Sorata Kanda, Mashiro Shiina, Sakurasou Dormitory, Art, Cats, Genius Girl",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 8.2\n• Generi: Drama, Romance",
     "a": ["Toradora!", "The Pet Girl of Sakurasou", "Golden Time", "Clannad"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Mystery, Supernatural, Suspense\n• Tags: Satoru Fujinuma, Revival, Time Travel, 1988, Kidnapping Case, Hokkaido",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Mystery, Supernatural, Suspense",
     "a": ["Steins;Gate", "Re:Zero", "Erased (Boku dake ga Inai Machi)", "Tokyo Revengers"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: Liden Films\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Drama, Supernatural\n• Tags: Takemichi, Tokyo Manji Gang, Time Travel, Mikey, Draken, Delinquents",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: Liden Films\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Drama, Supernatural",
     "a": ["Erased", "Tokyo Revengers", "Durarara!!", "91 Days"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.4\n• Generi: Action, Adventure, Fantasy, Romance\n• Tags: Yona, Hak, Four Dragons, Kouka Kingdom, Red Hair, Betrayal, Su-won",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.4\n• Generi: Action, Adventure, Fantasy, Romance",
     "a": ["Yona of the Dawn (Akatsuki no Yona)", "Snow White with the Red Hair", "Fushigi Yuugi", "The Twelve Kingdoms"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Bones\n• Source: Manga\n• Score: 7.7\n• Generi: Fantasy, Romance\n• Tags: Shirayuki, Zen Wistaria, Clarines, Herbalist, Red Hair, Prince",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Bones\n• Source: Manga\n• Score: 7.7\n• Generi: Fantasy, Romance",
     "a": ["Yona of the Dawn", "Snow White with the Red Hair (Akagami no Shirayuki-hime)", "Ancient Magus' Bride", "Violet Evergarden"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Wit Studio\n• Source: Manga\n• Score: 8.0\n• Generi: Drama, Fantasy, Romance\n• Tags: Chise Hatori, Elias Ainsworth, Mage, Celtic Mythology, Sleigh Beggy, Magic",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Wit Studio\n• Source: Manga\n• Score: 8.0\n• Generi: Drama, Fantasy, Romance",
     "a": ["The Ancient Magus' Bride", "Made in Abyss", "Natsume's Book of Friends", "Spice and Wolf"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: Imagin\n• Source: Light Novel\n• Score: 8.2\n• Generi: Adventure, Fantasy, Romance\n• Tags: Kraft Lawrence, Holo the Wise Wolf, Economics, Merchant, Pagan Deity",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: Imagin\n• Source: Light Novel\n• Score: 8.2\n• Generi: Adventure, Fantasy, Romance",
     "a": ["The Ancient Magus' Bride", "Maoyu", "Spice and Wolf", "Log Horizon"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Satelight\n• Source: Light Novel\n• Score: 8.0\n• Generi: Action, Adventure, Fantasy\n• Tags: Isekai, Shiroe, Elder Tale, Akihabara, Strategy, Database, MMORPG Logged In",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Satelight\n• Source: Light Novel\n• Score: 8.0\n• Generi: Action, Adventure, Fantasy",
     "a": ["Sword Art Online", "Overlord", "No Game No Life", "Log Horizon"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.0\n• Generi: Comedy, Supernatural\n• Tags: Hozuki, King Enma, Japanese Hell, Mythology, Bureaucracy, Dark Comedy",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.0\n• Generi: Comedy, Supernatural",
     "a": ["Hozuki's Coolheadedness (Hozuki no Reitetsu)", "Noragami", "Soul Eater", "Natsume's Book of Friends"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: Brain's Base\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Slice of Life, Supernatural\n• Tags: Takashi Natsume, Madara (Nyanko-sensei), Yokai, Reiko, Book of Contracts",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: Brain's Base\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Slice of Life, Supernatural",
     "a": ["Mushishi", "Natsume's Book of Friends (Natsume Yuujinchou)", "Noragami", "Hotarubi no Mori e"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Brain's Base\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Romance, Supernatural\n• Tags: Hotaru, Gin, Forest of Spirits, Yokai, Touch and Disappear, Movie, Tears",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Brain's Base\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Romance, Supernatural",
     "a": ["Natsume's Book of Friends", "Anohana", "Hotarubi no Mori e", "Your Name."],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Brain's Base\n• Source: Manga\n• Score: 7.7\n• Generi: Comedy, Romance\n• Tags: Shizuku Mizutani, Haru Yoshida, Nagoya the Rooster, High School, Study, Misfits",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Brain's Base\n• Source: Manga\n• Score: 7.7\n• Generi: Comedy, Romance",
     "a": ["Toradora!", "My Little Monster (Tonari no Kaibutsu-kun)", "Ao Haru Ride", "Kimi ni Todoke"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.0\n• Generi: Drama, Romance\n• Tags: Sawako Kuronuma, Sadako nickname, Kazehaya, Misunderstandings, High School, Pure Love",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.0\n• Generi: Drama, Romance",
     "a": ["Kimi ni Todoke: From Me to You", "Ao Haru Ride", "Say I Love You", "Orange"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: TMS Entertainment\n• Source: Web Manga\n• Score: 8.0\n• Generi: Comedy, Romance\n• Tags: Arata Kaizaki, ReLife Experiment, Pill, High School Retake, Chizuru Hishiro, NEET",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: TMS Entertainment\n• Source: Web Manga\n• Score: 8.0\n• Generi: Comedy, Romance",
     "a": ["Erased", "Orange", "ReLIFE", "Kokoro Connect"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Silver Link\n• Source: Light Novel\n• Score: 7.8\n• Generi: Drama, Romance, Supernatural\n• Tags: Cultural Research Club, Body Swap, Heartseed, Desires, Emotions, Five Students",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Silver Link\n• Source: Light Novel\n• Score: 7.8\n• Generi: Drama, Romance, Supernatural",
     "a": ["ReLIFE", "Kokoro Connect", "Anohana", "Kiznaiver"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Trigger\n• Source: Original\n• Score: 7.4\n• Generi: Drama, Sci-Fi\n• Tags: Sugomori City, Kizna System, Shared Pain, Seven Wounds, Katsuhira, Noriko",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Trigger\n• Source: Original\n• Score: 7.4\n• Generi: Drama, Sci-Fi",
     "a": ["Kiznaiver", "Kill la Kill", "Darling in the Franxx", "Kokoro Connect"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.1\n• Generi: Comedy\n• Tags: Moritaka Mashiro, Akito Takagi, Manga Artists, Weekly Shonen Jack, Azuki, Eiji Nizuma",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.1\n• Generi: Comedy",
     "a": ["Bakuman.", "Silver Spoon", "Shirobako", "Comic Girls"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: P.A. Works\n• Source: Original\n• Score: 8.2\n• Generi: Comedy, Drama\n• Tags: Aoi Miyamori, Musashino Animation, Anime Production, Donuts, Industry Realities",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: P.A. Works\n• Source: Original\n• Score: 8.2\n• Generi: Comedy, Drama",
     "a": ["Bakuman.", "Shirobako", "Keep Your Hands Off Eizouken!", "New Game!"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: Science SARU\n• Source: Manga\n• Score: 8.1\n• Generi: Adventure, Comedy\n• Tags: Midori Asakusa, Sayaka, Tsubame, Anime Club, Imagination, Masaaki Yuasa",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: Science SARU\n• Source: Manga\n• Score: 8.1\n• Generi: Adventure, Comedy",
     "a": ["Shirobako", "Keep Your Hands Off Eizouken!", "Ping Pong", "Mob Psycho 100"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Production I.G\n• Source: Novel\n• Score: 8.4\n• Generi: Sports\n• Tags: Hakone Ekiden, Marathon, Kakeru, Haiji, Kansei University, Dormitory, Running",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Production I.G\n• Source: Novel\n• Score: 8.4\n• Generi: Sports",
     "a": ["Haikyu!!", "Free!", "Run with the Wind (Kaze ga Tsuyoku Fuiteiru)", "Tsurune"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.1\n• Generi: Sports, Suspense\n• Tags: Baseball, Toua Tokuchi, Lycaons, One Outs Contract, Gambling, Mind Games",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.1\n• Generi: Sports, Suspense",
     "a": ["Ace of Diamond", "One Outs", "Major", "Big Windup!"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Madhouse / Production I.G\n• Source: Manga\n• Score: 8.1\n• Generi: Sports\n• Tags: Baseball, Eijun Sawamura, Seidou High School, Koshien, Pitcher, Kazuya Miyuki",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Madhouse / Production I.G\n• Source: Manga\n• Score: 8.1\n• Generi: Sports",
     "a": ["One Outs", "Major", "Ace of Diamond (Diamond no Ace)", "Cross Game"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Drama\n• Tags: Hinomaru Ushio, Sumo Wrestling, Oodachi High School, National Tournament, Short Stature",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Drama",
     "a": ["Hajime no Ippo", "Hinomaru Sumo (Hinomaru Zumou)", "Baki", "Kengan Ashura"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: TMS Entertainment\n• Source: Original\n• Score: 8.0\n• Generi: Action, Sci-Fi, Sports\n• Tags: Boxing, Junk Dog, Gear, Megalonia, Ashita no Joe 50th Anniversary",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: TMS Entertainment\n• Source: Original\n• Score: 8.0\n• Generi: Action, Sci-Fi, Sports",
     "a": ["Hajime no Ippo", "Kengan Ashura", "Megalo Box", "Levius"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Studio Blanc\n• Source: Light Novel\n• Score: 7.3\n• Generi: Comedy, Romance\n• Tags: Itsuki Hashima, Light Novel Authors, Little Sister Obsession, Nayuta, Board Games",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Studio Blanc\n• Source: Light Novel\n• Score: 7.3\n• Generi: Comedy, Romance",
     "a": ["A Sister's All You Need. (Imouto sae Ireba Ii.)", "Eromanga Sensei", "Oreimo", "Saekano"],
     "c": 0,
     "img": ""
   }, 
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 7.9\n• Generi: Comedy, Slice of Life\n• Tags: Grand Blue, Diving Club, Izu University, Drinking Games, Alcohol, Peek-a-Boo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 7.9\n• Generi: Comedy, Slice of Life",
     "a": ["Free!", "Grand Blue Dreaming", "Golden Time", "Prison School"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 7.7\n• Generi: Comedy, Ecchi\n• Tags: Hachimitsu Academy, Prison Block, Kiyoshi, Chairman, Vice President, Escapes",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 7.7\n• Generi: Comedy, Ecchi",
     "a": ["Prison School", "Grand Blue", "Shimoneta", "Great Teacher Onizuka"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 7.4\n• Generi: Comedy, Ecchi, Sci-Fi\n• Tags: SOX, Tanukichi, Ayame, Censorship, Underwear Mask, Dirty Jokes, Dystopia",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 7.4\n• Generi: Comedy, Ecchi, Sci-Fi",
     "a": ["Prison School", "Kill la Kill", "Shimoneta: A Boring World Where the Concept of Dirty Jokes Doesn't Exist", "To Love Ru"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Sunrise\n• Source: Manga\n• Score: 7.8\n• Generi: Comedy, Slice of Life\n• Tags: Sanada North High School, Tadakuni, Hidenori, Yoshitake, Gags, Everyday Life",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Sunrise\n• Source: Manga\n• Score: 7.8\n• Generi: Comedy, Slice of Life",
     "a": ["Nichijou - My Ordinary Life", "Daily Lives of High School Boys (Danshi Koukousei no Nichijou)", "Chio's School Road", "Asobi Asobase"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 8.4\n• Generi: Comedy, Slice of Life\n• Tags: Yukko, Mio, Mai, Nano the Robot, Professor, Talking Cat Sakamoto, Absurd Humor",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 8.4\n• Generi: Comedy, Slice of Life",
     "a": ["Nichijou - My Ordinary Life", "Daily Lives of High School Boys", "Lucky Star", "K-On!"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Lerche\n• Source: Manga\n• Score: 8.1\n• Generi: Comedy\n• Tags: Pastimers Club, Hanako, Olivia, Kasumi, Absurd Face Expressions, Surreal Gags",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Lerche\n• Source: Manga\n• Score: 8.1\n• Generi: Comedy",
     "a": ["Nichijou", "Asobi Asobase: Workshop of Fun", "Lucky Star", "Pop Team Epic"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Kyoto Animation\n• Source: Light Novel\n• Score: 7.8\n• Generi: Comedy, Fantasy, Slice of Life\n• Tags: Tohru, Kobayashi, Kanna, Fafnir, Maid, Otaku, Miss Kobayashi's Dragon Maid",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Kyoto Animation\n• Source: Light Novel\n• Score: 7.8\n• Generi: Comedy, Fantasy, Slice of Life",
     "a": ["Konosuba", "Interspecies Reviewers", "Miss Kobayashi's Dragon Maid", "Monster Musume"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 7.5\n• Generi: Comedy, Slice of Life\n• Tags: Konata Izumi, Kagami, Tsukasa, Miyuki, Otaku Culture, Slow Pace, Timotei",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 7.5\n• Generi: Comedy, Slice of Life",
     "a": ["Lucky Star", "K-On!", "Azumanga Daioh", "Melancholy of Haruhi Suzumiya"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 7.8\n• Generi: Comedy, Slice of Life\n• Tags: Light Music Club, Yui Hirasawa, Mio, Ritsu, Tsumugi, Azusa, Tea and Cakes, Afterschool Tea Time",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 7.8\n• Generi: Comedy, Slice of Life",
     "a": ["Lucky Star", "Beck", "K-On!", "Sound! Euphonium"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Kyoto Animation\n• Source: Novel\n• Score: 8.0\n• Generi: Drama, Music\n• Tags: Kitauji High School, Concert Band, Kumiko Oumae, Reina, Asuka, Nationals, Noboru Taki",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Kyoto Animation\n• Source: Novel\n• Score: 8.0\n• Generi: Drama, Music",
     "a": ["K-On!", "Your Lie in April", "Nodame Cantabile", "Sound! Euphonium (Hibike! Euphonium)"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Music, Romance\n• Tags: Shinichi Chiaki, Megumi Noda, Classical Music, Conductor, Piano, Paris, Josei",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Music, Romance",
     "a": ["Your Lie in April", "Nodame Cantabile", "Sound! Euphonium", "Kids on the Slope"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: MAPPA / Tezuka Productions\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Music, Romance\n• Tags: 1960s, Kyushu, Kaoru, Sentaro, Ritsuko, Jazz, Drums, Shinichiro Watanabe",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: MAPPA / Tezuka Productions\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Music, Romance",
     "a": ["Beck", "Kids on the Slope (Sakamichi no Apollon)", "Your Lie in April", "Nodame Cantabile"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Music\n• Tags: Yukio Tanaka (Koyuki), Ryusuke, Maho, Rock Band, Guitar, Lucille, Dying Breed",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Music",
     "a": ["Beck: Mongolian Chop Squad", "Kids on the Slope", "Given", "Nana"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.5\n• Generi: Drama, Romance\n• Tags: Nana Osaki, Nana Komatsu (Hachi), Black Stones (Blast), Trapnest, Ren, Tokyo, Josei",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.5\n• Generi: Drama, Romance",
     "a": ["Beck", "Nana", "Paradise Kiss", "Given"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2005\n• Studio: Madhouse\n• Source: Manga\n• Score: 7.7\n• Generi: Drama, Romance\n• Tags: Yukari Hayasaka, George, Yazawa Arts, Fashion Design, Atelier, Josei, Ai Yazawa",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2005\n• Studio: Madhouse\n• Source: Manga\n• Score: 7.7\n• Generi: Drama, Romance",
     "a": ["Nana", "Paradise Kiss", "Neighborhood Story", "Blue Period"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: Seven Arcs\n• Source: Manga\n• Score: 8.0\n• Generi: Drama\n• Tags: Yatora Yaguchi, Fine Arts, Painting, Tokyo University of the Arts (Geidai), Canvas",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: Seven Arcs\n• Source: Manga\n• Score: 8.0\n• Generi: Drama",
     "a": ["Bakuman.", "Shirobako", "Blue Period", "Honey and Clover"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2005\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.0\n• Generi: Drama, Romance\n• Tags: Yuuta, Hagumi, Takemoto, Art College, Unrequited Love, Ferris Wheel, Honey and Clover",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2005\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.0\n• Generi: Drama, Romance",
     "a": ["Blue Period", "March comes in like a lion", "Honey and Clover", "Nodame Cantabile"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: TMS Entertainment\n• Source: Manga\n• Score: 8.1\n• Generi: Comedy, Romance\n• Tags: Kaguya Shinomiya, Miyuki Shirogane, Shuchiin Academy, Student Council, Chika Fujiwara, Love is War",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: TMS Entertainment\n• Source: Manga\n• Score: 8.1\n• Generi: Comedy, Romance",
     "a": ["Kaguya-sama: Love is War", "Toradora!", "Oregairu", "Horimiya"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Brain's Base\n• Source: Light Novel\n• Score: 8.0\n• Generi: Comedy, Drama, Romance\n• Tags: Hachiman Hikigaya, Yukino Yukinoshita, Yui, Service Club, Cynicism, Youth Wrong As I Expected",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Brain's Base\n• Source: Light Novel\n• Score: 8.0\n• Generi: Comedy, Drama, Romance",
     "a": ["Kaguya-sama", "My Teen Romantic Comedy SNAFU (Oregairu)", "Toradora!", "Hyouka"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Kyoto Animation\n• Source: Novel\n• Score: 8.1\n• Generi: Mystery, Slice of Life\n• Tags: Houtarou Oreki, Eru Chitanda, Classic Lit Club, I'm Curious, Kamiyama High School",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Kyoto Animation\n• Source: Novel\n• Score: 8.1\n• Generi: Mystery, Slice of Life",
     "a": ["Oregairu", "Monogatari", "Hyouka", "Kokoro Connect"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Romance, Slice of Life\n• Tags: Kyouko Hori, Izumi Miyamura, Tattoos, Piercings, Secret Lives, Katagiri High School",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Romance, Slice of Life",
     "a": ["Horimiya", "Kimi ni Todoke", "Ao Haru Ride", "Toradora!"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Production I.G\n• Source: Manga\n• Score: 7.7\n• Generi: Drama, Romance\n• Tags: Futaba Yoshioka, Kou Tanaka, Middle School Crush, Change of Last Name, Blue Spring Ride",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Production I.G\n• Source: Manga\n• Score: 7.7\n• Generi: Drama, Romance",
     "a": ["Kimi ni Todoke", "Horimiya", "Ao Haru Ride (Blue Spring Ride)", "Say I Love You"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: TMS Entertainment\n• Source: Manga\n• Score: 7.8\n• Generi: Drama, Romance\n• Tags: Naho Takamiya, Kakeru Naruse, Letter from Future, Suicide Prevention, Matsumoto, Time Paradox",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: TMS Entertainment\n• Source: Manga\n• Score: 7.8\n• Generi: Drama, Romance",
     "a": ["Orange", "Erased", "ReLIFE", "Your Name."],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Lerche\n• Source: Manga\n• Score: 6.5\n• Generi: Drama, Romance\n• Tags: Hanabi Yasuraoka, Mugi Awaya, Fake Relationship, Unrequited Love, Dark Romance, Scum's Wish",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Lerche\n• Source: Manga\n• Score: 6.5\n• Generi: Drama, Romance",
     "a": ["Domestic Girlfriend", "Scum's Wish (Kuzu no Honkai)", "White Album 2", "Citrus"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: diomedéa\n• Source: Manga\n• Source: Manga\n• Score: 6.8\n• Generi: Drama, Romance\n• Tags: Natsuo Fujii, Hina, Rui, Teacher-Student Love, Stepsisters, Love Triangle",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: diomedéa\n• Source: Manga\n• Score: 6.8\n• Generi: Drama, Romance",
     "a": ["Scum's Wish", "Domestic Girlfriend (Domestic na Kanojo)", "Citrus", "Fuuka"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Passione\n• Source: Manga\n• Score: 6.5\n• Generi: Drama, Romance\n• Tags: Yuzu Aihara, Mei Aihara, Stepsisters, Yuri, Student Council President, Ribbon",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Passione\n• Source: Manga\n• Score: 6.5\n• Generi: Drama, Romance",
     "a": ["Citrus", "Bloom Into You", "Strawberry Panic", "Netsuzou Trap"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: TROYCA\n• Source: Manga\n• Score: 7.9\n• Generi: Drama, Romance\n• Tags: Yuu Koito, Touko Nanami, Yuri, Student Council, Lack of Feelings, Masterpiece Yuri",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: TROYCA\n• Source: Manga\n• Score: 7.9\n• Generi: Drama, Romance",
     "a": ["Citrus", "Strawberry Panic", "Bloom Into You (Yagate Kimi ni Naru)", "Adachi and Shimamura"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Production I.G\n• Source: Original\n• Score: 7.4\n• Generi: Action, Sci-Fi\n• Tags: Shu Ouma, Inori Yuzuriha, Apocalypse Virus, Funeral Parlor, Void Genome, Singer",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Production I.G\n• Source: Original\n• Score: 7.4\n• Generi: Action, Sci-Fi",
     "a": ["Code Geass", "Guilty Crown", "Aldnoah.Zero", "Darling in the Franxx"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: A-1 Pictures / TROYCA\n• Source: Original\n• Score: 7.4\n• Generi: Action, Sci-Fi\n• Tags: Vers Empire, Mars vs Earth, Inaho Kaizuka, Slaine Troyard, Mecha, Aldnoah Drive",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: A-1 Pictures / TROYCA\n• Source: Original\n• Score: 7.4\n• Generi: Action, Sci-Fi",
     "a": ["Guilty Crown", "Mobile Suit Gundam", "Aldnoah.Zero", "Valvrave the Liberator"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Sunrise\n• Source: Original\n• Score: 7.0\n• Generi: Action, Sci-Fi, Mecha\n• Tags: JIOR, Dorssia, Haruto Tokishima, Valvrave units, Vampiric Pilot, Module 77",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Sunrise\n• Source: Original\n• Score: 7.0\n• Generi: Action, Sci-Fi, Mecha",
     "a": ["Valvrave the Liberator (Kakumeiki Valvrave)", "Aldnoah.Zero", "Gundam Seed", "Code Geass"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Overlap (8bit)\n• Source: Light Novel\n• Score: 6.6\n• Generi: Action, Sci-Fi\n• Tags: IS Academy, Ichika Orimura, Mecha Suits, Harem, Exoskeletons, International Students",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Overlap (8bit)\n• Source: Light Novel\n• Score: 6.6\n• Generi: Action, Sci-Fi",
     "a": ["Infinite Stratos", "The Asterisk War", "Chivalry of a Failed Knight", "Hundred"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Silver Link\n• Source: Light Novel\n• Score: 7.5\n• Generi: Action, Fantasy, Romance\n• Tags: Ikki Kurogane, Stella Vermillion, Hagun Academy, Blazers, Worst One, Sword Duel",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Silver Link\n• Source: Light Novel\n• Score: 7.5\n• Generi: Action, Fantasy, Romance",
     "a": ["The Asterisk War", "Infinite Stratos", "Chivalry of a Failed Knight (Rakudai Kishi no Cavalry)", "Blade Dance of the Elementalers"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: A-1 Pictures\n• Source: Light Novel\n• Score: 6.9\n• Generi: Action, Fantasy, Sci-Fi\n• Tags: Asterisk City, Ayato Amagiri, Julis, Genestella, Seidoukan Academy, Festa Tournament",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: A-1 Pictures\n• Source: Light Novel\n• Score: 6.9\n• Generi: Action, Fantasy, Sci-Fi",
     "a": ["Chivalry of a Failed Knight", "The Asterisk War (Gakusen Toshi Asterisk)", "Hundred", "Absolute Duo"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: MAPPA\n• Source: Web Manga\n• Score: 7.3\n• Generi: Action, Fantasy\n• Tags: Yasuke, Samurai, Alternate History, Oda Nobunaga, Magic and Mecha, Netflix",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: MAPPA\n• Source: Web Manga\n• Score: 7.3\n• Generi: Action, Fantasy",
     "a": ["Yasuke", "Afro Samurai", "Samurai Champloo", "Dororo"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: Gonzo\n• Source: Original\n• Score: 7.4\n• Generi: Action, Sci-Fi\n• Tags: Afro, Number 1 Headband, Justice, Takashi Okazaki, Samuel L. Jackson, Revenge",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: Gonzo\n• Source: Original\n• Score: 7.4\n• Generi: Action, Sci-Fi",
     "a": ["Yasuke", "Samurai Champloo", "Afro Samurai", "Ninja Scroll"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Manglobe\n• Source: Original\n• Score: 8.5\n• Generi: Action, Adventure\n• Tags: Mugen, Jin, Fuu, Sunflower Samurai, Hip Hop Soundtrack, Edo Period, Shinichiro Watanabe",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Manglobe\n• Source: Original\n• Score: 8.5\n• Generi: Action, Adventure",
     "a": ["Cowboy Bebop", "Samurai Champloo", "Rurouni Kenshin", "Dororo"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1996\n• Studio: Studio Gallop / Studio Deen\n• Source: Manga\n• Score: 8.3\n• Generi: Action, Adventure, Romance\n• Tags: Kenshin Himura, Battosai, Sakabato, Kaoru Kamiya, Meiji Era, Kyoto Arc",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1996\n• Studio: Studio Gallop / Studio Deen\n• Source: Manga\n• Score: 8.3\n• Generi: Action, Adventure, Romance",
     "a": ["Samurai Champloo", "Rurouni Kenshin", "Gintama", "Peacemaker Kurogane"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Brain's Base\n• Source: Manga\n• Score: 7.7\n• Generi: Action, Comedy, Fantasy\n• Tags: Staz Charlie Blood, Demon World, Fuyumi Yanagi, Ghost, Vampire Otaku, Portal",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Brain's Base\n• Source: Manga\n• Score: 7.7\n• Generi: Action, Comedy, Fantasy",
     "a": ["Blood Lad", "Hellsing", "Rosario + Vampire", "Soul Eater"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.4\n• Generi: Action, Horror, Supernatural\n• Tags: Alucard, Seras Victoria, Integra Hellsing, Millennium, Vatican, Ghouls, Gore, Jackal",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.4\n• Generi: Action, Horror, Supernatural",
     "a": ["Hellsing Ultimate", "Trinity Blood", "Vampire Knight", "Blood+"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2005\n• Studio: Production I.G\n• Source: Original\n• Score: 7.4\n• Generi: Action, Mystery, Supernatural\n• Tags: Saya Otonashi, Chiropterans, Haji, Katana, Red Shield, Okinawa, Blood-related",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2005\n• Studio: Production I.G\n• Source: Original\n• Score: 7.4\n• Generi: Action, Mystery, Supernatural",
     "a": ["Blood+", "Hellsing", "Blood-C", "Shiki"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Production I.G\n• Source: Manga\n• Score: 7.7\n• Generi: Horror, Mystery, Supernatural\n• Tags: Saya Kisaragi, Ukishima Jinja, Elder Bairns, Shrine Maiden, Extreme Gore, Plot Twist, Clamp",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Production I.G\n• Source: Manga\n• Score: 7.7\n• Generi: Horror, Mystery, Supernatural",
     "a": ["Blood+", "Blood-C", "Shiki", "Another"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2010\n• Studio: Daume\n• Source: Novel\n• Score: 7.8\n• Generi: Horror, Mystery, Supernatural\n• Tags: Sotoba Village, Natsuno, Toshio Ozaki, Sunako, Vampires, Epidemic, Kirishiki Family",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2010\n• Studio: Daume\n• Source: Novel\n• Score: 7.8\n• Generi: Horror, Mystery, Supernatural",
     "a": ["Another", "Shiki", "Hellsing Ultimate", "Higurashi"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: P.A. Works\n• Source: Novel\n• Score: 7.5\n• Generi: Horror, Mystery, Supernatural\n• Tags: Yomiyama North Middle School, Class 3-3, Mei Misaki, Kouichi Sakakibara, Calamity, Umbrella Death",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: P.A. Works\n• Source: Novel\n• Score: 7.5\n• Generi: Horror, Mystery, Supernatural",
     "a": ["Another", "Shiki", "Corpse Party", "Higurashi"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Studio Deen\n• Source: Visual Novel\n• Score: 7.9\n• Generi: Horror, Mystery, Supernatural, Suspense\n• Tags: Hinamizawa, Keiichi Maebara, Oyashiro-sama Curse, June 1983, Time Loops, Cicadas, Rena",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Studio Deen\n• Source: Visual Novel\n• Score: 7.9\n• Generi: Horror, Mystery, Supernatural, Suspense",
     "a": ["Another", "Umineko no Naku Koro ni", "Higurashi: When They Cry", "Steins;Gate"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Studio Deen\n• Source: Visual Novel\n• Score: 7.0\n• Generi: Horror, Mystery, Supernatural, Suspense\n• Tags: Rokkenjima Island, Battler Ushiromiya, Beatrice the Golden Witch, Family Inheritance, Mass Murder",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Studio Deen\n• Source: Visual Novel\n• Score: 7.0\n• Generi: Horror, Mystery, Supernatural, Suspense",
     "a": ["Higurashi", "Umineko: When They Cry", "Danganronpa", "Ghost Hunt"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Lerche\n• Source: Game\n• Score: 7.3\n• Generi: Mystery, Sci-Fi, Suspense\n• Tags: Hope's Peak Academy, Monokuma, Makoto Naegi, Junko Enoshima, Class Trial, Mutual Killing",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Lerche\n• Source: Game\n• Score: 7.3\n• Generi: Mystery, Sci-Fi, Suspense",
     "a": ["Danganronpa: The Animation", "Assassination Classroom", "Classroom of the Elite", "Deadman Wonderland"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Manglobe\n• Source: Manga\n• Score: 7.2\n• Generi: Action, Sci-Fi, Horror\n• Tags: Ganta Igarashi, Shiro, Deadman, Branch of Sin, Prison Theme Park, Red Diamond",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Manglobe\n• Source: Manga\n• Score: 7.2\n• Generi: Action, Sci-Fi, Horror",
     "a": ["Danganronpa", "Tokyo Ghoul", "Btooom!", "Deadman Wonderland"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Madhouse\n• Source: Manga\n• Score: 7.3\n• Generi: Action, Sci-Fi, Psychological\n• Tags: Ryouta Sakamoto, Himiko, Deserted Island, BIM Bombs, Real-life Video Game, Survival",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Madhouse\n• Source: Manga\n• Score: 7.3\n• Generi: Action, Sci-Fi, Psychological",
     "a": ["Gantz", "Btooom!", "Sword Art Online", "Mirai Nikki"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: asread\n• Source: Manga\n• Score: 7.5\n• Generi: Action, Supernatural, Suspense\n• Tags: Yukiteru Amano, Yuno Gasai, Deus Ex Machina, Future Diaries, Survival Game, Godhood, Yandere Queen",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: asread\n• Source: Manga\n• Score: 7.5\n• Generi: Action, Supernatural, Suspense",
     "a": ["Mirai Nikki (Future Diary)", "Deadman Wonderland", "Btooom!", "Eden of the East"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Production I.G\n• Source: Original\n• Score: 7.8\n• Generi: Mystery, Romance, Sci-Fi, Suspense\n• Tags: Akira Takizawa, Saki Morimi, Juiz, 10 Billion Yen, Seleção, Mobile Phone, Amnesia",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Production I.G\n• Source: Original\n• Score: 7.8\n• Generi: Mystery, Romance, Sci-Fi, Suspense",
     "a": ["Mirai Nikki", "Psycho-Pass", "Eden of the East (Higashi no Eden)", "Guilty Crown"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Production I.G\n• Source: Manga\n• Score: 7.9\n• Generi: Comedy, Slice of Life\n• Tags: Usagi Drop, Daikichi Kawachi, Rin Kaga, Adoption, Grandfather's Secret Child, Heartwarming",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Production I.G\n• Source: Manga\n• Score: 7.9\n• Generi: Comedy, Slice of Life",
     "a": ["Barakamon", "Sweetness and Lightning", "Bunny Drop (Usagi Drop)", "Poco's Udon World"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: TMS Entertainment\n• Source: Manga\n• Score: 7.5\n• Generi: Comedy, Slice of Life\n• Tags: Kouhei Inuzuka, Tsumugi, Kotori, Cooking, Single Father, Delicious Food, Heartwarming",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: TMS Entertainment\n• Source: Manga\n• Score: 7.5\n• Generi: Comedy, Slice of Life",
     "a": ["Sweetness and Lightning (Amaama to Inazuma)", "Silver Spoon", "Barakamon", "Food Wars!"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy\n• Tags: Soma Yukihira, Totsuki Culinary Academy, Food Gasms, Shokugeki, Erina Nakiri, Cooking Battles",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy",
     "a": ["Sweetness and Lightning", "Food Wars! (Shokugeki no Souma)", "Yakitate!! Japan", "Toriko"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Sunrise\n• Source: Manga\n• Score: 7.9\n• Generi: Comedy\n• Tags: Kazuma Azuma, Solar Hands, Bread Making, Pantasia, Ja-pan, Absurd Cooking Reactions",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Sunrise\n• Source: Manga\n• Score: 7.9\n• Generi: Comedy",
     "a": ["Food Wars!", "Yakitate!! Japan", "Toriko", "Silver Spoon"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Toei Animation\n• Source: Manga\n• Score: 7.5\n• Generi: Action, Adventure, Fantasy\n• Tags: Toriko, Komatsu, Gourmet Hunter, Ingredients, Four Heavenly Kings, God Food",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Toei Animation\n• Source: Manga\n• Score: 7.5\n• Generi: Action, Adventure, Fantasy",
     "a": ["Hunter x Hunter", "Food Wars!", "One Piece", "Toriko"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1999\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.7\n• Generi: Action, Adventure, Fantasy\n• Tags: Monkey D. Luffy, Straw Hat Pirates, Grand Line, Devil Fruit, One Piece, Eiichiro Oda",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1999\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.7\n• Generi: Action, Adventure, Fantasy",
     "a": ["Naruto", "Bleach", "One Piece", "Fairy Tail"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2002\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Adventure\n• Tags: Naruto Uzumaki, Sasuke Uchiha, Sakura, Kakashi, Hidden Leaf Village, Nine-Tails, Hokage",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2002\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Adventure",
     "a": ["Naruto", "Bleach", "One Piece", "Hunter x Hunter"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Adventure, Fantasy\n• Tags: Ichigo Kurosaki, Rukia Kuchiki, Soul Society, Zanpakuto, Hollows, Shinigami, Tite Kubo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Adventure, Fantasy",
     "a": ["Naruto", "Yu Yu Hakusho", "Bleach", "Soul Eater"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: A-1 Pictures / Satelight\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Adventure, Fantasy\n• Tags: Natsu Dragneel, Lucy Heartfilia, Erza, Gray, Happy, Magnolia Town, Dragon Slayer, Guild",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: A-1 Pictures / Satelight\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Adventure, Fantasy",
     "a": ["Fairy Tail", "Black Clover", "Seven Deadly Sins", "Rave Master"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1992\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.4\n• Generi: Action, Adventure, Supernatural\n• Tags: Yusuke Urameshi, Kuwabara, Kurama, Hiei, Spirit Detective, Spirit Gun, Dark Tournament, Yoshihiro Togashi",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1992\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.4\n• Generi: Action, Adventure, Supernatural",
     "a": ["Hunter x Hunter", "Bleach", "Yu Yu Hakusho", "InuYasha"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2000\n• Studio: Sunrise\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Adventure, Fantasy, Romance\n• Tags: Kagome Higurashi, Inuyasha, Shikon Jewel, Feudal Japan, Naraku, Tessaiga, Half-Demon",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2000\n• Studio: Sunrise\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Adventure, Fantasy, Romance",
     "a": ["Yu Yu Hakusho", "InuYasha", "Dororo", "Demon Slayer"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1989\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Fantasy\n• Tags: Son Goku, Saiyan, Vegeta, Frieza, Dragon Balls, Kamehameha, Akira Toriyama",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1989\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Fantasy",
     "a": ["Dragon Ball Z", "Naruto", "One Piece", "Yu Yu Hakusho"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1996\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.0\n• Generi: Sports\n• Tags: Hanamichi Sakuragi, Kaede Rukawa, Shohoku High School, Basketball, Haruko, Takehiko Inoue",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1996\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.0\n• Generi: Sports",
     "a": ["Kuroko's Basketball", "Ahiru no Sora", "Slam Dunk", "Dear Boys"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2001\n• Studio: Trans Arts\n• Source: Manga\n• Score: 7.9\n• Generi: Sports\n• Tags: Ryoma Echizen, Seigaku, Tennis, Prince of Tennis, Twist Serve, National Tournament",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2001\n• Studio: Trans Arts\n• Source: Manga\n• Score: 7.9\n• Generi: Sports",
     "a": ["The Prince of Tennis (Tennis no Ouji-sama)", "Baby Steps", "Stars Align", "Haikyu!!"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.8\n• Generi: Sports\n• Tags: Maruo Eiichiro (Ei-Chan), Natsu, Notes, Tactical Tennis, Baby Steps, Realist Player",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.8\n• Generi: Sports",
     "a": ["The Prince of Tennis", "Baby Steps", "Ping Pong", "Ace of Diamond"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2001\n• Studio: Studio Pierrot\n• Source: Manga\n• Score: 8.1\n• Generi: Comedy, Drama, Supernatural\n• Tags: Hikaru Shindo, Fujiwara no Sai, Go Game, Ghost, Akira Toya, Board Game",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2001\n• Studio: Studio Pierrot\n• Source: Manga\n• Score: 8.1\n• Generi: Comedy, Drama, Supernatural",
     "a": ["March comes in like a lion", "Chihayafuru", "Hikaru no Go", "Shion no Ou"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: David Production\n• Source: Manga\n• Score: 7.6\n• Generi: Comedy\n• Tags: White Blood Cell, Red Blood Cell, Platelets, Human Body, Bacteria, Biological Education",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: David Production\n• Source: Manga\n• Score: 7.6\n• Generi: Comedy",
     "a": ["Cells at Work! (Hataraku Saibou)", "Dr. STONE", "Silver Spoon", "Moyashimon"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: Shirogumi / Telecom Animation Film\n• Source: Manga\n• Score: 7.5\n• Generi: Comedy, Supernatural\n• Tags: Tadayasu Sawaki, Microbes, Agriculture University, Fermentation, Talking Bacteria",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: Shirogumi / Telecom Animation Film\n• Source: Manga\n• Score: 7.5\n• Generi: Comedy, Supernatural",
     "a": ["Cells at Work!", "Silver Spoon", "Moyashimon: Tales of Agriculture", "Barakamon"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: David Production\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Supernatural\n• Tags: Joseph Joestar, Caesar Zeppeli, Lisa Lisa, Kars, Red Stone of Aja, Pillar Men, Hamon",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: David Production\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Supernatural",
     "a": ["Le Bizzarre Avventure di JoJo: Battle Tendency", "Hellsing Ultimate", "Fist of the North Star", "Berserk"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: David Production\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Adventure, Supernatural\n• Tags: Josuke Higashikata, Yoshikage Kira, Morioh Town, Crazy Diamond, Killer Queen, Hand Obsession",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: David Production\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Adventure, Supernatural",
     "a": ["JoJo's Bizarre Adventure: Diamond is Unbreakable", "Stardust Crusaders", "Golden Wind", "Stone Ocean"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: David Production\n• Source: Manga\n• Score: 8.6\n• Generi: Action, Adventure\n• Tags: Giorno Giovanna, Bruno Bucciarati, Passione Mafia, Italy, Golden Experience, King Crimson",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: David Production\n• Source: Manga\n• Score: 8.6\n• Generi: Action, Adventure",
     "a": ["Diamond is Unbreakable", "JoJo's Bizarre Adventure: Vento Aureo (Golden Wind)", "Stone Ocean", "Steel Ball Run"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: David Production\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure\n• Tags: Jolyne Cujoh, Green Dolphin Street Prison, Enrico Pucci, Stone Free, Made in Heaven, Florida",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: David Production\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure",
     "a": ["Golden Wind", "Stone Ocean (JoJo Parte 6)", "Steel Ball Run", "JoJolion"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Studio Deen\n• Source: Visual Novel\n• Score: 7.3\n• Generi: Action, Fantasy, Supernatural\n• Tags: Shirou Emiya, Saber, Rin Tohsaka, Fuyuki City, Holy Grail War, Fate Route",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Studio Deen\n• Source: Visual Novel\n• Score: 7.3\n• Generi: Action, Fantasy, Supernatural",
     "a": ["Fate/Zero", "Fate/stay night (2006)", "Fate/stay night: Unlimited Blade Works", "Fate/Apocrypha"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: ufotable\n• Source: Visual Novel\n• Score: 8.2\n• Generi: Action, Fantasy, Supernatural\n• Tags: Shirou Emiya, Archer, Rin Tohsaka, Unlimited Blade Works, Unlimited Blade Works route, ufotable Animation",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: ufotable\n• Source: Visual Novel\n• Score: 8.2\n• Generi: Action, Fantasy, Supernatural",
     "a": ["Fate/Zero", "Fate/stay night (2006)", "Fate/stay night: Unlimited Blade Works (TV)", "Fate/stay night: Heaven's Feel"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: ufotable\n• Source: Visual Novel\n• Score: 8.3\n• Generi: Action, Fantasy, Horror\n• Tags: Sakura Matou, Shirou Emiya, Dark Sakura, Saber Alter, Movie Trilogy, Heaven's Feel Route",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: ufotable\n• Source: Visual Novel\n• Score: 8.3\n• Generi: Action, Fantasy, Horror",
     "a": ["Fate/stay night: Heaven's Feel", "Fate/Zero", "Fate/Apocrypha", "Fate/Grand Order"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: A-1 Pictures\n• Source: Light Novel\n• Score: 7.1\n• Generi: Action, Fantasy\n• Tags: Great Holy Grail War, Black Faction vs Red Faction, Sieg, Ruler (Jeanne d'Arc), Astolfo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: A-1 Pictures\n• Source: Light Novel\n• Score: 7.1\n• Generi: Action, Fantasy",
     "a": ["Fate/stay night", "Fate/Zero", "Fate/Apocrypha", "Fate/Extra Last Encore"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: CloverWorks\n• Source: Mobile Game\n• Score: 7.9\n• Generi: Action, Fantasy, Sci-Fi\n• Tags: Ritsuka Fujimaru, Mash Kyrielight, Gilgamesh King, Babylonia, Seventh Singularity, Demonic Beasts",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: CloverWorks\n• Source: Mobile Game\n• Score: 7.9\n• Generi: Action, Fantasy, Sci-Fi",
     "a": ["Fate/Grand Order: Absolute Demonic Front - Babylonia", "Fate/Apocrypha", "Fate/Zero", "Fate/Extra"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Kyoto Animation\n• Source: Light Novel\n• Score: 7.4\n• Generi: Comedy, Fantasy, Slice of Life\n• Tags: Yuuta Togashi, Rikka Takanashi, Chuunibyou, Tyrant's Eye, Dark Flame Master, High School Romance",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Kyoto Animation\n• Source: Light Novel\n• Score: 7.4\n• Generi: Comedy, Fantasy, Slice of Life",
     "a": ["Love, Chunibyo & Other Delusions! (Chuunibyou demo Koi ga Shitai!)", "Toradora!", "Oregairu", "Bunny Girl Senpai"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 7.5\n• Generi: Comedy, Romance\n• Tags: Erika Shinohara, Kyouya Sata, Fake Boyfriend, Black Prince, Dog contract, Shojo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 7.5\n• Generi: Comedy, Romance",
     "a": ["Wolf Girl and Black Prince (Ookami Shoujo to Kuro Ouji)", "Ao Haru Ride", "Kimi ni Todoke", "My Little Monster"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.0\n• Generi: Comedy, Fantasy, Romance\n• Tags: Nanami Momozono, Tomoe, Mikage Shrine, Land God, Fox Familiar, Yokai, Shojo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.0\n• Generi: Comedy, Fantasy, Romance",
     "a": ["InuYasha", "Kamisama Kiss (Kamisama Hajimemashita)", "Natsume's Book of Friends", "Noragami"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1997\n• Studio: OLM\n• Source: Game\n• Score: 7.4\n• Generi: Action, Adventure, Fantasy\n• Tags: Ash Ketchum, Pikachu, Pallet Town, Pokéball, Allenatore, Gotta Catch 'Em All",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1997\n• Studio: OLM\n• Source: Game\n• Score: 7.4\n• Generi: Action, Adventure, Fantasy",
     "a": ["Digimon", "Pokémon", "Yu-Gi-Oh!", "Monster Rancher"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2000\n• Studio: Toei Animation\n• Source: Game\n• Score: 7.3\n• Generi: Action, Adventure, Fantasy\n• Tags: Yugi Mutou, Pharaoh, Duel Monsters, carte, Millennium Puzzle, Kaiba",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2000\n• Studio: Toei Animation\n• Source: Game\n• Score: 7.3\n• Generi: Action, Adventure, Fantasy",
     "a": ["Cardcaptor Sakura", "Pokémon", "Yu-Gi-Oh!", "Bakugan"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 7.5\n• Generi: Action, Comedy, Fantasy\n• Tags: Isekai, Kirito, Asuna, intrappolati in un videogioco, spada, Aincrad",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 7.5\n• Generi: Action, Comedy, Fantasy",
     "a": ["Sword Art Online", "Log Horizon", "Overlord", "Accel World"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2002\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Adventure\n• Tags: Naruto Uzumaki, Villaggio della Foglia, Ninja, Rasengan, Sasuke, Hokage",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2002\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Adventure",
     "a": ["Bleach", "One Piece", "Naruto", "Hunter x Hunter"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1999\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.7\n• Generi: Action, Adventure, Fantasy\n• Tags: Luffy, Pirati, Frutto del Diavolo, Grande Linea, Zoro, Tesoro misterioso",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1999\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.7\n• Generi: Action, Adventure, Fantasy",
     "a": ["One Piece", "Naruto", "Fairy Tail", "Bleach"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1989\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Fantasy\n• Tags: Goku, Sayan, Sfere del Drago, Vegeta, Kamehameha, Super Sayan",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1989\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Fantasy",
     "a": ["Naruto", "Dragon Ball Z", "One Piece", "Bleach"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Madhouse\n• Source: Web Manga\n• Score: 8.5\n• Generi: Action, Comedy, Sci-Fi\n• Tags: Saitama, eroe per hobby, un solo pugno, pelato, Genos, Associazione Eroi",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Madhouse\n• Source: Web Manga\n• Score: 8.5\n• Generi: Action, Comedy, Sci-Fi",
     "a": ["My Hero Academia", "Mob Psycho 100", "Dragon Ball Super", "One Punch Man"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.6\n• Generi: Supernatural, Suspense\n• Tags: Light Yagami, quaderno della morte, L, Ryuk, Shinigami, Kira",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.6\n• Generi: Supernatural, Suspense",
     "a": ["Code Geass", "Death Note", "Monster", "Psycho-Pass"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Bones\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Sci-Fi\n• Tags: Deku, All Might, Quirk, Unione dei Villain, scuola per supereroi, Bakugo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Bones\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Sci-Fi",
     "a": ["My Hero Academia", "One Punch Man", "Jujutsu Kaisen", "Naruto"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: ufotable\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Fantasy\n• Tags: Tanjiro, Nezuko, demoni, spada di katana, cacciatori di demoni, respiro dell'acqua",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: ufotable\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Fantasy",
     "a": ["Jujutsu Kaisen", "Bleach", "Demon Slayer (Kimetsu no Yaiba)", "InuYasha"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.6\n• Generi: Action, Fantasy\n• Tags: Yuji Itadori, dita di Sukuna, Gojo Satoru, maledizioni, istituto di arti occulte",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.6\n• Generi: Action, Fantasy",
     "a": ["Chainsaw Man", "Jujutsu Kaisen", "Demon Slayer", "Tokyo Ghoul"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: WIT Studio\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Drama, Suspense\n• Tags: Eren Jaeger, giganti mangia-uomini, mura protettive, Mikasa, Armin, Corpo di Ricerca",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: WIT Studio\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Drama, Suspense",
     "a": ["L'Attacco dei Giganti (Attack on Titan)", "Kabaneri", "Claymore", "Vinland Saga"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.4\n• Generi: Sports\n• Tags: Pallavolo, Hinata Shoyo, Kageyama, squadra del Karasuno, corvi",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.4\n• Generi: Sports",
     "a": ["Kuroko's Basketball", "Haikyu!!", "Free!", "Slam Dunk"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Madhouse\n• Source: Manga\n• Score: 9.0\n• Generi: Action, Adventure, Fantasy\n• Tags: Gon Freecss, Killua, licenza di Hunter, Nen, Kurapika, Hisoka",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Madhouse\n• Source: Manga\n• Score: 9.0\n• Generi: Action, Adventure, Fantasy",
     "a": ["Yu Yu Hakusho", "Naruto Shippuden", "Bleach", "Hunter x Hunter"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Bones\n• Source: Manga\n• Score: 9.1\n• Generi: Action, Adventure, Drama, Fantasy\n• Tags: Edward Elric, Alphonse, alchimia, scambio equivalente, braccio d'acciaio, pietra filosofale",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Bones\n• Source: Manga\n• Score: 9.1\n• Generi: Action, Adventure, Drama, Fantasy",
     "a": ["Fullmetal Alchemist: Brotherhood", "Soul Eater", "Blue Exorcist", "D.Gray-man"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Fantasy, Horror, Suspense\n• Tags: Ken Kaneki, capelli bianchi, ghouls, caffè Anteiku, maschera, Tokyo, carne umana",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Fantasy, Horror, Suspense",
     "a": ["Parasyte", "Tokyo Ghoul", "Deadman Wonderland", "Chainsaw Man"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2022\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Comedy, Horror\n• Tags: Denji, Pochita, motosega nel petto, Makima, cacciatori di diavoli, Power",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2022\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Comedy, Horror",
     "a": ["Jujutsu Kaisen", "Tokyo Ghoul", "Chainsaw Man", "Dorohedoro"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2022\n• Studio: Wit Studio / CloverWorks\n• Source: Manga\n• Score: 8.5\n• Generi: Comedy, Slice of Life\n• Tags: Anya, Loid Forger, Yor, telepate, spia, assassina, finta famiglia, cane Bond",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2022\n• Studio: Wit Studio / CloverWorks\n• Source: Manga\n• Score: 8.5\n• Generi: Comedy, Slice of Life",
     "a": ["Kaguya-sama", "Spy x Family", "Buddy Daddies", "The Promised Neverland"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: White Fox\n• Source: Visual Novel\n• Score: 8.9\n• Generi: Drama, Sci-Fi, Suspense\n• Tags: Okabe Rintaro, microonde a celle, messaggi nel passato, linee temporali, Makise Kurisu, El Psy Kongroo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: White Fox\n• Source: Visual Novel\n• Score: 8.9\n• Generi: Drama, Sci-Fi, Suspense",
     "a": ["Erased", "Re:Zero", "Tokyo Revengers", "Steins;Gate"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Sunrise\n• Source: Original\n• Score: 8.7\n• Generi: Action, Drama, Sci-Fi\n• Tags: Lelouch Lamperouge, Geass, mecha, maschera di Zero, ribellione, Impero di Britannia",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Sunrise\n• Source: Original\n• Score: 8.7\n• Generi: Action, Drama, Sci-Fi",
     "a": ["Code Geass: Lelouch of the Rebellion", "Guilty Crown", "Gundam", "Evangelion"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: White Fox\n• Source: Light Novel\n• Score: 8.2\n• Generi: Drama, Fantasy, Suspense\n• Tags: Subaru Natsuki, Isekai, ritorno dalla morte, Rem, Emilia, strega dell'invidia",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: White Fox\n• Source: Light Novel\n• Score: 8.2\n• Generi: Drama, Fantasy, Suspense",
     "a": ["Konosuba", "Sword Art Online", "Re:Zero - Starting Life in Another World", "Shield Hero"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Studio Deen\n• Source: Light Novel\n• Score: 8.1\n• Generi: Adventure, Comedy, Fantasy\n• Tags: Kazuma, dea inutile Aqua, Megumin magia esplosiva, Darkness, Isekai comico",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Studio Deen\n• Source: Light Novel\n• Score: 8.1\n• Generi: Adventure, Comedy, Fantasy",
     "a": ["Konosuba!", "Slime Isekai", "Overlord", "No Game No Life"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Toei Animation\n• Source: Manga\n• Score: 7.4\n• Generi: Action, Adventure, Fantasy\n• Tags: Goku, Beerus, Torneo del Potere, Jiren, Ultra Istinto, continuazione di DBZ",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Toei Animation\n• Source: Manga\n• Score: 7.4\n• Generi: Action, Adventure, Fantasy",
     "a": ["Dragon Ball GT", "Dragon Ball Super", "Dragon Ball Heroes", "Naruto Boruto"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Adventure, Fantasy\n• Tags: Ichigo Kurosaki, mietitore di anime, spada gigante Zanpakuto, Rukia, Soul Society",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Adventure, Fantasy",
     "a": ["Naruto", "Yu Yu Hakusho", "Bleach", "Soul Eater"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.6\n• Generi: Mystery, Sci-Fi, Suspense\n• Tags: Emma, Norman, Ray, orfanotrofio Grace Field, fuga dai demoni, numeri sul collo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.6\n• Generi: Mystery, Sci-Fi, Suspense",
     "a": ["Made in Abyss", "The Promised Neverland", "Attack on Titan", "Another"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: TMS Entertainment\n• Source: Manga\n• Score: 8.1\n• Generi: Comedy, Romance\n• Tags: Kaguya Shinomiya, Shirogane, guerra d'amore, consiglio studentesco, Chika Fujiwara, confessione",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: TMS Entertainment\n• Source: Manga\n• Score: 8.1\n• Generi: Comedy, Romance",
     "a": ["Kaguya-sama: Love is War", "Horimiya", "Toradora!", "Oregairu"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: David Production\n• Source: Manga\n• Score: 8.1\n• Generi: Adventure, Comedy, Sci-Fi\n• Tags: Senku Ishigami, mondo di pietra, pietrificazione, regno della scienza, formula chimica",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: David Production\n• Source: Manga\n• Score: 8.1\n• Generi: Adventure, Comedy, Sci-Fi",
     "a": ["Dr. STONE", "Steins;Gate", "Cells at Work!", "Attack on Titan"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Eight Bit\n• Source: Light Novel\n• Score: 8.1\n• Generi: Action, Adventure, Comedy, Fantasy\n• Tags: Rimuru Tempest, Isekai, mostro azzurro, dragone Veldora, grande saggio",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Eight Bit\n• Source: Light Novel\n• Score: 8.1\n• Generi: Action, Adventure, Comedy, Fantasy",
     "a": ["Overlord", "Mushoku Tensei", "That Time I Got Reincarnated as a Slime", "Konosuba"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1998\n• Studio: Sunrise\n• Source: Original\n• Score: 8.8\n• Generi: Action, Sci-Fi\n• Tags: Spike Spiegel, astronave Bebop, cacciatori di taglie, Jet Black, Faye Valentine, Ein il cane",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1998\n• Studio: Sunrise\n• Source: Original\n• Score: 8.8\n• Generi: Action, Sci-Fi",
     "a": ["Trigun", "Outlaw Star", "Space Dandy", "Cowboy Bebop"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1995\n• Studio: Gainax\n• Source: Original\n• Score: 8.3\n• Generi: Action, Drama, Sci-Fi\n• Tags: Shinji Ikari, robot gigante Eva-01, angeli, Rei Ayanami, Asuka, fine del mondo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1995\n• Studio: Gainax\n• Source: Original\n• Score: 8.3\n• Generi: Action, Drama, Sci-Fi",
     "a": ["Gundam", "Neon Genesis Evangelion", "Gurren Lagann", "Code Geass"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 8.7\n• Generi: Drama, Romance\n• Tags: Arima Kousei, Kaori Miyazono, violino, pianoforte, melodrama musicale, primavera",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 8.7\n• Generi: Drama, Romance",
     "a": ["Your Lie in April (Shigatsu wa Kimi no Uso)", "Nodame Cantabile", "K-On!", "Sound! Euphonium"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 8.1\n• Generi: Drama, Romance\n• Tags: Taiga Aisaka, Ryuuji, tigre tascabile, tsundere, amore scolastico",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 8.1\n• Generi: Drama, Romance",
     "a": ["Clannad", "Kimi ni Todoke", "Toradora!", "Lovely Complex"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Romance, Slice of Life\n• Tags: Hori, Miyamura, segreti scolastici, tatuaggi e piercing, amore dolcissimo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Romance, Slice of Life",
     "a": ["Horimiya", "Ao Haru Ride", "Kimi ni Todoke", "Kaguya-sama"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Fantasy\n• Tags: Meliodas, tana del cinghiale, sette peccati capitali, Elizabeth, reame di Britannia",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Fantasy",
     "a": ["Fairy Tail", "The Seven Deadly Sins (Nanatsu no Taizai)", "Black Clover", "Overlord"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Studio Pierrot\n• Source: Manga\n• Score: 8.1\n• Generi: Action, Comedy, Fantasy\n• Tags: Asta, Yuno, grimorio a cinque foglie, Toro Nero, anti-magia, Re Magico",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Studio Pierrot\n• Source: Manga\n• Score: 8.1\n• Generi: Action, Comedy, Fantasy",
     "a": ["Fairy Tail", "Black Clover", "Bleach", "My Hero Academia"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Adventure, Fantasy\n• Tags: Natsu Dragneel, Lucy, gilda di maghi, Happy il gatto blu, magia del fuoco",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 7.6\n• Generi: Action, Adventure, Fantasy",
     "a": ["Fairy Tail", "Black Clover", "Rave", "Seven Deadly Sins"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1996\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.0\n• Generi: Sports\n• Tags: Hanamichi Sakuragi, canestro, squadra dello Shohoku, Rukia, pallacanestro",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1996\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.0\n• Generi: Sports",
     "a": ["Kuroko's Basketball", "Slam Dunk", "Ahiru no Sora", "Dear Boys"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.1\n• Generi: Sports\n• Tags: Tetsuya Kuroko, Kagami, passaggi invisibili, Generazione dei Miracoli, basket",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.1\n• Generi: Sports",
     "a": ["Slam Dunk", "Haikyu!!", "Kuroko's Basketball", "Free!"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1999\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Adventure\n• Tags: Naruto adolescente, Akatsuki, dolore di Pain, Jiraiya, quarta guerra ninja",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1999\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Adventure",
     "a": ["Naruto Shippuden", "Boruto", "Bleach", "One Piece"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: A-1 Pictures\n• Source: Original\n• Score: 8.3\n• Generi: Drama, Supernatural\n• Tags: Menma, fantasma, desideri d'infanzia, pianti finali, gruppo di amici",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: A-1 Pictures\n• Source: Original\n• Score: 8.3\n• Generi: Drama, Supernatural",
     "a": ["Anohana: The Flower We Saw That Day", "Your Lie in April", "Angel Beats!", "Clannad"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1993\n• Studio: Toei Animation\n• Source: Manga\n• Score: 7.7\n• Generi: Mahou Shoujo, Romance\n• Tags: Bunny Tsukino, gatto Luna, cristallo d'argento, guerriere Sailor, Tuxedo Mask",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1993\n• Studio: Toei Animation\n• Source: Manga\n• Score: 7.7\n• Generi: Mahou Shoujo, Romance",
     "a": ["Madoka Magica", "Sailor Moon", "Cardcaptor Sakura", "Mew Mew"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1996\n• Studio: Toei Animation\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Adventure\n• Tags: Son Goku bambino, macchina di Pilaf, viaggio nello spazio, trasformazione in scimmia, GT",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1996\n• Studio: Toei Animation\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Adventure",
     "a": ["Dragon Ball Z", "Dragon Ball GT", "Dragon Ball Kai", "Dragon Ball Super"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Studio Deen\n• Source: Light Novel\n• Score: 7.3\n• Generi: Action, Fantasy\n• Tags: Shirou Emiya, evocazione di Saber, guerra del Santo Graal, spadaccina bionda",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Studio Deen\n• Source: Light Novel\n• Score: 7.3\n• Generi: Action, Fantasy",
     "a": ["Fate/Zero", "Fate/stay night (2006)", "Fate/Apocrypha", "Fate/Grand Order"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Madhouse\n• Source: Light Novel\n• Score: 7.9\n• Generi: Action, Fantasy\n• Tags: Ainz Ooal Gown, scheletro mago supremo, grande tomba di Nazarick, Albedo, NPC servitori",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Madhouse\n• Source: Light Novel\n• Score: 7.9\n• Generi: Action, Fantasy",
     "a": ["Log Horizon", "Sword Art Online", "Overlord", "Slime Isekai"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: Kinema Citrus\n• Source: Light Novel\n• Score: 8.0\n• Generi: Action, Adventure, Fantasy\n• Tags: Naofumi, eroe dello scudo, tradimento iniziale, Raphtalia la procione, Filo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: Kinema Citrus\n• Source: Light Novel\n• Score: 8.0\n• Generi: Action, Adventure, Fantasy",
     "a": ["The Rising of the Shield Hero", "Goblin Slayer", "DanMachi", "Arifureta"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 7.8\n• Generi: Comedy, Slice of Life\n• Tags: Club di musica leggera, Yui chitarra, Mio basso, tè e pasticcini, Azusa",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2009\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 7.8\n• Generi: Comedy, Slice of Life",
     "a": ["K-On!", "Beck", "Sound! Euphonium", "Love Live!"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1998\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Sci-Fi\n• Tags: Vash the Stampede, cappotto rosso, pianeta desertico, ricercato da 60 miliardi, pistolero pacifista",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1998\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Sci-Fi",
     "a": ["Cowboy Bebop", "Outlaw Star", "Trigun", "Gungrave"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Kyoto Animation\n• Source: Light Novel\n• Score: 8.6\n• Generi: Drama, Fantasy\n• Tags: Violet, scrivere lettere per gli altri, protesi alle mani, reduce di guerra, maggiore Gilbert",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: Kyoto Animation\n• Source: Light Novel\n• Score: 8.6\n• Generi: Drama, Fantasy",
     "a": ["A Silent Voice", "Your Lie in April", "Anohana", "Violet Evergarden"],
     "c": 3,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2000\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.7\n• Generi: Sports\n• Tags: Ippo Makunouchi, pugilato, colpo Dempsey Roll, palestra Kamogawa, Takamura",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2000\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.7\n• Generi: Sports",
     "a": ["Hajime no Ippo", "Ashita no Joe", "Megalo Box", "Baki"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Shaft\n• Source: Original\n• Score: 8.3\n• Generi: Drama, Mahou Shoujo, Suspense\n• Tags: Madoka Kaname, contratto con Kyubey, streghe, Homura, maghette oscure",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Shaft\n• Source: Original\n• Score: 8.3\n• Generi: Drama, Mahou Shoujo, Suspense",
     "a": ["Sailor Moon", "Puella Magi Madoka Magica", "Cardcaptor Sakura", "Yuki Yuna"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Bones\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Comedy, Supernatural\n• Tags: Yato, dio senza un tempio, 5 yen per preghiera, Hiyori, Yukine la spada",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Bones\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Comedy, Supernatural",
     "a": ["Noragami", "Soul Eater", "Blue Exorcist", "Bleach"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Trigger\n• Source: Original\n• Score: 8.0\n• Generi: Action, Comedy, Sci-Fi\n• Tags: Ryuko Matoi, lama a forbice, vestiti da battaglia parlanti, Senketsu, Satsuki Kiryuin",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: Trigger\n• Source: Original\n• Score: 8.0\n• Generi: Action, Comedy, Sci-Fi",
     "a": ["Gurren Lagann", "Kill la Kill", "Akame ga Kill!", "Soul Eater"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 8.9\n• Generi: Drama\n• Tags: Shoya Ishida, Shoko Nishimiya, ragazza sorda, bullismo alle elementari, riscatto, film d'animazione",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 8.9\n• Generi: Drama",
     "a": ["Your Name.", "Voglio mangiare il tuo pancreas", "La Forma della Voce (A Silent Voice)", "Anohana"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: CoMix Wave Films\n• Source: Original\n• Score: 8.8\n• Generi: Drama, Romance, Supernatural\n• Tags: Taki e Mitsuha, scambio di corpi, sciamana, stella cadente, Tokyo vs campagna, Makoto Shinkai",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: CoMix Wave Films\n• Source: Original\n• Score: 8.8\n• Generi: Drama, Romance, Supernatural",
     "a": ["Your Name.", "La Forma della Voce", "Oltre i confini dello spazio", "Weathering With You"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Kinema Citrus\n• Source: Web Manga\n• Score: 8.7\n• Generi: Adventure, Drama, Fantasy\n• Tags: Riko e Reg, grande voragine misteriosa, reliquie, maledizione della discesa, robot",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: Kinema Citrus\n• Source: Web Manga\n• Score: 8.7\n• Generi: Adventure, Drama, Fantasy",
     "a": ["The Promised Neverland", "Made in Abyss", "Tower of God", "Inori"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: White Fox\n• Source: Manga\n• Score: 7.5\n• Generi: Action, Fantasy\n• Tags: Tatsumi, assassini Night Raid, Akame, armi imperiali Teigu, capitale corrotta",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: White Fox\n• Source: Manga\n• Score: 7.5\n• Generi: Action, Fantasy",
     "a": ["Akame ga Kill!", "Kill la Kill", "Fate/Zero", "Attack on Titan"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: ufotable\n• Source: Light Novel\n• Score: 8.3\n• Generi: Action, Supernatural\n• Tags: Kiritsugu Emiya, Saber, Gilgamesh, Kotomine, quarta guerra del Graal, prequel",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: ufotable\n• Source: Light Novel\n• Score: 8.3\n• Generi: Action, Supernatural",
     "a": ["Fate/stay night", "Fate/Extra", "Fate/Zero", "Fate/Apocrypha"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Production I.G\n• Source: Original\n• Score: 8.4\n• Generi: Action, Sci-Fi\n• Tags: Akane Tsunemori, Shinya Kogami, pistola Dominator, coefficiente di criminalità, Sistema Sibyl, cyberpunk",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Production I.G\n• Source: Original\n• Score: 8.4\n• Generi: Action, Sci-Fi",
     "a": ["Ghost in the Shell", "Psycho-Pass", "Cyberpunk Edgerunners", "Ergo Proxy"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: MAPPA\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Sci-Fi, Horror\n• Tags: Shinichi Izumi, alieno parassita, braccio destro mutato, Migi, lotta per la sopravvivenza",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: MAPPA\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Sci-Fi, Horror",
     "a": ["Tokyo Ghoul", "Parasyte -the maxim-", "Devilman Crybaby", "Inuyashiki"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: CloverWorks\n• Source: Original\n• Score: 7.2\n• Generi: Action, Drama, Sci-Fi\n• Tags: Hiro, Zero Two, robot FRANXX, mostri stridulanti, parassiti adolescenti, codice 002",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: CloverWorks\n• Source: Original\n• Score: 7.2\n• Generi: Action, Drama, Sci-Fi",
     "a": ["Neon Genesis Evangelion", "Gurren Lagann", "Darling in the Franxx", "Ssss.Gridman"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: Gainax\n• Source: Original\n• Score: 8.6\n• Generi: Action, Adventure, Sci-Fi\n• Tags: Simon, Kamina, robot con gli occhiali, trivella che perfora i cieli, Yoko, anti-spiral",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2007\n• Studio: Gainax\n• Source: Original\n• Score: 8.6\n• Generi: Action, Adventure, Sci-Fi",
     "a": ["Kill la Kill", "Tengen Toppa Gurren Lagann", "Evangelion", "Gundam"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1997\n• Studio: OLM\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Adventure, Fantasy\n• Tags: Guts lo spadaccino nero, Griffith, Squadra dei Falchi, ammazzadraghi, Behelit, eclissi",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1997\n• Studio: OLM\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Adventure, Fantasy",
     "a": ["Berserk", "Claymore", "Vinland Saga", "Goblin Slayer"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: WIT Studio\n• Source: Manga\n• Score: 8.7\n• Generi: Action, Adventure, Drama\n• Tags: Thorfinn, vichinghi, vendetta contro Askeladd, drakkar, Inghilterra, principe Canuto",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: WIT Studio\n• Source: Manga\n• Score: 8.7\n• Generi: Action, Adventure, Drama",
     "a": ["Berserk", "Vinland Saga", "Golden Kamuy", "Kingdom"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Madhouse\n• Source: Manga\n• Score: 7.5\n• Generi: Supernatural, Suspense\n• Tags: Kaiji Ito, debiti di gioco, nave Espoir, sasso carta forbici con le carte, giochi psicologici",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: Madhouse\n• Source: Manga\n• Score: 7.5\n• Generi: Supernatural, Suspense",
     "a": ["Kakegurui", "Gyakkyou Burai Kaiji: Ultimate Survivor", "Death Note", "No Game No Life"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: MAPPA\n• Source: Manga\n• Score: 7.2\n• Generi: Drama, Mystery, Psychological\n• Tags: Yumeko Jabami, accademia privata Hyakkaou, scommesse folli, facce impazzite, elezioni studentesche",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2017\n• Studio: MAPPA\n• Source: Manga\n• Score: 7.2\n• Generi: Drama, Mystery, Psychological",
     "a": ["Kaiji", "Death Parade", "Kakegurui", "Liar Game"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Sci-Fi\n• Tags: Revy due mani, Rock, mercenari a Roanapur, mafia russa Balalaika, sparatorie",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Sci-Fi",
     "a": ["Black Lagoon", "Jormungand", "Gangsta", "91 Days"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2022\n• Studio: Trigger\n• Source: Game\n• Score: 8.6\n• Generi: Action, Sci-Fi\n• Tags: David Martinez, Night City, innesti cybernetici, Rebecca, Lucy, ciberpsicosi",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2022\n• Studio: Trigger\n• Source: Game\n• Score: 8.6\n• Generi: Action, Sci-Fi",
     "a": ["Cyberpunk: Edgerunners", "Psycho-Pass", "Ghost in the Shell", "Akira"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Sunrise\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Comedy, Sci-Fi\n• Tags: Gintoki, Shinpachi, Kagura, alieni Amanto nell'epoca Edo, parodia totale, agenzia tuttofare",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Sunrise\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Comedy, Sci-Fi",
     "a": ["Gintama", "Rurouni Kenshin", "Samurai Champloo", "Bleach"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Bones\n• Source: Web Manga\n• Score: 8.5\n• Generi: Action, Comedy, Supernatural\n• Tags: Mob (Shigeo), sensitivo potentissimo, truffatore Reigen, misuratore di stress al 100%, spiriti",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Bones\n• Source: Web Manga\n• Score: 8.5\n• Generi: Action, Comedy, Supernatural",
     "a": ["One Punch Man", "Jujutsu Kaisen", "Mob Psycho 100", "Noragami"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Lerche\n• Source: Manga\n• Score: 8.1\n• Generi: Action, Comedy\n• Tags: Koro-sensei la piovra gialla, classe 3-E, uccidere il professore, luna distrutta, coltelli di gomma",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: Lerche\n• Source: Manga\n• Score: 8.1\n• Generi: Action, Comedy",
     "a": ["Assassination Classroom", "Classroom of the Elite", "My Hero Academia", "Great Teacher Onizuka"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1999\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.3\n• Generi: Action, Comedy, Drama\n• Tags: Eikichi Onizuka, ex teppista, professore delle medie, classe ribelle, moto, 22 anni",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1999\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.3\n• Generi: Action, Comedy, Drama",
     "a": ["Slam Dunk", "GTO: Great Teacher Onizuka", "Assassination Classroom", "Golden Boy"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Madhouse\n• Source: Light Novel\n• Score: 8.1\n• Generi: Comedy, Fantasy\n• Tags: Sora e Shiro, i 'Bianchi', mondo governato dai giochi, dio Tet, niente violenza",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Madhouse\n• Source: Light Novel\n• Score: 8.1\n• Generi: Comedy, Fantasy",
     "a": ["Sword Art Online", "No Game No Life", "Log Horizon", "Kakegurui"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: White Fox\n• Source: Light Novel\n• Score: 7.4\n• Generi: Action, Fantasy\n• Tags: guerriero con armatura sporca, caccia solo piccoli mostri verdi, sacerdotessa, scudo piccolo",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: White Fox\n• Source: Light Novel\n• Score: 7.4\n• Generi: Action, Fantasy",
     "a": ["Goblin Slayer", "Berserk", "Shield Hero", "DanMachi"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Sunrise\n• Source: Manga\n• Score: 7.8\n• Generi: Comedy, Slice of Life\n• Tags: Tadakuni, Hidenori, Yoshitake, mutande della sorella, gags scolastiche demenziali",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: Sunrise\n• Source: Manga\n• Score: 7.8\n• Generi: Comedy, Slice of Life",
     "a": ["Nichijou", "Daily Lives of High School Boys", "Lucky Star", "Asobi Asobase"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 8.4\n• Generi: Comedy, Slice of Life\n• Tags: Yukko, Mio, professoressa bambina, robot Nano con la chiave sulla schiena, capre a scuola, gags assurde",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Kyoto Animation\n• Source: Manga\n• Score: 8.4\n• Generi: Comedy, Slice of Life",
     "a": ["Nichijou - My Ordinary Life", "Lucky Star", "K-On!", "Azumanga Daioh"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 7.9\n• Generi: Comedy, Slice of Life\n• Tags: Kitahara, club di immersioni Peek-a-boo, bere alcol nei bicchierini, nudità comica, università",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2018\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 7.9\n• Generi: Comedy, Slice of Life",
     "a": ["Free!", "Prison School", "Grand Blue Dreaming", "Golden Time"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 7.7\n• Generi: Comedy, Ecchi\n• Tags: Kiyoshi, prigione scolastica interna, 5 ragazzi in una scuola femminile, la presidentessa, punizioni corporali",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 7.7\n• Generi: Comedy, Ecchi",
     "a": ["Prison School", "Grand Blue", "Shimoneta", "Highschool DxD"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy\n• Tags: Soma Yukihira, accademia di cucina Totsuki, vestiti che esplodono per il sapore, sfide culinarie",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2015\n• Studio: J.C.Staff\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy",
     "a": ["Food Wars! (Shokugeki no Souma)", "Yakitate!! Japan", "Toriko", "Silver Spoon"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Mystery, Supernatural, Suspense\n• Tags: Satoru Fujinuma, viaggiare indietro nel tempo (Revival), salvare i compagni delle elementari, rapitore, neve",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2016\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Mystery, Supernatural, Suspense",
     "a": ["Steins;Gate", "Erased (Boku dake ga Inai Machi)", "Tokyo Revengers", "Re:Zero"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: Liden Films\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Drama, Supernatural\n• Tags: Takemichi piagnucolone, salto nel passato di 12 anni, banda di motociclisti Toman, Mikey, Draken",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: Liden Films\n• Source: Manga\n• Score: 7.9\n• Generi: Action, Drama, Supernatural",
     "a": ["Erased", "Tokyo Revengers", "91 Days", "Durarara!!"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Manglobe\n• Source: Original\n• Score: 8.5\n• Generi: Action, Adventure\n• Tags: Mugen il selvaggio, Jin il ronin, Fuu, samurai che profuma di girasoli, colonna sonora hip-hop",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Manglobe\n• Source: Original\n• Score: 8.5\n• Generi: Action, Adventure",
     "a": ["Rurouni Kenshin", "Samurai Champloo", "Cowboy Bebop", "Afro Samurai"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1996\n• Studio: Studio Gallop / Studio Deen\n• Source: Manga\n• Score: 8.3\n• Generi: Action, Adventure, Romance\n• Tags: spadaccino vagabondo, cicatrice a forma di X, katana a lama invertita, Kaoru, epoca Meiji",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1996\n• Studio: Studio Gallop / Studio Deen\n• Source: Manga\n• Score: 8.3\n• Generi: Action, Adventure, Romance",
     "a": ["Samurai Champloo", "Gintama", "Rurouni Kenshin (Kenshin samurai vagabondo)", "InuYasha"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: P.A. Works\n• Source: Novel\n• Score: 7.5\n• Generi: Horror, Mystery, Supernatural\n• Tags: Mei Misaki con la benda, classe 3-3 maledetta, morti assurde con l'ombrello, chi è il morto in più?",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: P.A. Works\n• Source: Novel\n• Score: 7.5\n• Generi: Horror, Mystery, Supernatural",
     "a": ["Another", "Shiki", "Higurashi", "Corpse Party"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: Brain's Base\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Slice of Life, Supernatural\n• Tags: Natsume, gatto ciccione Nyanko-sensei, restituire i nomi agli spiriti Yokai, taccuino degli amici",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: Brain's Base\n• Source: Manga\n• Score: 8.3\n• Generi: Drama, Slice of Life, Supernatural",
     "a": ["Mushishi", "Natsume degli Spiriti (Natsume Yuujinchou)", "Noragami", "InuYasha"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2002\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Adventure\n• Tags: esami di selezione dei Chunin, Orochimaru, Jiraiya il saggio dei rospi, Tsunade, invasione della Foglia",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2002\n• Studio: Pierrot\n• Source: Manga\n• Score: 8.0\n• Generi: Action, Adventure",
     "a": ["Naruto (Prima serie)", "Bleach", "One Piece", "Hunter x Hunter"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1999\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.7\n• Generi: Action, Adventure, Fantasy\n• Tags: saga di Alabasta, Crocodile, principessa Vivi, Chopper la renna medica, nave Going Merry",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1999\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.7\n• Generi: Action, Adventure, Fantasy",
     "a": ["Naruto", "Fairy Tail", "One Piece", "Bleach"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1989\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Fantasy\n• Tags: saga di Cell, Trunks del futuro, stanza dello spirito e del tempo, Gohan Super Sayan 2",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1989\n• Studio: Toei Animation\n• Source: Manga\n• Score: 8.2\n• Generi: Action, Adventure, Fantasy",
     "a": ["Dragon Ball Z", "Dragon Ball Super", "Yu Yu Hakusho", "Naruto"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Madhouse\n• Source: Manga\n• Score: 9.0\n• Generi: Action, Adventure, Fantasy\n• Tags: esame per diventare Hunter, Killua della famiglia Zoldyck, torre della lotta, Hisoka il clown",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: Madhouse\n• Source: Manga\n• Score: 9.0\n• Generi: Action, Adventure, Fantasy",
     "a": ["Naruto", "Hunter x Hunter (2011)", "Bleach", "Yu Yu Hakusho"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.6\n• Generi: Action, Fantasy\n• Tags: espansione del dominio, Megumi Fushiguro, Nobara, Satoru Gojo con gli occhi bendati, dita maledette",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2020\n• Studio: MAPPA\n• Source: Manga\n• Score: 8.6\n• Generi: Action, Fantasy",
     "a": ["Jujutsu Kaisen", "Chainsaw Man", "Demon Slayer", "Tokyo Ghoul"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: ufotable\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Fantasy\n• Tags: selezione finale sulla montagna dei glicini, Zenitsu fifone, Inosuke testa di cinghiale, Muzan Kibutsuji",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2019\n• Studio: ufotable\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Fantasy",
     "a": ["Demon Slayer", "Jujutsu Kaisen", "Bleach", "Dororo"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: WIT Studio\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Drama, Suspense\n• Tags: distretto di Shiganshina, gigante colossale, gigante corazzato, il capitano Levi Ackerman",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2013\n• Studio: WIT Studio\n• Source: Manga\n• Score: 8.5\n• Generi: Action, Drama, Suspense",
     "a": ["L'Attacco dei Giganti", "Kabaneri", "Seraph of the End", "Vinland Saga"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.6\n• Generi: Supernatural, Suspense\n• Tags: detective L, agenzia di polizia, Misa Amane, Ryuk che mangia mele, quaderno nero",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2006\n• Studio: Madhouse\n• Source: Manga\n• Score: 8.6\n• Generi: Supernatural, Suspense",
     "a": ["Code Geass", "Monster", "Death Note", "Psycho-Pass"],
     "c": 2,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 7.5\n• Generi: Action, Comedy, Fantasy\n• Tags: videogioco mortale di Akihiko Kayaba, spade Elucidator e Dark Repulser, gilda dei Cavalieri del Giuramento di Sangue",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2012\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 7.5\n• Generi: Action, Comedy, Fantasy",
     "a": ["Sword Art Online", "Log Horizon", "Overlord", "No Game No Life"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: White Fox\n• Source: Visual Novel\n• Score: 8.9\n• Generi: Drama, Sci-Fi, Suspense\n• Tags: laboratorio di gadget futuristici, sbanana, John Titor, linea temporale Alpha, assistente Kurisu",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2011\n• Studio: White Fox\n• Source: Visual Novel\n• Score: 8.9\n• Generi: Drama, Sci-Fi, Suspense",
     "a": ["Steins;Gate", "Robotics;Notes", "Re:Zero", "Erased"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.4\n• Generi: Sports\n• Tags: palazzetto dello sport, torneo intercollegiale, alzata veloce, liceo Karasuno vs Aoba Johsai, Oikawa",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2014\n• Studio: Production I.G\n• Source: Manga\n• Score: 8.4\n• Generi: Sports",
     "a": ["Kuroko's Basketball", "Haikyu!!", "Free!", "Ace of Diamond"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Adventure, Fantasy\n• Tags: capitani delle 13 brigate, finto tradimento di Sosuke Aizen, potenziamento Bankai, mostri Hollow",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2004\n• Studio: Pierrot\n• Source: Manga\n• Score: 7.8\n• Generi: Action, Adventure, Fantasy",
     "a": ["Naruto", "Bleach", "Yu Yu Hakusho", "D.Gray-man"],
     "c": 1,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 8.1\n• Generi: Drama, Romance\n• Tags: borsa di studio, festival scolastico, drago e tigre, bisticci d'amore, Taiga e Ryuuji",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2008\n• Studio: J.C.Staff\n• Source: Light Novel\n• Score: 8.1\n• Generi: Drama, Romance",
     "a": ["Toradora!", "Clannad", "Lovely Complex", "Golden Time"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Romance\n• Tags: ragazza popolare a casa sciatta, ragazzo cupo fuori ma pieno di piercing, innamoramento, scuola superiore",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2021\n• Studio: CloverWorks\n• Source: Manga\n• Score: 8.2\n• Generi: Comedy, Romance",
     "a": ["Horimiya", "Ao Haru Ride", "Kimi ni Todoke", "Kaguya-sama"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 2022\n• Studio: Wit Studio / CloverWorks\n• Source: Manga\n• Score: 8.5\n• Generi: Comedy, Slice of Life\n• Tags: missione 'Strix', scuola d'élite Eden, noccioline, sguardi buffi di Anya, finto matrimonio",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 2022\n• Studio: Wit Studio / CloverWorks\n• Source: Manga\n• Score: 8.5\n• Generi: Comedy, Slice of Life",
     "a": ["Spy x Family", "Buddy Daddies", "Kaguya-sama", "The Promised Neverland"],
     "c": 0,
     "img": ""
   },
   {
-    "q": "Indovina l'anime dagli indizi:\n• Anno: 1997\n• Studio: OLM\n• Source: Game\n• Score: 7.4\n• Generi: Action, Adventure, Fantasy\n• Tags: capipalestra, medaglie, infermiera Joy, Team Rocket, Jesse e James, catturare mostriciattoli selvatici",
+    "q": "Indovina l'anime dagli indizi:\n• Anno: 1997\n• Studio: OLM\n• Source: Game\n• Score: 7.4\n• Generi: Action, Adventure, Fantasy",
     "a": ["Digimon", "Yu-Gi-Oh!", "Pokémon", "Monster Rancher"],
     "c": 2,
     "img": ""
   }
+        ];
+
+        // PACCHETTO CULTURA GENERALE
+        const packCultura = [
+            // INCOLLA QUI TUTTE LE TUE DOMANDE DI CULTURA GENERALE
         ];
 
         function addPlayer() {
@@ -1871,10 +1866,13 @@
         let players = [];
         let activePlayerIndex = 0;
         let isRolling = false;
+        
+        // VARIABILI PER IL DADO (Anti-Ripetizione)
+        let lastRoll = 0;
+        let rollCount = 0;
 
-        // NUOVO ORDINE DELLE CASELLE
         const gooseSquares = [12, 28, 42, 61, 75, 89];
-        const questionSquares = [4, 9, 17, 25, 31, 38, 46, 53, 58, 66, 74, 81, 86, 93, 97]; 
+        const questionSquares = [4, 10, 17, 24, 31, 38, 47, 54, 58, 67, 73, 83, 86, 92, 99]; 
         const ruleSquares = [7, 14, 23, 35, 43, 51, 62, 69, 78, 85, 94]; 
         const forwardSquares = { 3: 2, 11: 4, 21: 1, 33: 3, 44: 2, 55: 1, 64: 3, 72: 2, 82: 4, 91: 1 };
         const backwardSquares = { 6: -2, 16: -3, 26: -1, 37: -4, 48: -2, 59: -1, 68: -3, 79: -2, 88: -4, 98: -2 };
@@ -1902,15 +1900,31 @@
         }
 
         function startGame() {
-            if (setupPlayers.length < 2) return alert("Almeno 2 giocatori!");
+            if (setupPlayers.length < 1) return alert("Devi inserire almeno 1 giocatore!");
+
+            // CONTROLLO PACCHETTI SELEZIONATI
+            let selectedPacks = [];
+            if (document.getElementById('pack-anime').checked) {
+                selectedPacks = selectedPacks.concat(packAnime);
+            }
+            if (document.getElementById('pack-cultura').checked) {
+                selectedPacks = selectedPacks.concat(packCultura);
+            }
+
+            if (selectedPacks.length === 0) {
+                return alert("Devi selezionare almeno un pacchetto di domande!");
+            }
+
+            // CARICA IL DATABASE
+            quizDatabase = [...selectedPacks];
+
             players = setupPlayers.map((p, idx) => ({ id: idx + 1, name: p.name, pos: 1, color: p.color, char: p.name.charAt(0).toUpperCase(), skipTurn: false }));
             document.getElementById('setup-container').style.display = 'none';
             document.getElementById('game-container').style.display = 'flex';
             
             const boardEl = document.getElementById('board');
             boardStructure.forEach(data => {
-                let name = "Sentiero";
-                let desc = "";
+                let name = "Sentiero"; let desc = "";
                 
                 if (data.type === "start") { name = "Partenza ⛩️"; desc = "Inizio"; }
                 else if (data.type === "finish") { name = "ARRIVO 🌌"; desc = "Vittoria!"; }
@@ -1957,7 +1971,21 @@
             setTimeout(() => {
                 clearInterval(inter);
                 document.getElementById('dice').classList.remove("rolling");
-                const steps = Math.floor(Math.random() * 6) + 1;
+                
+                // LOGICA DADO ANTI-RIPETIZIONE
+                let steps = Math.floor(Math.random() * 6) + 1;
+                if (steps === lastRoll) {
+                    rollCount++;
+                    if (rollCount >= 2) { 
+                        // Se è uscito lo stesso numero 2 volte, forza un numero diverso
+                        steps = (steps % 6) + 1; 
+                        rollCount = 0;
+                    }
+                } else {
+                    rollCount = 0;
+                }
+                lastRoll = steps;
+
                 document.getElementById('dice').innerText = ["⚀","⚁","⚂","⚃","⚄","⚅"][steps-1];
                 log(`<b style="color:${currentPlayer.color}">${currentPlayer.name}</b> fa ${steps}.`);
                 movePlayer(currentPlayer, steps);
