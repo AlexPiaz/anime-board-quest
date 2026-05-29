@@ -2553,9 +2553,9 @@ function openPunishModal(ruleIdx) {
 }
 window.openPunishModal = openPunishModal;
 </script>
-    <script>
+ <script>
     // Imposta il ritardo in millisecondi (10000 = 10 secondi)
-    const ritardoPubblicita = 30000; 
+    const ritardoPubblicita = 10000; 
 
     setTimeout(function() {
         console.log("Avvio delle pubblicità ritardato...");
@@ -2564,8 +2564,8 @@ window.openPunishModal = openPunishModal;
         let monetagScript = document.createElement('script');
         
         // INSERISCI QUI L'URL DEL TUO SCRIPT MONETAG
-        <script>(function(s){s.dataset.zone='11072860',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-        monetagScript.src = "https://tuo-link-fornito-da-monetag.js"; 
+        // (Lo trovi nel codice che ti dà Monetag alla voce "src")
+        monetagScript.src = "<script>(function(s){s.dataset.zone='11072860',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>"; 
         
         // Aggiunge lo script alla pagina e lo fa partire
         document.head.appendChild(monetagScript);
