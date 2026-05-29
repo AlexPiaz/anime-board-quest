@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="monetag" content="82e8ded7727773ca033dce4865842c6d">
+     <meta name="monetag" content="82e8ded7727773ca033dce4865842c6d">
     <title>Board Quest | Legend Quiz Edition</title>
-    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1535059756217332" crossorigin="anonymous"></script>
     <style>
         :root {
             --bg-color: #08090f; --panel-color: #121420; --accent-pink: #ff2a74;
             --accent-blue: #00f0ff; --accent-purple: #7000ff; --accent-yellow: #ffbe0b; --text-color: #ffffff;
             --gold: #ffd700; --success: #00ff66; --error: #ff3b3b;
         }
+
         * { box-sizing: border-box; touch-action: manipulation; }
+
         body {
             font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-color);
             margin: 0; padding: 20px 15px; display: flex; flex-direction: column; align-items: center;
             background-image: radial-gradient(circle at 50% 10%, #1a153a 0%, #08090f 100%);
             min-height: 100vh; position: relative; overflow-x: hidden; line-height: 1.6;
         }
+
         body::before {
             content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)), radial-gradient(1px 1px at 90px 20px, #ddd, rgba(0,0,0,0));
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 90px 20px, #ddd, rgba(0,0,0,0));
             background-repeat: no-repeat; background-size: 200px 200px; opacity: 0.3;
             pointer-events: none; z-index: 0;
         }
+
         .game-banner {
             position: fixed; top: 0; left: 0; right: 0; height: 55px;
             background: linear-gradient(90deg, rgba(255,42,116,0.95) 0%, rgba(112,0,255,0.95) 50%, rgba(0,240,255,0.95) 100%);
@@ -33,9 +39,11 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.4); backdrop-filter: blur(5px);
         }
         .banner-text { font-size: 1.1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; text-align: center; }
+        
         .main-content { width: 100%; max-width: 1600px; margin-top: 70px; position: relative; z-index: 1; padding-bottom: 30px; display: flex; flex-direction: column; align-items: center; }
         .top-bar { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; gap: 20px; width: 100%; }
         h1 { font-size: 2.5rem; text-transform: uppercase; letter-spacing: 4px; text-shadow: 0 0 20px var(--accent-blue); margin: 0; text-align: center; }
+        
         .rules-btn {
             background: linear-gradient(135deg, var(--accent-yellow), #ff9900); color: #000;
             border: none; border-radius: 30px; padding: 12px 30px; font-weight: bold; font-size: 1.1rem;
@@ -43,20 +51,23 @@
             width: max-content; align-self: center; margin-bottom: 10px;
         }
         .rules-btn:hover { transform: scale(1.05); }
+
         .center-container { width: 100%; max-width: 750px; margin: 0 auto; text-align: center; }
         .panel { background: rgba(18, 20, 32, 0.95); border: 2px solid var(--accent-blue); padding: 35px 25px; border-radius: 16px; text-align: center; margin-bottom: 20px; width: 100%; }
         .setup-row { display: flex; gap: 15px; margin: 25px 0; justify-content: center; flex-wrap: wrap; align-items: center; }
+        
         input[type="text"], input[type="number"], select {
             padding: 15px; border-radius: 10px; border: 2px solid var(--accent-purple);
-            background: #08090f; color: #fff; font-size: 1.1rem; flex: 1; min-width: 150px;
-            width: 100%; box-sizing: border-box;
+            background: #08090f; color: #fff; font-size: 1.1rem; flex: 1; min-width: 150px; width: 100%; box-sizing: border-box;
         }
         #player-pawn-input, #online-pawn-input { flex: 0.3; min-width: 100px; text-align: center; }
+        
         .packs-container { display: flex; gap: 15px; justify-content: center; margin: 25px 0; flex-wrap: wrap; }
         .pack-label { background: #191d30; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background 0.2s; }
         .pack-label:hover { background: #2d3454; }
         .player-item { display: flex; justify-content: space-between; align-items: center; background: #191d30; padding: 12px 18px; margin-bottom: 12px; border-radius: 10px; font-size: 1.1rem; }
         .gm-radio { accent-color: var(--gold); transform: scale(1.5); margin-right: 15px; cursor: pointer; }
+        
         .btn-group { display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: 15px; }
         .btn-row { display: flex; gap: 15px; width: 100%; }
         button {
@@ -69,13 +80,16 @@
         .start-btn { font-size: 1.3rem; padding: 18px; background: linear-gradient(45deg, #00ff66, #00cc55); color: #000; }
         .undo-btn { background: #ff3b3b; }
         .restart-btn { background: linear-gradient(45deg, #ff6600, #ff2a74); }
+        
         #mode-selector { display: flex; gap: 20px; margin-bottom: 30px; justify-content: center; flex-wrap: wrap; }
         .mode-btn { width: auto; padding: 15px 30px; font-size: 1.2rem; border-radius: 15px; background: #191d30; border: 2px solid #333; }
         .mode-btn.active { border-color: var(--accent-blue); background: rgba(0,240,255,0.1); box-shadow: 0 0 15px var(--accent-blue); }
+
         #game-container { display: none; width: 100%; }
         .game-layout { display: flex; gap: 25px; width: 100%; align-items: flex-start; }
         #board-wrapper { flex: 3.5; width: 100%; background: rgba(18, 20, 32, 0.85); border-radius: 16px; border: 2px solid var(--accent-purple); padding: 20px; overflow-x: auto; }
         #board { display: grid; grid-template-columns: repeat(10, minmax(80px, 1fr)); gap: 10px; width: 100%; min-width: 800px; }
+        
         .cell {
             background: linear-gradient(135deg, #191d30, #0f1120); border: 2px solid #2d3454; border-radius: 10px;
             position: relative; display: flex; flex-direction: column; align-items: center; padding: 8px;
@@ -90,6 +104,7 @@
         .cell-num { position: absolute; top: 4px; left: 6px; background: rgba(0,0,0,0.8); padding: 3px 6px; border-radius: 6px; color: var(--accent-blue); font-size: 0.8rem; font-weight: bold; }
         .cell-name { font-size: 0.9rem; font-weight: bold; margin-top: auto; text-align: center; width: 100%; line-height: 1.2; padding-top: 15px; }
         .cell-desc { font-size: 0.7rem; color: #a0a5c0; text-align: center; margin-bottom: auto; }
+        
         .cell.start { border-color: #00ff66; background: linear-gradient(135deg, #082d18, #041a0c); }
         .cell.finish { border-color: var(--accent-pink); background: linear-gradient(135deg, #4a061d, #2a0310); }
         .cell.goose { border-color: var(--accent-yellow); background: linear-gradient(135deg, #3a2b02, #1f1601); }
@@ -98,6 +113,7 @@
         .cell.custom-rule { border-color: #ad00ff; background: linear-gradient(135deg, #26023a, #12011c); }
         .cell.forward { border-color: #00ff66; background: linear-gradient(135deg, #0b3d17, #05220c); }
         .cell.backward { border-color: #ff3366; background: linear-gradient(135deg, #3d0b16, #1f0409); }
+
         .players-container { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: auto; width: 100%; padding-top: 15px; }
         .pawn {
             position: relative; width: 34px; height: 34px; border-radius: 50%; border: 2px solid #fff;
@@ -116,40 +132,53 @@
         }
         .pawn:hover .pawn-tooltip { display: block; }
         @keyframes idleBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+        
         #side-panels { flex: 1.2; display: flex; flex-direction: column; gap: 20px; min-width: 320px; }
         .turn-indicator { font-size: 1.3rem; text-align: center; padding: 15px; background: #121420; border-radius: 10px; border-left: 5px solid var(--accent-blue); font-weight: bold; margin-bottom: 25px; }
         #dice { width: 90px; height: 90px; background: linear-gradient(135deg, white, #e0e0e0); color: #111; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: bold; margin: 0 auto 20px auto; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .rolling { animation: rollDice3D 0.5s infinite; }
         @keyframes rollDice3D { 0% { transform: rotateX(0deg) rotateY(0deg); } 50% { transform: rotateX(180deg) rotateY(180deg) scale(1.2); } 100% { transform: rotateX(360deg) rotateY(360deg); } }
+        
         #player-legend-container { margin-top: 15px; font-size: 0.95rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
         #player-legend { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .legend-item { display: flex; align-items: center; gap: 5px; font-weight: bold; }
         .legend-color { width: 14px; height: 14px; border-radius: 50%; border: 1px solid white; }
+        
         #log { background: rgba(8,9,15,0.9); border-radius: 10px; padding: 15px; font-size: 0.9rem; border: 1px solid #2d3454; margin-top: 20px; min-height: 150px; max-height: 250px; overflow-y: auto; text-align: left; }
         .log-entry { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 8px; }
         .log-entry-info { color: #aaa; font-style: italic; }
         .log-entry-warning { color: #ffbe0b; }
         .log-entry-error { color: #ff3b3b; }
         .log-entry-success { color: #00ff66; }
+        
         #custom-rules-panel { border-color: #ad00ff; flex: 1; min-height: 250px; max-height: 400px; display: flex; flex-direction: column; }
         #rules-list { overflow-y: auto; padding: 0; margin: 0; list-style: none; display: flex; flex-direction: column; gap: 15px; }
         #rules-list li { background: rgba(173,0,255,0.15); border-left: 4px solid #ad00ff; padding: 15px; border-radius: 8px; font-size: 1rem; display: flex; flex-direction: column; gap: 12px; }
         .punish-btn { background: #ff3b3b; border: none; color: white; padding: 12px; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: bold; width: 100%; transition: background 0.2s; margin-top: 5px; }
         #gm-panel { border-color: var(--gold); background: rgba(30,25,0,0.95); }
+
         /* Modali */
         #feedback-toast {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel-color); padding: 30px 45px; border-radius: 16px;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); padding: 30px 45px; border-radius: 16px;
             font-size: 1.5rem; font-weight: bold; text-align: center; z-index: 9999; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.9); border: 4px solid;
             min-width: 320px; max-width: 90vw;
         }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: linear-gradient(135deg, var(--panel-color), #0a0c14); border: 3px solid var(--accent-blue); padding: 35px 25px; border-radius: 16px; max-width: 600px; width: 100%; text-align: center; max-height: 90vh; overflow-y: auto; position: relative; }
+        .modal-content { background: linear-gradient(135deg, var(--panel-color), #0a0c14); border: 3px solid var(--accent-blue); padding: 35px 25px; border-radius: 16px; max-width: 600px; width: 100%; text-align: left; max-height: 90vh; overflow-y: auto; position: relative; }
         .click-outside-info { position: absolute; top: -30px; left: 0; width: 100%; text-align: center; color: #aaa; font-size: 0.85rem; font-style: italic; pointer-events: none; }
-        .quiz-question-text { font-size: 1.3rem; font-weight: bold; margin: 0 0 30px 0; line-height: 1.5; }
-        .quiz-option { background: #191d30; border: 2px solid #ff781f; padding: 18px; margin: 12px 0; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.1rem; transition: background 0.2s; }
+        
+        .rules-section { margin-bottom: 20px; border-left: 3px solid var(--accent-blue); padding-left: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;}
+        .rules-section h4 { color: var(--accent-blue); margin: 0 0 10px 0; font-size: 1.1rem; }
+        .rules-section p { margin: 0 0 8px 0; font-size: 0.95rem; line-height: 1.5; }
+        .rules-section ul { margin: 0; padding-left: 20px; font-size: 0.95rem; line-height: 1.5; }
+        .rules-section li { margin-bottom: 6px; }
+
+        .quiz-question-text { font-size: 1.3rem; font-weight: bold; margin: 0 0 30px 0; line-height: 1.5; text-align: center;}
+        .quiz-option { background: #191d30; border: 2px solid #ff781f; padding: 18px; margin: 12px 0; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.1rem; transition: background 0.2s; text-align: center;}
         .quiz-option:hover:not(.disabled) { background: #ff781f; color: black; }
         .quiz-option.disabled { opacity: 0.6; cursor: not-allowed; border-color: #555; }
-        .quiz-penalty-note { font-size: 1rem; color: #ff3b3b; margin-top: 20px; font-weight: bold; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .quiz-penalty-note { font-size: 1rem; color: #ff3b3b; margin-top: 20px; font-weight: bold; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;}
+        
         .tabs { display: flex; margin-bottom: 25px; border-bottom: 2px solid #333; gap: 10px; }
         .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-weight: bold; color: #888; border-radius: 8px 8px 0 0; font-size: 1.05rem; }
         .tab.active { color: var(--accent-purple); border-bottom: 4px solid var(--accent-purple); background: rgba(173,0,255,0.1); }
@@ -157,9 +186,16 @@
         .tab-content.active { display: block; }
         .form-group { margin-bottom: 20px; width: 100%; text-align: left; }
         .form-group label { display: block; margin-bottom: 8px; font-size: 1rem; color: var(--accent-blue); font-weight: bold; }
+        
         .rule-hint { background: rgba(173,0,255,0.1); border: 1px solid #ad00ff; border-radius: 10px; padding: 14px 16px; font-size: 0.95rem; color: #ccc; margin-bottom: 20px; text-align: left; line-height: 1.6; }
         .rule-hint b { color: #ad00ff; }
         #creator-tag { position: fixed; bottom: 10px; right: 15px; font-size: 0.9rem; color: rgba(255,255,255,0.7); z-index: 1000; pointer-events: none; font-weight: bold; }
+        
+        /* Pannello Gestione GM */
+        .gm-player-row { background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; }
+        .gm-player-row button { margin:0; padding: 8px; font-size: 0.9rem; width: auto;}
+        .lobby-kick-btn { background: #ff3b3b !important; color: white !important; border: none !important; border-radius: 6px !important; padding: 6px 12px !important; cursor: pointer !important; font-weight: bold !important; margin-left: 10px !important; width: auto !important; font-size: 0.85rem !important; }
+
         @media (max-width: 1100px) { .game-layout { flex-direction: column; } #side-panels { flex-direction: row; flex-wrap: wrap; width: 100%; } .panel { flex: 1; min-width: 300px; } }
         @media (max-width: 750px) { body { padding: 10px; } #board { min-width: 600px; } .pawn { width: 28px; height: 28px; font-size: 0.8rem; } .btn-row { flex-direction: column; } }
     </style>
@@ -172,7 +208,7 @@
 <div class="main-content">
     <div class="top-bar">
         <h1>BOARD QUEST</h1>
-        <button class="rules-btn" onclick="openModal('rules-modal')" style="width:auto;">📜 Regole del Gioco</button>
+        <button class="rules-btn" onclick="openModal('rules-modal')" style="width:auto;">📜 Leggi le Regole</button>
     </div>
 
     <div id="mode-selector">
@@ -182,16 +218,13 @@
 
     <div class="center-container panel" id="setup-container">
         <h2>👥 Giocatori & Game Master (Locale)</h2>
-        <p style="color:#ccc; margin-bottom:20px;">Seleziona la 👑 per assegnare il GM.</p>
+        <p style="color:#ccc; margin-bottom:20px;">Seleziona la 👑 per assegnare il ruolo di Game Master.</p>
         <div class="setup-row">
             <select id="player-pawn-input" title="Scegli la tua pedina">
-                <option value="">Pedina</option>
-                <option value="🐉">🐉 Drago</option><option value="⚔️">⚔️ Spade</option>
-                <option value="🚗">🚗 Auto</option><option value="🦁">🦁 Leone</option>
-                <option value="🚀">🚀 Razzo</option><option value="💎">💎 Diamante</option>
-                <option value="👻">👻 Fantasma</option><option value="👽">👽 Alieno</option>
-                <option value="🤡">🤡 Clown</option><option value="🤖">🤖 Robot</option>
-                <option value="🍕">🍕 Pizza</option><option value="🍄">🍄 Fungo</option>
+                <option value="">Pedina</option><option value="🐉">🐉 Drago</option><option value="⚔️">⚔️ Spade</option>
+                <option value="🚗">🚗 Auto</option><option value="🦁">🦁 Leone</option><option value="🚀">🚀 Razzo</option>
+                <option value="💎">💎 Diamante</option><option value="👻">👻 Fantasma</option><option value="👽">👽 Alieno</option>
+                <option value="🤡">🤡 Clown</option><option value="🤖">🤖 Robot</option><option value="🍕">🍕 Pizza</option><option value="🍄">🍄 Fungo</option>
             </select>
             <input type="text" id="player-name-input" placeholder="Nome Giocatore" maxlength="15">
             <button style="width:auto; padding:15px 30px; margin-top:0;" onclick="addPlayer()">➕ Aggiungi</button>
@@ -211,13 +244,10 @@
         <h2>🌐 Multiplayer Online</h2>
         <div class="setup-row">
             <select id="online-pawn-input" title="Scegli la tua pedina">
-                <option value="">Pedina</option>
-                <option value="🐉">🐉 Drago</option><option value="⚔️">⚔️ Spade</option>
-                <option value="🚗">🚗 Auto</option><option value="🦁">🦁 Leone</option>
-                <option value="🚀">🚀 Razzo</option><option value="💎">💎 Diamante</option>
-                <option value="👻">👻 Fantasma</option><option value="👽">👽 Alieno</option>
-                <option value="🤡">🤡 Clown</option><option value="🤖">🤖 Robot</option>
-                <option value="🍕">🍕 Pizza</option><option value="🍄">🍄 Fungo</option>
+                <option value="">Pedina</option><option value="🐉">🐉 Drago</option><option value="⚔️">⚔️ Spade</option>
+                <option value="🚗">🚗 Auto</option><option value="🦁">🦁 Leone</option><option value="🚀">🚀 Razzo</option>
+                <option value="💎">💎 Diamante</option><option value="👻">👻 Fantasma</option><option value="👽">👽 Alieno</option>
+                <option value="🤡">🤡 Clown</option><option value="🤖">🤖 Robot</option><option value="🍕">🍕 Pizza</option><option value="🍄">🍄 Fungo</option>
             </select>
             <input type="text" id="online-name-input" placeholder="Il tuo Nome" maxlength="15">
         </div>
@@ -230,11 +260,11 @@
                 <label class="pack-label"><input type="checkbox" id="pack-videogiochi-online"> 🎮 Videogiochi</label>
             </div>
         </div>
-        <button onclick="hostOnlineGame()" style="background:var(--accent-purple);">Crea Stanza (Diventi GM)</button>
+        <button onclick="hostOnlineGame()" style="background:var(--accent-purple);">Crea Nuova Stanza (Diventi GM)</button>
         <hr style="border:1px solid #333; margin:25px 0;">
         <div class="btn-row">
             <input type="text" id="room-code-input" placeholder="Codice Stanza" style="margin-bottom:0; text-transform:uppercase;">
-            <button onclick="joinOnlineGame()" style="background:#555; margin-top:0;">Unisciti a Stanza Esistente</button>
+            <button onclick="joinOnlineGame()" style="background:#555; margin-top:0;">Unisciti a Stanza</button>
         </div>
     </div>
 
@@ -280,8 +310,9 @@
 
                 <div class="panel" id="gm-panel">
                     <h3>👑 Game Master:<br><span id="gm-name" style="color:white; font-size:1.5rem; display:block; margin-top:5px;">Nessuno</span></h3>
-                    <p style="font-size:0.9rem; color:#ccc; margin-bottom:20px;">Il GM supervisiona le regole e applica gli effetti.</p>
+                    <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">Il GM supervisiona le regole e gestisce la partita.</p>
                     <button onclick="openPassGMModal()" style="background:var(--gold); color:black;">🔄 Passa Ruolo GM</button>
+                    <button onclick="openGMSettingsModal()" style="background:linear-gradient(45deg, #00f0ff, #7000ff); margin-top:10px;">⚙️ Gestione Giocatori</button>
                 </div>
             </div>
         </div>
@@ -290,17 +321,98 @@
 
 <div id="rules-modal" class="modal-overlay" onclick="closeModalOutside(event,'rules-modal')">
     <div class="modal-content" style="border-color:var(--accent-blue);">
-        <h2 style="color:var(--accent-blue); margin-top:0;">📜 Regole del Gioco</h2>
-        <div class="rules-section"><h4>🎯 Obiettivo</h4><p>Raggiungi esattamente la casella 100! Se tiri di più, rimbalzi all'indietro.</p></div>
-        <div class="rules-section"><h4>👑 GM</h4><p>Supervisiona le regole e applica bonus/malus a chi sgarra.</p></div>
-        <div class="rules-section"><h4>❓ Domanda</h4><p>Rispondi correttamente per continuare. Sbagliare costa -2 passi.</p></div>
-        <div class="rules-section"><h4>📜 Legge</h4><p>Chi atterra inventa una regola. Il GM decide quando applicarla.</p></div>
-        <button onclick="closeModal('rules-modal')" style="margin-top:20px;">Chiudi</button>
+        <h2 style="color:var(--accent-blue); margin-top:0; text-align:center;">📜 REGOLE DEL GIOCO</h2>
+        
+        <div class="rules-section">
+            <h4>🎯 OBIETTIVO</h4>
+            <p>Raggiungi <strong>esattamente la casella 100</strong>! Se il lancio dei dadi supera il traguardo, rimbalzi all'indietro del numero di passi in eccesso.</p>
+        </div>
+        
+        <div class="rules-section">
+            <h4>🎲 SVOLGIMENTO DEL TURNO</h4>
+            <ul>
+                <li><strong>1. Lancia i dadi</strong> - Clicca sul dado per ottenere un numero da 1 a 6.</li>
+                <li><strong>2. Muovi la pedina</strong> - Avanza del numero di caselle ottenuto.</li>
+                <li><strong>3. Attiva l'effetto casella</strong> - Ogni casella ha un effetto speciale.</li>
+                <li><strong>4. Passa il turno</strong> - Dopo l'effetto, tocca al giocatore successivo.</li>
+            </ul>
+        </div>
+
+        <div class="rules-section">
+            <h4>🏆 TIPI DI CASELLE</h4>
+            <ul>
+                <li><strong style="color:#00ff66;">⛩️ Partenza (1)</strong> - Punto di partenza.</li>
+                <li><strong style="color:#ff2a74;">🌌 Arrivo (100)</strong> - Vittoria immediata!</li>
+                <li><strong style="color:#ffbe0b;">✨ Oca</strong> - Ripeti il lancio e avanza dello stesso numero di passi.</li>
+                <li><strong style="color:#ff781f;">❓ Domanda</strong> - Rispondi correttamente per avanzare, sbagliare fa arretrare di 2 passi.</li>
+                <li><strong style="color:#ad00ff;">📜 Legge</strong> - Crea una nuova regola personalizzata!</li>
+                <li><strong style="color:#00ff66;">🏃 Avanti</strong> - Avanza di 1-2 caselle extra.</li>
+                <li><strong style="color:#ff3366;">🔙 Indietro</strong> - Arretra di 1-2 caselle.</li>
+                <li><strong style="color:#ff3b3b;">⛔ Prigione/Malus</strong> - Salta un turno o vai a una casella specifica.</li>
+            </ul>
+        </div>
+
+        <div class="rules-section">
+            <h4>📝 SISTEMA QUIZ</h4>
+            <ul>
+                <li>Domande a risposta multipla con 4 opzioni.</li>
+                <li><strong style="color:#00ff66;">✅ Risposta corretta</strong> - Turno concluso normalmente.</li>
+                <li><strong style="color:#ff3b3b;">❌ Risposta sbagliata</strong> - Arretri di 2 caselle.</li>
+                <li>Le domande sono divise per tematiche (Anime, Cultura, Sport, Videogiochi).</li>
+            </ul>
+        </div>
+
+        <div class="rules-section">
+            <h4>👑 GAME MASTER (GM)</h4>
+            <ul>
+                <li>Supervisiona il rispetto delle regole.</li>
+                <li>Può <strong>applicare le leggi</strong> create durante la partita.</li>
+                <li>Può <strong>spostare liberamente le pedine</strong> e <strong>espellere giocatori</strong> tramite le impostazioni.</li>
+                <li>Può <strong>passare il ruolo</strong> a un altro giocatore.</li>
+                <li>In modalità online, solo il GM può avviare la partita.</li>
+            </ul>
+        </div>
+
+        <div class="rules-section">
+            <h4>📜 LEGGI PERSONALIZZATE</h4>
+            <ul>
+                <li><strong>Nuova regola</strong> - Inserisci testo e valore di penalità/bonus.</li>
+                <li><strong>Modifica casella</strong> - Trasforma una casella in qualsiasi altro tipo.</li>
+                <li>Solo il <strong>GM può applicare</strong> gli effetti delle leggi.</li>
+            </ul>
+        </div>
+
+        <div class="rules-section">
+            <h4>🌐 MODALITÀ ONLINE</h4>
+            <ul>
+                <li><strong>Crea Stanza</strong> - Diventi GM e ottieni un codice.</li>
+                <li><strong>Unisciti</strong> - Inserisci il codice per entrare in una stanza.</li>
+                <li><strong>Condividi link</strong> - Usa il pulsante "Copia Link" per invitare amici.</li>
+                <li>Lo stato di gioco è sincronizzato in tempo reale con Firebase.</li>
+            </ul>
+        </div>
+
+        <div class="rules-section">
+            <h4>🎮 COMANDI DISPONIBILI</h4>
+            <ul>
+                <li><strong>🎲 Lancia i Dadi</strong> - Esegui il tuo turno.</li>
+                <li><strong>↩️ Annulla Ultima Mossa</strong> - Annulla solo l'ultimo turno effettuato (solo GM).</li>
+                <li><strong>🔄 Esci/Ricomincia</strong> - Termina la partita e torna al menu.</li>
+                <li><strong>⚡ Applica Effetto</strong> - Applica una legge a un giocatore (solo GM).</li>
+                <li><strong>🔄 Passa Ruolo GM</strong> - Trasferisci i poteri di GM a un altro.</li>
+                <li><strong>⚙️ Gestione Giocatori</strong> - Sposta pedine o espelli giocatori (solo GM).</li>
+            </ul>
+        </div>
+        
+        <div style="text-align:center;">
+            <button onclick="closeModal('rules-modal')" style="margin-top:20px; width:auto; padding: 10px 30px;">Chiudi</button>
+        </div>
     </div>
 </div>
 
-<div id="quiz-modal" class="modal-overlay">
-    <div class="modal-content" style="border-color:#ff781f;">
+<div id="quiz-modal" class="modal-overlay" onclick="closeModalOutside(event,'quiz-modal')">
+    <div class="modal-content" style="border-color:#ff781f; text-align: center;">
+        <div class="click-outside-info">Clicca fuori per guardare il tabellone</div>
         <h2 style="color:#ff781f; margin-bottom:20px;">❓ DOMANDA</h2>
         <p id="quiz-question" class="quiz-question-text"></p>
         <div id="quiz-options-container"></div>
@@ -309,8 +421,9 @@
     </div>
 </div>
 
-<div id="rule-creator-modal" class="modal-overlay">
-    <div class="modal-content" style="border-color:#ad00ff;">
+<div id="rule-creator-modal" class="modal-overlay" onclick="closeModalOutside(event,'rule-creator-modal')">
+    <div class="modal-content" style="border-color:#ad00ff; text-align: center;">
+        <div class="click-outside-info">Clicca fuori per guardare il tabellone</div>
         <h2 style="color:#ad00ff; margin-top:0;" id="rule-modal-title">📜 Crea una Legge</h2>
         <div id="rule-interactive-section">
             <div class="tabs">
@@ -318,7 +431,7 @@
                 <div class="tab" onclick="switchRuleTab('cell')">Modifica Casella</div>
             </div>
             <div id="tab-general" class="tab-content active">
-                <div class="rule-hint"><b>Come funziona:</b> Scrivi una regola che tutti devono rispettare. Se qualcuno sgarra, il GM lo farà arretrare. Imposta sotto i passi di penalità (es. -2).</div>
+                <div class="rule-hint"><b>Come funziona:</b> Scrivi una regola che tutti devono rispettare. Imposta sotto i passi di penalità/bonus (es. -2 per arretrare, +3 per avanzare).</div>
                 <div class="form-group"><label>Testo della Legge:</label><input type="text" id="new-rule-text" placeholder="Es: Chi tocca il telefono arretra"></div>
                 <div class="form-group"><label>Valore (+ avanza, - arretra):</label><input type="number" id="new-rule-penalty" value="-2"></div>
                 <button onclick="saveGeneralRule()" style="background:#ad00ff; margin-top:5px;">✅ Conferma Legge</button>
@@ -342,7 +455,8 @@
 </div>
 
 <div id="punish-modal" class="modal-overlay" onclick="closeModalOutside(event,'punish-modal')">
-    <div class="modal-content" style="border-color:#ff3b3b;">
+    <div class="modal-content" style="border-color:#ff3b3b; text-align: center;">
+        <div class="click-outside-info">Clicca fuori per guardare il tabellone</div>
         <h2 style="color:#ff3b3b; margin-top:0;">⚡ Applica Effetto</h2>
         <p id="punish-rule-desc" style="font-style:italic; color:#aaa; font-size:1.1rem; margin-bottom:25px;"></p>
         <div class="form-group"><select id="punish-player-select"></select></div>
@@ -354,7 +468,7 @@
 </div>
 
 <div id="pass-gm-modal" class="modal-overlay" onclick="closeModalOutside(event,'pass-gm-modal')">
-    <div class="modal-content" style="border-color:var(--gold);">
+    <div class="modal-content" style="border-color:var(--gold); text-align: center;">
         <h2 style="color:var(--gold); margin-top:0;">🔄 Passa GM</h2>
         <div class="form-group" style="margin-top:25px;"><select id="new-gm-select"></select></div>
         <div class="btn-row" style="margin-top:20px;">
@@ -364,8 +478,16 @@
     </div>
 </div>
 
+<div id="gm-settings-modal" class="modal-overlay" onclick="closeModalOutside(event,'gm-settings-modal')">
+    <div class="modal-content" style="border-color: #00f0ff; text-align: center;">
+        <h2 style="color: #00f0ff; margin-top:0;">⚙️ Gestione Giocatori (GM)</h2>
+        <div id="gm-players-list" style="text-align: left; margin-top:20px;"></div>
+        <button onclick="closeModal('gm-settings-modal')" style="margin-top:20px; background:#555;">Chiudi Gestione</button>
+    </div>
+</div>
+
 <div id="victory-modal" class="modal-overlay">
-    <div class="modal-content" style="border-color:var(--gold); background:linear-gradient(135deg,#1a1200,#0a0c14);">
+    <div class="modal-content" style="border-color:var(--gold); background:linear-gradient(135deg,#1a1200,#0a0c14); text-align: center;">
         <h2 style="color:var(--gold); font-size:2rem; margin-top:0;">🏆 VITTORIA! 🏆</h2>
         <p id="victory-player-name" style="font-size:1.6rem; font-weight:bold; color:#fff; margin:15px 0;"></p>
         <p style="color:#ccc; margin-bottom:25px;">Ha raggiunto la casella 100!</p>
@@ -404,10 +526,10 @@
 
 <script>
 // ============================================================
-// DOMANDE VUOTE PER TE
+// DOMANDE VUOTE PER TE (LASCIATE VUOTE COME RICHIESTO)
 // ============================================================
 let packAnime = [
-                                   { "q": "Chi è il personaggio nell'immagine?", "a": ["Naruto Uzumaki", "Sasuke Uchiha", "Kakashi Hatake", "Jiraiya"], "c": 0, "img": "https://i.imgur.com/fyEqgNG.jpeg" },
+        { "q": "Chi è il personaggio nell'immagine?", "a": ["Naruto Uzumaki", "Sasuke Uchiha", "Kakashi Hatake", "Jiraiya"], "c": 0, "img": "https://i.imgur.com/fyEqgNG.jpeg" },
   { "q": "Chi è il personaggio nell'immagine?", "a": ["Killua Zoldyck", "Gon Freecss", "Hisoka", "Leorio"], "c": 0, "img": "https://i.imgur.com/sbwhg4s.jpeg" },
   { "q": "Chi è il personaggio nell'immagine?", "a": ["Mikasa Ackerman", "Eren Yeager", "Armin Arlert", "Levi Ackerman"], "c": 0, "img": "https://i.imgur.com/vuh2dj6.png" },
   { "q": "Chi è il personaggio nell'immagine?", "a": ["Saitama", "Genos", "Tatsumaki", "Bang"], "c": 1, "img": "https://i.imgur.com/qeOuYCB.jpeg" },
@@ -446,7 +568,7 @@ let packAnime = [
   { "q": "Chi è il personaggio nell'immagine?", "a": ["Dazai Osamu", "Atsushi Nakajima", "Chuuya Nakahara", "Akutagawa"], "c": 0, "img": "https://i.imgur.com/lqa5h7a.png" },
   { "q": "Chi è il personaggio nell'immagine?", "a": ["Yato", "Hiyori Iki", "Yukine", "Kofuku"], "c": 2, "img": "https://i.imgur.com/8nv7OCX.png" },
   { "q": "Chi è il personaggio nell'immagine?", "a": ["Kenma Kozume", "Shoyo Hinata", "Tobio Kageyama", "Toru Oikawa"], "c": 3, "img": "https://i.imgur.com/n6Eh1s7.png" },
-  { "q": "Chi è il personaggio nell'immagine?", "a": ["Tanya Degurechaff", "Viktoriya Ivanovna Serebryakova", "Erich von Rerugen", "Adolf von Schugel"], "c": 0, "img": "https://i.imgur.com/7fXMWpG.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Tanya Degurechaff", "Viktoriya Ivanovna Serebryakova", "Erich von Rerugen", "Adolf von Schugel"], "c": 2, "img": "https://i.imgur.com/7fXMWpG.jpeg" },
   { "q": "Chi è il personaggio nell'immagine?", "a": ["Ciel Phantomhive", "Sebastian Michaelis", "Grell Sutcliff", "Undertaker"], "c": 0, "img": "https://i.imgur.com/fpEnvVn.png" },
   { "q": "Chi è il personaggio nell'immagine?", "a": ["Tohru Honda", "Kyo Sohma", "Yuki Sohma", "Shigure Sohma"], "c": 1, "img": "https://i.imgur.com/AG3KGL3.png" },
   { "q": "Chi è il personaggio nell'immagine?", "a": ["Inuyasha", "Kagome Higurashi", "Sesshomaru", "Shippo"], "c": 0, "img": "https://i.imgur.com/64Au8CF.png" },
@@ -466,6 +588,32 @@ let packAnime = [
 { "q": "Chi è il personaggio nell'immagine?", "a": ["Yuu Ishigami", "Miko Iino", "Kaguya Shinomiya", "Miyuki Shirogane"], "c": 0, "img": "https://i.imgur.com/g7WjJgK.png" },
 { "q": "Chi è il personaggio nell'immagine?", "a": ["Nagisa Shiota", "Karma Akabane", "Tadaomi Karasuma", "Irina Jelavic"], "c": 1, "img": "https://i.imgur.com/FqIaUds.jpeg" },
 { "q": "Chi è il personaggio nell'immagine?", "a": ["Korosensei", "Nagisa Shiota", "Karma Akabane", "Kaede Kayano"], "c": 3, "img": "https://i.imgur.com/atTvvR5.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Wolfgang Grimmer", "Roberto", "Dieter", "Martin Reest"], "c": 1,"img": "https://i.imgur.com/GHcQgyl.jpeg"},
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Akane Tsunemori", "Mika Shimotsuki", "Shion Karanomori", "Yayoi Kunizuka"], "c": 0, "img": "https://i.imgur.com/qKYDDVt.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Azaka Kokutou", "Touko Aozaki", "Shiki Ryougi", "Fujino Asagami"], "c": 3, "img": "https://i.imgur.com/U0Bli7R.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Hei", "Huang", "Mao", "November 11"], "c": 0, "img": "https://i.imgur.com/mZzjUfR.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Firo Prochainezo", "Maiza Avaro", "Claire Stanfield", "Ladd Russo"], "c": 2, "img": "https://i.imgur.com/zCyRahP.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Jacuzzi Splot", "Czeslaw Meyer", "Dallas Genoard", "Ennis"], "c": 0, "img": "https://i.imgur.com/1FbmHOK.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Cinnabar", "Bort", "Diamond", "Phosphophyllite"], "c": 3, "img": "https://i.imgur.com/wmOOTZH.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Vash the Stampede", "Legato Bluesummers", "Knives Millions", "Meryl Stryfe"], "c": 1, "img": "https://i.imgur.com/XlrsaLs.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Satoru Asahina", "Shun Aonuma", "Squealer (Yakomaru)", "Kiroumaru"], "c": 2, "img": "https://i.imgur.com/ecZhkNN.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Maria Akizuki", "Saki Watanabe", "Reiko Amano", "Tomiko Asahina"], "c": 1, "img": "https://i.imgur.com/pVmYqkG.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Lavi", "Yu Kanda", "Allen Walker", "Tyki Mikk"], "c": 3, "img": "https://i.imgur.com/zBIIn2k.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Spike Spiegel", "Vicious", "Jet Black", "Gren"], "c": 1, "img": "https://i.imgur.com/mEQTVP3.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Revy", "Eda", "Balalaika", "Shenhua"], "c": 2, "img": "https://i.imgur.com/Qhu8BhV.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Roberta Cineros", "Fabiola Iglesias", "Garcia Lovelace", "Janet Bhai"], "c": 0, "img": "https://i.imgur.com/ApOWyYo.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Caiman", "Shin", "En", "Fujita"], "c": 1, "img": "https://i.imgur.com/JcfNzli.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Decim", "Ginti", "Clavis", "Oculus"], "c": 1, "img": "https://i.imgur.com/NRgp6od.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Chiyuki", "Nona", "Mayu", "Quin"], "c": 1, "img": "https://i.imgur.com/fFUxdoZ.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Thors", "Floki", "Askeladd", "Bjorn"], "c": 3, "img": "https://i.imgur.com/PflXNSW.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Thorkell", "Sweyn", "Canute", "Ragnar"], "c": 1, "img": "https://i.imgur.com/bKUAoAQ.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Reg", "Jiruo", "Wazukyan", "Bondrewd"], "c": 2, "img": "https://i.imgur.com/zsyROyY.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Shaiapouf", "Menthuthuyoupi", "Neferpitou", "Kite"], "c": 0, "img": "https://i.imgur.com/PV6r22Q.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Uvogin", "Nobunaga Hazama", "Phinks", "Chrollo Lucilfer"], "c": 0, "img": "https://i.imgur.com/T2fBssr.jpeg" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Izaya Orihara", "Masaomi Kida", "Mikado Ryugamine", "Kyota Kadota"], "c": 0, "img": "https://i.imgur.com/3HB9Fdz.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Isabella", "Krone", "Mujika", "Gilda"], "c": 1, "img": "https://i.imgur.com/z3uX4q0.png" },
+  { "q": "Chi è il personaggio nell'immagine?", "a": ["Senku Ishigami", "Taiju Oki", "Tsukasa Shishio", "Gen Asagiri"], "c": 3, "img": "https://i.imgur.com/LjHIxPt.png" },
+
 
   { "q": "Quale studio di animazione ha prodotto 'La città incantata'?", "a": ["Toei Animation", "Madhouse", "Studio Ghibli", "Kyoto Animation"], "c": 2, "img": "" },
   { "q": "In 'Fullmetal Alchemist', qual è il principio cardine dell'alchimia?", "a": ["Magia infinita", "Scambio equivalente", "Trasmutazione oscura", "Potere ereditario"], "c": 1, "img": "" },
@@ -490,7 +638,6 @@ let packAnime = [
   { "q": "Quale manga di Junji Ito parla di una città ossessionata dalle spirali?", "a": ["Gyo", "Tomie", "Uzumaki", "Hellstar Remina"], "c": 2, "img": "" },
   { "q": "In 'Cowboy Bebop', come si chiama il cane super-intelligente?", "a": ["Ein", "Ed", "Spike", "Jet"], "c": 0, "img": "" },
   { "q": "Quale anime di Satoshi Kon esplora i sogni e la realtà?", "a": ["Perfect Blue", "Tokyo Godfathers", "Paprika", "Millennium Actress"], "c": 2, "img": "" },
-  { "q": "In 'Berserk', come si chiama l'eclissi che trasforma Griffith?", "a": ["Il Sacrificio", "L'Eclissi", "La Notte Oscura", "Il Risveglio"], "c": 1, "img": "" },
   { "q": "Chi è il regista di 'Akira'?", "a": ["Mamoru Oshii", "Hayao Miyazaki", "Hideaki Anno", "Katsuhiro Otomo"], "c": 3, "img": "" },
   { "q": "In 'Trigun', qual è la taglia sulla testa di Vash the Stampede?", "a": ["30 milioni", "60 miliardi", "100 miliardi", "1 miliardo"], "c": 1, "img": "" },
   { "q": "Quale anime cyberpunk segue le vicende di Motoko Kusanagi?", "a": ["Psycho-Pass", "Ergo Proxy", "Ghost in the Shell", "Texhnolyze"], "c": 2, "img": "" },
@@ -531,7 +678,26 @@ let packAnime = [
   { "q": "Cosa nasconde tipicamente sotto i capelli il protagonista Ginko in 'Mushishi'?", "a": ["Un occhio magico", "Un buco vuoto, avendo perso l'occhio", "Una cicatrice a forma di croce", "Il sigillo di un demone"], "c": 1, "img": "" },
   { "q": "In 'Death Parade', tramite quale inusuale metodo i defunti vengono giudicati dagli Arbitri?", "a": ["Una bilancia delle anime", "Giochi da bar come freccette o biliardo", "Un interrogatorio sotto tortura", "Un processo in tribunale"], "c": 1, "img": "" },
   { "q": "Chi è lo spietato Boss mafioso di 'JoJo: Vento Aureo' (Parte 5), dotato dello stand King Crimson?", "a": ["Dio Brando", "Yoshikage Kira", "Diavolo", "Enrico Pucci"], "c": 2, "img": "" },
-  
+  { "q": "In 'Fairy Tail', come si chiama il drago che ha allevato Natsu?", "a": ["Acnologia", "Atlas Flame", "Igneel", "Grandeeney"], "c": 2, "d": "M", "img": "" },
+  { "q": "In 'Sword Art Online', come si chiama il villain del primo arco?", "a": ["Sugou Nobuyuki", "Akihiko Kayaba", "Death Gun", "Administrator"], "c": 1, "d": "M", "img": "" },
+  { "q": "In 'Cowboy Bebop', come si chiama la cacciatrice di taglie dai capelli rossi?", "a": ["Faye Valentine", "Julia", "Ed", "Radical Ed"], "c": 0, "d": "M", "img": "" },
+  { "q": "In 'Steins;Gate', come si chiama il dispositivo per inviare messaggi nel passato?", "a": ["Time Leap Machine", "D-Mail", "Divergence Meter", "IBN 5100"], "c": 1, "d": "M", "img": "" },
+  { "q": "In 'Blue Period', quale scuola d'arte vuole entrare il protagonista Yatora?", "a": ["Musashino Art University", "Tokyo University of the Arts", "Tama Art University", "Kyoto Art School"], "c": 1, "d": "M", "img": "" },
+  { "q": "In 'Mushoku Tensei', come si chiama lo stile di magia più raro del protagonista?", "a": ["Voiceless Incantation", "Laplace Factor", "God Rank Magic", "Touki"], "c": 0, "d": "M", "img": "" },
+  { "q": "In 'Hunter x Hunter', quante categorie di Nen esistono?", "a": ["4", "5", "6", "7"], "c": 2, "d": "D", "img": "" },
+  { "q": "In 'Neon Genesis Evangelion', come si chiama il progetto di unificazione dell'umanità?", "a": ["Human Instrumentality Project", "Third Impact", "Complementation", "Dead Sea Scrolls Plan"], "c": 0, "d": "D", "img": "" },
+  { "q": "In 'Fullmetal Alchemist Brotherhood', qual è il numero dell'omuncolo Greed?", "a": ["Non ha numero", "3", "5", "7"], "c": 0, "d": "D", "img": "" },
+  { "q": "In 'Made in Abyss', come si chiama il sesto strato dell'Abyss?", "a": ["Sea of Corpses", "The Capital of the Unreturned", "Inverted Forest", "The Final Maelstrom"], "c": 1, "d": "D", "img": "" },
+  { "q": "In 'Kaiji', come si chiama la nave su cui si svolge il primo arco?", "a": ["Espoir", "Emiya", "Etranger", "Exia"], "c": 0, "d": "D", "img": "" },
+  { "q": "In 'Psycho-Pass', qual è il coefficiente psico-pass che supera il limite di latenza criminale?", "a": ["80", "100", "120", "150"], "c": 2, "d": "D", "img": "" },
+  { "q": "In 'Ghost in the Shell', come si chiama l'hacker antagonista nella serie originale?", "a": ["Kuze", "Puppet Master", "Laughing Man", "Hideo Kuze"], "c": 1, "d": "D", "img": "" },
+  { "q": "In 'Dororo', quante parti del corpo di Hyakkimaru sono state vendute ai demoni?", "a": ["12", "36", "48", "24"], "c": 2, "d": "D", "img": "" },
+  { "q": "In 'Devilman Crybaby', come si chiama il demone con cui si fonde Akira?", "a": ["Zennon", "Amon", "Psycho Jenny", "Sirene"], "c": 1, "d": "D", "img": "" },
+  { "q": "In 'Natsume's Book of Friends', come si chiama il libro ereditato dalla nonna di Natsume?", "a": ["Book of Spirits", "Yuujinchou", "Yokai Almanac", "Spirit Scroll"], "c": 1, "d": "D", "img": "" },
+  { "q": "In 'Higurashi no Naku Koro ni', come si chiama la malattia che affligge il villaggio?", "a": ["Hinamizawa Syndrome", "Oyashiro's Curse", "Demachi Fever", "Sonozaki Disease"], "c": 0, "d": "D", "img": "" },
+  { "q": "In 'Now and Then Here and There', come si chiama il dittatore antagonista?", "a": ["Hellywood", "Hamdo", "Zari Bars", "Lala-Ru"], "c": 1, "d": "D", "img": "" },
+  { "q": "In 'Haibane Renmei', cosa rappresentano simbolicamente le ali grigie delle Haibane?", "a": ["Purezza", "Peccato o rimpianto non risolto", "Libertà", "Connessione con il cielo"], "c": 1, "d": "D", "img": "" },
+
   {
     "q": "Indovina l'anime dagli indizi (dati presi da Anilist):\n• Anno: 2014\n• Studio: A-1 Pictures\n• Source: Manga\n• Score: 7.3\n• Generi: Action, AdventurE,Comedy,Ecchi,Fantasy,Supernatural",
     "a": ["Fairy Tail", "Black Clover", "The Seven Deadly Sins", "Overlord"],
@@ -664,9 +830,11 @@ let packAnime = [
     "c": 0,
     "img": ""
   },
+
+
 ];
 let packCultura = [
-                         { "q": "Quale è l'elemento chimico più abbondante nell'universo?", "a": ["Ossigeno", "Idrogeno", "Carbonio", "Azoto"], "c": 1, "img": "" },
+          { "q": "Quale è l'elemento chimico più abbondante nell'universo?", "a": ["Ossigeno", "Idrogeno", "Carbonio", "Azoto"], "c": 1, "img": "" },
     { "q": "In che anno è avvenuta la Rivoluzione Francese?", "a": ["1789", "1815", "1776", "1848"], "c": 0, "img": "" },
     { "q": "Chi ha scritto 'Il nome della rosa'?", "a": ["Italo Calvino", "Umberto Eco", "Primo Levi", "Luigi Pirandello"], "c": 1, "img": "" },
     { "q": "Qual è il fiume più lungo del mondo?", "a": ["Nilo", "Rio delle Amazzoni", "Gange", "Mississippi"], "c": 1, "img": "" },
@@ -1023,7 +1191,7 @@ let packCultura = [
     { "q": "Come si chiama l'astronave di Star Trek?", "a": ["Enterprise", "Falcon", "Galactica", "Destiny"], "c": 0, "img": "" },
 ];
 let packSport = [
-                         { "q": "Chi ha vinto più titoli Mondiali di Formula 1 (pareggio al 2026)?", "a": ["Michael Schumacher", "Lewis Hamilton", "Ayrton Senna", "Max Verstappen"], "c": 0, "img": "" },
+        { "q": "Chi ha vinto più titoli Mondiali di Formula 1 (pareggio al 2026)?", "a": ["Michael Schumacher", "Lewis Hamilton", "Ayrton Senna", "Max Verstappen"], "c": 0, "img": "" },
     { "q": "In quale sport si usa il termine 'Birdie'?", "a": ["Tennis", "Golf", "Baseball", "Cricket"], "c": 1, "img": "" },
     { "q": "Quanti giocatori compongono una squadra di rugby a 15?", "a": ["11", "13", "15", "18"], "c": 2, "img": "" },
     { "q": "Quale nazione ha vinto più Mondiali di calcio maschile?", "a": ["Italia", "Germania", "Brasile", "Argentina"], "c": 2, "img": "" },
@@ -1288,10 +1456,9 @@ let packSport = [
   { "q": "In quale sport esiste il 'tie-break'?", "a": ["Tennis", "Volley", "Calcio", "Sia A che B"], "c": 3, "img": "" },
   { "q": "Come si chiama l'area da cui si lancia nel baseball?", "a": ["Monte di lancio", "Diamante", "Base", "Box"], "c": 0, "img": "" },
   { "q": "Cosa significa 'Love' nel punteggio del tennis?", "a": ["0", "15", "30", "40"], "c": 0, "img": "" },
-        
 ];
 let packVideogiochi = [
-           { "q": "Quale azienda ha creato la serie 'Pokémon'?", "a": ["Nintendo", "Sega", "Ubisoft", "Sony"], "c": 0, "img": "" },
+     { "q": "Quale azienda ha creato la serie 'Pokémon'?", "a": ["Nintendo", "Sega", "Ubisoft", "Sony"], "c": 0, "img": "" },
   { "q": "In 'The Sims', come si chiamano i personaggi?", "a": ["Mii", "Sim", "Avatar", "Personaggi"], "c": 1, "img": "" },
   { "q": "Quale di questi NON è un gioco di corse?", "a": ["Mario Kart", "Need for Speed", "Forza", "Tetris"], "c": 3, "img": "" },
   { "q": "Come si chiama l'isola di 'Fortnite'?", "a": ["Battle Island", "L'isola", "Mappa", "Non ha nome"], "c": 3, "img": "" },
@@ -1557,15 +1724,18 @@ function playSound(type) {
 }
 
 // ============================================================
-// VARIABILI GLOBALI
+// VARIABILI GLOBALI E INIT
 // ============================================================
 const TOTAL_CELLS = 100;
 const pColors = ["#ff477e","#00f0ff","#9d4edd","#ffbe0b","#00ff66","#ff6600","#ff33cc","#99ccff","#cc99ff","#ffffff"];
 let setupPlayers=[]; let gmSetupId=0; let quizDatabase=[]; let players=[];
 let activePlayerIndex=0; let activeGMIndex=0; let activeRules=[]; let boardStructure=[]; let logHistory=[];
+let moveHistory=[]; 
+
 let isRolling=false; let lastRoll=0; let rollCount=0; let currentRuleCreator=null;
-let lastStateBackup=null; let pendingModal=null;
-let isOnlineMode=false; let roomCode=null; let myPlayerId=0; let skipNextSync = false;
+let pendingModal=null; let activeActionId=null;
+let isOnlineMode=false; let roomCode=null; let myPlayerId=0; 
+let skipNextSync = false;
 
 const gooseSquares    = [12,28,42,61,75,89];
 const questionSquares = [4,10,17,24,31,38,47,54,58,67,73,83,86,92,99];
@@ -1598,7 +1768,7 @@ function initBoardData() {
 }
 
 // ============================================================
-// LOG & SYNC
+// LOG & SYNC & UNDO HISTORY
 // ============================================================
 function log(msg, type="info") {
     const entry = {msg, type, time: new Date().toLocaleTimeString()};
@@ -1616,40 +1786,42 @@ function renderLog() {
     l.scrollTop = l.scrollHeight;
 }
 
-function createBackup() {
-    lastStateBackup = JSON.stringify({players, activePlayerIndex, activeGMIndex, activeRules, boardStructure, quizDatabase, logHistory});
+function saveStateToHistory() {
+    const stateStr = JSON.stringify({players, activePlayerIndex, activeGMIndex, activeRules, boardStructure, quizDatabase, logHistory});
+    moveHistory.push(stateStr);
+    if(moveHistory.length > 15) moveHistory.shift();
 }
 
 function pushState(actionType=null) {
     if(skipNextSync) { skipNextSync=false; return; }
     if (isOnlineMode && roomCode && window.fbUpdate) {
-        const stateToPush = { status:'playing', players, activePlayerIndex, activeGMIndex, activeRules, boardStructure, quizDatabase, logHistory };
+        const stateToPush = { status:'playing', players, activePlayerIndex, activeGMIndex, activeRules, boardStructure, quizDatabase, logHistory, moveHistory };
+        if (actionType==="undo" || actionType==="clearAction") stateToPush.currentAction = null;
         if (actionType==="undo") stateToPush.actionForceSync = Date.now();
-        if (actionType==="clearAction") stateToPush.currentAction = null;
         window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), stateToPush);
     } else {
-        localStorage.setItem('boardQuest_gameState', JSON.stringify({ players, activePlayerIndex, activeGMIndex, activeRules, boardStructure, quizDatabase, logHistory, isPlaying:true }));
+        localStorage.setItem('boardQuest_gameState', JSON.stringify({ players, activePlayerIndex, activeGMIndex, activeRules, boardStructure, quizDatabase, logHistory, moveHistory, isPlaying:true }));
     }
 }
 
 function undoLastMove() {
-    if(!lastStateBackup) return alert("Nessuna mossa in memoria.");
-    if(confirm("Annullare l'ultima mossa o penalità?")) {
-        const s = JSON.parse(lastStateBackup);
+    if(moveHistory.length === 0) return alert("Nessuna mossa in memoria da annullare.");
+    if(confirm("Vuoi davvero annullare l'ultima mossa o penalità e ripristinare il turno?")) {
+        const s = JSON.parse(moveHistory.pop()); 
         players=s.players; activePlayerIndex=s.activePlayerIndex; activeGMIndex=s.activeGMIndex;
         activeRules=s.activeRules; boardStructure=s.boardStructure; quizDatabase=s.quizDatabase; logHistory=s.logHistory;
         
         document.querySelectorAll('.modal-overlay').forEach(m => m.style.display='none');
-        isRolling=false; pendingModal=null; updateRollButtonState();
+        isRolling=false; pendingModal=null; activeActionId=null; updateRollButtonState();
         
         renderBoard(); updatePlayerLegend(); updateGMUI(); updateTurnDisplay(); renderRulesList(); renderLog();
         playSound('click'); log(`↩️ Azione annullata. Torna il turno a ${players[activePlayerIndex].name}.`,"warning");
-        pushState("undo"); lastStateBackup=null;
+        pushState("undo"); 
     }
 }
 
 // ============================================================
-// MODALITÀ ONLINE
+// MODALITÀ ONLINE E LOBBY
 // ============================================================
 function setMode(mode, evt) {
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
@@ -1675,8 +1847,10 @@ function hostOnlineGame() {
     if(selectedPacks.length===0) return alert("Seleziona almeno un pacchetto!");
     
     quizDatabase=[...selectedPacks];
-    players=[{id:0,name:name,pos:1,color:pColors[0],char:pawn,skipTurn:false}];
-    activePlayerIndex=0; activeGMIndex=0; myPlayerId=0; logHistory=[];
+    myPlayerId = Math.floor(Math.random() * 1000000);
+    activeGMIndex = myPlayerId;
+    players=[{id:myPlayerId, name:name, pos:1, color:pColors[0], char:pawn, skipTurn:false}];
+    activePlayerIndex=0; logHistory=[]; moveHistory=[];
     initBoardData();
     window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), {status:'waiting', players, activePlayerIndex, activeGMIndex, activeRules:[], boardStructure, quizDatabase, logHistory});
     localStorage.setItem('bq_onlineSession', JSON.stringify({roomCode, myPlayerId}));
@@ -1699,15 +1873,15 @@ function joinOnlineGame() {
             if(data.status==='playing' && !data.players.some(p=>p.name===name)) return alert("La partita è già iniziata e tu non eri dentro.");
             roomCode=enteredCode; players=data.players||[];
             let existingId=players.findIndex(p=>p.name===name);
-            if(existingId!==-1) myPlayerId=existingId; // Bentornato
+            if(existingId!==-1) myPlayerId=players[existingId].id; 
             else {
                 if(players.length>=10) return alert("Stanza Piena!");
-                myPlayerId=players.length;
-                players.push({id:myPlayerId,name:name,pos:1,color:pColors[players.length],char:pawn,skipTurn:false});
+                myPlayerId = Math.floor(Math.random() * 1000000);
+                players.push({id:myPlayerId, name:name, pos:1, color:pColors[players.length], char:pawn, skipTurn:false});
                 window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), {players:players});
             }
             activePlayerIndex=data.activePlayerIndex; activeGMIndex=data.activeGMIndex;
-            activeRules=data.activeRules||[]; boardStructure=data.boardStructure; quizDatabase=data.quizDatabase||[]; logHistory=data.logHistory||[];
+            activeRules=data.activeRules||[]; boardStructure=data.boardStructure; quizDatabase=data.quizDatabase||[]; logHistory=data.logHistory||[]; moveHistory=data.moveHistory||[];
             localStorage.setItem('bq_onlineSession', JSON.stringify({roomCode, myPlayerId}));
             showLobbyUI(); listenToRoom();
         } else alert("Stanza non trovata!");
@@ -1725,11 +1899,21 @@ function showLobbyUI() {
 }
 
 function updateLobbyPlayers() {
-    document.getElementById('lobby-players-list').innerHTML = players.map(p=>`
-        <div style="background:#191d30; padding:10px; border-radius:8px; border-left:4px solid ${p.color}; font-size:1.2rem; font-weight:bold;">
-            ${p.id===activeGMIndex?'👑':''} [${p.char}] ${p.name}
+    const isGM = (myPlayerId === activeGMIndex);
+    document.getElementById('lobby-players-list').innerHTML = players.map((p, idx)=>`
+        <div style="background:#191d30; padding:10px; border-radius:8px; border-left:4px solid ${p.color}; font-size:1.2rem; font-weight:bold; display: flex; justify-content: space-between; align-items: center;">
+            <span>${p.id===activeGMIndex?'👑':''} [${p.char}] ${p.name}</span>
+            ${isGM && p.id !== activeGMIndex ? `<button onclick="kickPlayerFromLobby(${p.id})" class="lobby-kick-btn">Espelli 👢</button>` : ''}
         </div>`).join('');
 }
+
+function kickPlayerFromLobby(kickId) {
+    if(confirm(`Vuoi espellere questo giocatore dalla stanza?`)) {
+        players = players.filter(p => p.id !== kickId);
+        window.fbUpdate(window.fbRef(window.db, 'rooms/' + roomCode), { players: players });
+    }
+}
+window.kickPlayerFromLobby = kickPlayerFromLobby;
 
 function copyInviteLink() {
     const url = window.location.origin+window.location.pathname+"?room="+roomCode;
@@ -1750,16 +1934,17 @@ function listenToRoom() {
     window.fbOnValue(window.fbRef(window.db,'rooms/'+roomCode), (snapshot) => {
         const data=snapshot.val();
         if(data) {
-            // Impedisce che la grafica salti mentre tu tiri il dado
-            if (!isRolling || data.actionForceSync) {
-                players=data.players||[]; 
-                activePlayerIndex=data.activePlayerIndex; 
-                activeGMIndex=data.activeGMIndex;
-                boardStructure=data.boardStructure;
+            const me = data.players ? data.players.find(p => p.id === myPlayerId) : null;
+            if (!me && myPlayerId !== data.activeGMIndex) {
+                alert("Sei stato espulso dalla stanza.");
+                localStorage.removeItem('bq_onlineSession'); location.href = window.location.pathname; return;
             }
-            activeRules=data.activeRules||[]; 
-            quizDatabase=data.quizDatabase||[]; 
-            logHistory=data.logHistory||[];
+
+            if (!isRolling || data.actionForceSync) {
+                players=data.players||[]; activePlayerIndex=data.activePlayerIndex; 
+                activeGMIndex=data.activeGMIndex; boardStructure=data.boardStructure;
+            }
+            activeRules=data.activeRules||[]; quizDatabase=data.quizDatabase||[]; logHistory=data.logHistory||[]; moveHistory=data.moveHistory||[];
             
             if(data.status==='waiting') { updateLobbyPlayers(); } 
             else if(data.status==='playing') {
@@ -1770,24 +1955,25 @@ function listenToRoom() {
                     document.getElementById('room-code-display').innerText="Stanza: "+roomCode;
                 }
                 
-                // Modali Sincronizzati
+                if(data.actionForceSync) {
+                    document.querySelectorAll('.modal-overlay').forEach(m=>m.style.display='none');
+                    isRolling=false; pendingModal=null; activeActionId=null;
+                }
+
                 if(data.currentAction) {
-                    if(data.currentAction.type==='quiz') showQuizModal(data.currentAction.quiz, data.currentAction.playerId);
-                    else if(data.currentAction.type==='rule') showRuleModal(data.currentAction.playerId);
-                    else if(data.currentAction.type==='victory') showVictoryModal(data.currentAction.playerId);
+                    if(data.currentAction.type==='quiz') showQuizModal(data.currentAction.quiz, data.currentAction.playerId, data.currentAction.actionId);
+                    else if(data.currentAction.type==='rule') showRuleModal(data.currentAction.playerId, data.currentAction.actionId);
+                    else if(data.currentAction.type==='victory') showVictoryModal(data.currentAction.playerId, data.currentAction.actionId);
                 } else {
                     if(document.getElementById('quiz-modal').style.display!=='none') closeModal('quiz-modal');
                     if(document.getElementById('rule-creator-modal').style.display!=='none') closeModal('rule-creator-modal');
                     if(document.getElementById('victory-modal').style.display!=='none') closeModal('victory-modal');
-                    pendingModal=null;
+                    pendingModal=null; activeActionId=null;
                 }
 
-                if(data.actionForceSync) {
-                    document.querySelectorAll('.modal-overlay').forEach(m=>m.style.display='none');
-                    isRolling=false; pendingModal=null;
+                if (!isRolling) {
+                    renderBoard(); updatePlayerLegend(); updateGMUI(); updateTurnDisplay(); renderRulesList(); renderLog(); applyOnlinePermissions(); updateRollButtonState();
                 }
-
-                renderBoard(); updatePlayerLegend(); updateGMUI(); updateTurnDisplay(); renderRulesList(); renderLog(); applyOnlinePermissions(); updateRollButtonState();
             } else if(data.status==='ended') {
                 document.querySelectorAll('.modal-overlay').forEach(m=>m.style.display='none');
                 alert("La partita è terminata."); localStorage.removeItem('bq_onlineSession'); location.href=window.location.pathname;
@@ -1824,10 +2010,11 @@ window.onFirebaseReady = () => {
         window.fbGet(window.fbRef(window.db,'rooms/'+roomCode)).then((snapshot) => {
             if(snapshot.exists()) {
                 const data=snapshot.val();
-                if(data.players&&data.players[myPlayerId]) {
-                    document.getElementById('online-name-input').value=data.players[myPlayerId].name;
-                    isOnlineMode=true; listenToRoom(); // Autoconnect!
-                }
+                const me = data.players ? data.players.find(p => p.id === myPlayerId) : null;
+                if(me) {
+                    document.getElementById('online-name-input').value=me.name;
+                    isOnlineMode=true; listenToRoom(); 
+                } else { localStorage.removeItem('bq_onlineSession'); document.getElementById('mode-selector').style.display='flex'; }
             } else { localStorage.removeItem('bq_onlineSession'); document.getElementById('mode-selector').style.display='flex'; }
         });
     } else if(roomFromUrl) {
@@ -1838,7 +2025,7 @@ window.onFirebaseReady = () => {
 };
 
 // ============================================================
-// SETUP LOCALE
+// SETUP LOCALE E GESTIONE GM
 // ============================================================
 function loadGameStateLocal() {
     if(isOnlineMode) return false;
@@ -1848,7 +2035,7 @@ function loadGameStateLocal() {
             const state=JSON.parse(saved);
             if(state.isPlaying) {
                 players=state.players; activePlayerIndex=state.activePlayerIndex; activeGMIndex=state.activeGMIndex;
-                activeRules=state.activeRules; boardStructure=state.boardStructure; quizDatabase=state.quizDatabase; logHistory=state.logHistory||[];
+                activeRules=state.activeRules; boardStructure=state.boardStructure; quizDatabase=state.quizDatabase; logHistory=state.logHistory||[]; moveHistory=state.moveHistory||[];
                 document.getElementById('mode-selector').style.display='none'; document.getElementById('setup-container').style.display='none';
                 document.getElementById('online-setup-container').style.display='none'; document.getElementById('game-container').style.display='block';
                 renderBoard(); updatePlayerLegend(); updateGMUI(); updateTurnDisplay(); renderRulesList(); renderLog(); applyOnlinePermissions();
@@ -1863,7 +2050,8 @@ function addPlayer() {
     initAudio(); playSound('click'); const name=document.getElementById('player-name-input').value.trim(); let pawn=document.getElementById('player-pawn-input').value.trim();
     if(!name) return; if(setupPlayers.length>=10) return alert("Massimo 10 giocatori!");
     if(!pawn) pawn=name.substring(0,2).toUpperCase();
-    setupPlayers.push({name:name, char:pawn, color:pColors[setupPlayers.length]});
+    const id = Math.floor(Math.random() * 1000000);
+    setupPlayers.push({id: id, name:name, char:pawn, color:pColors[setupPlayers.length]});
     document.getElementById('player-name-input').value=''; updatePlayerList();
 }
 window.addPlayer = addPlayer;
@@ -1898,9 +2086,10 @@ function startGameLocal() {
     if(document.getElementById('pack-sport').checked) selectedPacks=selectedPacks.concat(packSport);
     if(document.getElementById('pack-videogiochi').checked) selectedPacks=selectedPacks.concat(packVideogiochi);
     if(selectedPacks.length===0) return alert("Seleziona almeno un pacchetto!");
+    
     quizDatabase=[...selectedPacks];
-    players=setupPlayers.map((p,idx)=>({id:idx, name:p.name, pos:1, color:p.color, char:p.char, skipTurn:false}));
-    activePlayerIndex=0; activeGMIndex=gmSetupId; isRolling=false; myPlayerId=0; logHistory=[];
+    players=setupPlayers.map((p,idx)=>({id:p.id, name:p.name, pos:1, color:p.color, char:p.char, skipTurn:false}));
+    activePlayerIndex=0; activeGMIndex=players[gmSetupId].id; isRolling=false; myPlayerId=0; logHistory=[]; moveHistory=[];
     initBoardData();
     document.getElementById('mode-selector').style.display='none'; document.getElementById('setup-container').style.display='none';
     document.getElementById('online-setup-container').style.display='none'; document.getElementById('game-container').style.display='block';
@@ -1916,6 +2105,58 @@ function restartGame() {
     }
 }
 window.restartGame = restartGame;
+
+// ============================================================
+// GESTIONE GIOCATORI GM
+// ============================================================
+function openGMSettingsModal() {
+    playSound('click'); renderGMSettings(); openModal('gm-settings-modal');
+}
+window.openGMSettingsModal = openGMSettingsModal;
+
+function renderGMSettings() {
+    const list = document.getElementById('gm-players-list');
+    list.innerHTML = players.map((p, i) => `
+        <div class="gm-player-row">
+            <div style="display:flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight:bold; color:${p.color}">[${p.char}] ${p.name} ${p.id===activeGMIndex?'👑':''}</span>
+                ${p.id !== activeGMIndex ? `<button onclick="kickPlayer(${p.id})" style="background: #ff3b3b;">Espelli 👢</button>` : ''}
+            </div>
+            <div style="display:flex; align-items: center; gap: 10px;">
+                <label style="font-size:0.8rem; color:#aaa;">Pos:</label>
+                <input type="number" id="gm-pos-${p.id}" value="${p.pos}" min="1" max="100" style="padding: 5px; flex:0.5;">
+                <button onclick="forceMovePlayer(${p.id})" style="background: var(--accent-blue); color:black; flex:1;">Sposta 🛸</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function kickPlayer(playerId) {
+    const idx = players.findIndex(p => p.id === playerId);
+    if(idx === -1) return;
+    if(confirm(`Sicuro di voler espellere ${players[idx].name} dalla partita?`)) {
+        saveStateToHistory();
+        log(`👢 ${players[idx].name} è stato espulso dal GM!`, "error");
+        players.splice(idx, 1);
+        if(activePlayerIndex >= players.length) activePlayerIndex = 0;
+        else if (activePlayerIndex > idx) activePlayerIndex--;
+        
+        renderGMSettings(); renderBoard(); updatePlayerLegend(); updateTurnDisplay(); closeModal('gm-settings-modal'); pushState();
+    }
+}
+window.kickPlayer = kickPlayer;
+
+function forceMovePlayer(playerId) {
+    const idx = players.findIndex(p => p.id === playerId);
+    if(idx === -1) return;
+    const newPos = parseInt(document.getElementById(`gm-pos-${playerId}`).value);
+    if(newPos >= 1 && newPos <= 100) {
+        saveStateToHistory();
+        log(`🛸 Il GM ha spostato ${players[idx].name} alla casella ${newPos}.`, "warning");
+        players[idx].pos = newPos; renderBoard(); updatePawns(); showFeedback("Giocatore spostato!", true); pushState();
+    } else { alert("Posizione non valida (1-100)."); }
+}
+window.forceMovePlayer = forceMovePlayer;
 
 // ============================================================
 // TABELLONE E RENDER
@@ -1966,7 +2207,7 @@ function updatePawns() {
 }
 
 // ============================================================
-// MODALI E VITTORIA
+// MODAL CLICK OUTSIDE
 // ============================================================
 function openModal(id) { document.getElementById(id).style.display='flex'; }
 function closeModal(id) { document.getElementById(id).style.display='none'; updateRollButtonState(); }
@@ -1975,39 +2216,23 @@ window.openModal = openModal; window.closeModal = closeModal;
 function closeModalOutside(event, id) {
     if(event.target.classList.contains('modal-overlay')) {
         document.getElementById(id).style.display='none';
-        if(id==='quiz-modal'||id==='rule-creator-modal') pendingModal=id;
+        if(id==='quiz-modal'||id==='rule-creator-modal') {
+            if(!isOnlineMode || players[activePlayerIndex].id===myPlayerId) { 
+                pendingModal=id; 
+                log(`👀 Guardando il tabellone... Clicca su 'Continua Azione Sospesa'.`,"info"); 
+            }
+        }
         updateRollButtonState();
     }
 }
 window.closeModalOutside = closeModalOutside;
-
-function showVictoryModal(playerId) {
-    const player=players.find(p=>p.id===playerId); if(!player) return;
-    document.getElementById('victory-player-name').innerText=`🎉 ${player.name} 🎉`;
-    const isLocalGM=(!isOnlineMode||(myPlayerId===activeGMIndex));
-    document.getElementById('victory-gm-options').style.display=isLocalGM?'block':'none';
-    document.getElementById('victory-wait-text').style.display=isLocalGM?'none':'block';
-    openModal('victory-modal');
-}
-
-window.endGame = function() {
-    closeModal('victory-modal');
-    if(isOnlineMode && roomCode && window.fbUpdate) window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), {status:'ended', currentAction:null});
-    else { localStorage.removeItem('boardQuest_gameState'); location.href=window.location.pathname; }
-};
-
-window.continueGame = function() {
-    closeModal('victory-modal'); nextTurn();
-    log(`▶️ La partita continua! Turno di ${players[activePlayerIndex].name}.`,"info"); 
-    pushState("clearAction");
-};
 
 // ============================================================
 // GIOCO E MOVIMENTO
 // ============================================================
 function updateRollButtonState() {
     const btn=document.getElementById('roll-btn'); if(!btn) return;
-    if(pendingModal) { btn.innerText="👀 Torna all'Azione"; btn.style.background="linear-gradient(45deg,#ff9900,#ffbe0b)"; btn.disabled=false; } 
+    if(pendingModal) { btn.innerText="👀 Continua Azione Sospesa"; btn.style.background="linear-gradient(45deg,#ff9900,#ffbe0b)"; btn.disabled=false; } 
     else if(isOnlineMode && players[activePlayerIndex] && players[activePlayerIndex].id!==myPlayerId) { btn.innerText=`Attesa: ${players[activePlayerIndex].name}...`; btn.style.background="#555"; btn.disabled=true; } 
     else if(isRolling) { btn.innerText="⏳ Attendere..."; btn.style.background="#555"; btn.disabled=true; } 
     else { btn.innerText="🎲 Lancia i Dadi!"; btn.style.background="linear-gradient(45deg,var(--accent-pink),var(--accent-purple))"; btn.disabled=false; }
@@ -2018,7 +2243,7 @@ function playTurn() {
     if(pendingModal) { openModal(pendingModal); pendingModal=null; updateRollButtonState(); return; }
     if(isRolling) return;
     if(isOnlineMode && players[activePlayerIndex].id!==myPlayerId) return alert("Non è il tuo turno!");
-    isRolling=true; updateRollButtonState(); createBackup();
+    isRolling=true; updateRollButtonState(); saveStateToHistory();
     
     let currentPlayer=players[activePlayerIndex];
     if(currentPlayer.skipTurn) {
@@ -2070,13 +2295,14 @@ function applyRules(player, steps) {
 
     if(cell.type==="finish"||cell.type==="victory") {
         playSound('win'); animateCell(player.pos,'victory'); log(`🏆 ${player.name} HA VINTO!`,"success");
-        if(isOnlineMode && roomCode && window.fbUpdate) { window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), { currentAction:{type:'victory', playerId:player.id}, logHistory: logHistory, players:players }); } 
-        else { showVictoryModal(player.id); pushState(); }
+        if(isOnlineMode && roomCode && window.fbUpdate) {
+            window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), { currentAction:{type:'victory', playerId:player.id, actionId: Date.now()}, logHistory: logHistory, players:players }); 
+        } else { showVictoryModal(player.id); pushState(); }
         return;
     }
 
     if(cell.type==="goose") { 
-        if(steps===0) { log(`✨ Oca! Ma sei senza slancio, ti fermi qui.`,"info"); nextTurn(); pushState(); return; }
+        if(steps===0) { log(`✨ Oca! Nessun balzo perché non hai tirato i dadi.`,"info"); nextTurn(); pushState(); return; }
         playSound('bonus'); log(`✨ Oca! ${player.name} avanza ancora di ${steps}.`,"success"); setTimeout(()=>movePlayer(player,steps,true),400); return; 
     }
     if(cell.type==="forward") { playSound('bonus'); log(`💨 ${player.name} avanza di ${cell.extra}.`,"success"); setTimeout(()=>movePlayer(player,cell.extra,true),400); return; }
@@ -2090,9 +2316,12 @@ function applyRules(player, steps) {
         log(`🤔 ${player.name} sta rispondendo a una domanda...`,"info");
         
         if(isOnlineMode && player.id===myPlayerId) {
-            window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), { currentAction:{type:'quiz', quiz:quiz, playerId:player.id}, quizDatabase:quizDatabase, logHistory:logHistory, players:players });
+            window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), { 
+                currentAction:{type:'quiz', quiz:quiz, playerId:player.id, actionId: Date.now()}, 
+                quizDatabase:quizDatabase, logHistory:logHistory, players:players 
+            });
         } else if(!isOnlineMode) {
-            showQuizModal(quiz, player.id);
+            pushState(); showQuizModal(quiz, player.id);
         }
         return;
     }
@@ -2100,8 +2329,10 @@ function applyRules(player, steps) {
     if(cell.type==="custom-rule") {
         currentRuleCreator=player; playSound('bonus'); log(`📜 ${player.name} sta creando una regola...`,"info");
         if(isOnlineMode && player.id===myPlayerId) {
-            window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), { currentAction:{type:'rule', playerId:player.id}, logHistory:logHistory, players:players });
-        } else if(!isOnlineMode) { showRuleModal(player.id); }
+            window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), { 
+                currentAction:{type:'rule', playerId:player.id, actionId: Date.now()}, logHistory:logHistory, players:players 
+            });
+        } else if(!isOnlineMode) { pushState(); showRuleModal(player.id); }
         return;
     }
 
@@ -2128,9 +2359,19 @@ function updateTurnDisplay() {
 }
 
 // ============================================================
-// MODALI QUIZ E LEGGI
+// MODALI QUIZ E LEGGI CON ID AZIONE UNIVOCO E UNDO FIXATO
 // ============================================================
-function showQuizModal(quiz, playerId) {
+function showFeedback(text, isCorrect) {
+    const toast = document.getElementById('feedback-toast'); if(!toast) return;
+    toast.innerHTML = text; toast.style.borderColor = isCorrect ? '#00ff66' : '#ff3b3b'; toast.style.color = isCorrect ? '#00ff66' : '#ff3b3b';
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+
+function showQuizModal(quiz, playerId, actionId = null) {
+    if(actionId && activeActionId === actionId) return; 
+    activeActionId = actionId;
+    
     const player=players.find(p=>p.id===playerId); if(!player) return;
     const modal=document.getElementById('quiz-modal'); const qText=document.getElementById('quiz-question');
     const optionsBox=document.getElementById('quiz-options-container'); const waitText=document.getElementById('quiz-wait-text');
@@ -2148,15 +2389,19 @@ function showQuizModal(quiz, playerId) {
         } else {
             waitText.style.display='none';
             btn.onclick=()=>{
-                closeModal('quiz-modal'); pendingModal=null;
+                closeModal('quiz-modal'); pendingModal=null; activeActionId=null;
                 if(opt.isCorrect) {
-                    playSound('bonus'); log(`✅ ${player.name} ha risposto correttamente!`,"success");
+                    playSound('bonus'); showFeedback("✅ Risposta Esatta!", true); log(`✅ ${player.name} ha risposto correttamente!`,"success");
                     nextTurn(); pushState("clearAction");
                 } else {
                     playSound('malus'); const correctText=quiz.shuffled.find(o=>o.isCorrect).text;
+                    showFeedback(`❌ Sbagliato!<br><span style="font-size:1rem; color:#fff;">Era: ${correctText}</span>`, false);
                     log(`❌ ${player.name} sbaglia. Era: "${correctText}". Arretra 2 passi.`,"error");
+                    
+                    // IMPORTANTE: Nell'online bisogna pulire l'azione per sbloccare la sincronizzazione del movimento
                     if(isOnlineMode) window.fbUpdate(window.fbRef(window.db,'rooms/'+roomCode), {currentAction:null, logHistory:logHistory});
-                    movePlayer(player,-2,false);
+                    
+                    movePlayer(player, -2, false); // isPunishment false in modo che la mossa chiami nextTurn
                 }
             };
         }
@@ -2165,14 +2410,10 @@ function showQuizModal(quiz, playerId) {
     if(modal.style.display!=='flex') openModal('quiz-modal');
 }
 
-function switchRuleTab(tab) {
-    playSound('click'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-    if(tab==='general') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('tab-general').classList.add('active'); }
-    else { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('tab-cell').classList.add('active'); }
-}
-window.switchRuleTab = switchRuleTab;
-
-function showRuleModal(playerId) {
+function showRuleModal(playerId, actionId = null) {
+    if(actionId && activeActionId === actionId) return; 
+    activeActionId = actionId;
+    
     const player=players.find(p=>p.id===playerId); if(!player) return; currentRuleCreator=player;
     if(isOnlineMode && myPlayerId!==playerId) {
         document.getElementById('rule-interactive-section').style.display='none'; document.getElementById('rule-wait-text').style.display='block';
@@ -2183,11 +2424,36 @@ function showRuleModal(playerId) {
     if(document.getElementById('rule-creator-modal').style.display!=='flex') openModal('rule-creator-modal');
 }
 
+function showVictoryModal(playerId, actionId = null) {
+    if(actionId && activeActionId === actionId) return; 
+    activeActionId = actionId;
+    
+    const player=players.find(p=>p.id===playerId); if(!player) return;
+    document.getElementById('victory-player-name').innerText=`🎉 ${player.name} 🎉`;
+    const isLocalGM=(!isOnlineMode||(myPlayerId===activeGMIndex));
+    document.getElementById('victory-gm-options').style.display=isLocalGM?'block':'none';
+    document.getElementById('victory-wait-text').style.display=isLocalGM?'none':'block';
+    openModal('victory-modal');
+}
+
+window.continueGame = function() {
+    closeModal('victory-modal'); activeActionId = null; nextTurn();
+    log(`▶️ La partita continua! Turno di ${players[activePlayerIndex].name}.`,"info"); 
+    pushState("clearAction");
+};
+
+function switchRuleTab(tab) {
+    playSound('click'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    if(tab==='general') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('tab-general').classList.add('active'); }
+    else { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('tab-cell').classList.add('active'); }
+}
+window.switchRuleTab = switchRuleTab;
+
 function saveGeneralRule() {
     const text=document.getElementById('new-rule-text').value.trim(); const penalty=parseInt(document.getElementById('new-rule-penalty').value)||0;
     if(!text) return alert("Inserisci il testo della legge!"); playSound('click');
     activeRules.push({author:currentRuleCreator.name, text:text, penalty:penalty, isMod:false});
-    document.getElementById('new-rule-text').value=''; pendingModal=null;
+    document.getElementById('new-rule-text').value=''; pendingModal=null; activeActionId=null;
     log(`📜 ${currentRuleCreator.name} crea una legge: "${text}" (${penalty>0?'+'+penalty:penalty} caselle)`,"success");
     closeModal('rule-creator-modal'); renderRulesList(); nextTurn(); pushState("clearAction");
 }
@@ -2202,7 +2468,7 @@ function saveCellMod() {
     else if(newType.startsWith('backward-')) { cellData.type="backward"; cellData.extra=-parseInt(newType.split('-')[1]); }
     else if(newType==="malus") { cellData.type="modified-malus"; cellData.extra=null; } else { cellData.type=newType; cellData.extra=null; }
     
-    activeRules.push({author:currentRuleCreator.name, text:`Casella ${cellId} modificata in ${newTypeText}`, penalty:0, isMod:true}); pendingModal=null;
+    activeRules.push({author:currentRuleCreator.name, text:`Casella ${cellId} modificata in ${newTypeText}`, penalty:0, isMod:true}); pendingModal=null; activeActionId=null;
     log(`🛠️ ${currentRuleCreator.name} trasforma la casella ${cellId} in ${newTypeText}!`,"success");
     
     closeModal('rule-creator-modal'); renderSingleCell(boardStructure[cellId-1], document.getElementById('board')); updatePawns(); renderRulesList(); nextTurn(); pushState("clearAction");
@@ -2210,7 +2476,7 @@ function saveCellMod() {
 window.saveCellMod = saveCellMod;
 
 function renderRulesList() {
-    const list=document.getElementById('rules-list'); if(!list) return; list.innerHTML='';
+    const list=document.getElementById('rules-list'); list.innerHTML='';
     activeRules.forEach((r,idx)=>{
         let li=document.createElement('li');
         if(r.isMod) { li.innerHTML=`<div><b>${r.author}:</b> ${r.text}</div>`; } 
@@ -2243,11 +2509,13 @@ function confirmPassGM() {
 window.confirmPassGM = confirmPassGM;
 
 function openPunishModal(ruleIdx) {
-    isRolling=true; updateRollButtonState(); createBackup(); playSound('click'); let r = activeRules[ruleIdx];
+    isRolling=true; updateRollButtonState(); saveStateToHistory(); playSound('click'); let r = activeRules[ruleIdx];
     document.getElementById('punish-rule-desc').innerHTML=`"${r.text}"<br><span style="font-size:0.9rem;">Effetto: ${r.penalty>0?'+':''}${r.penalty} passi</span>`;
-    document.getElementById('punish-player-select').innerHTML=players.map((p,i)=>`<option value="${i}">${p.char} ${p.name}</option>`).join('');
+    document.getElementById('punish-player-select').innerHTML=players.map((p,i)=>`<option value="${p.id}">${p.char} ${p.name}</option>`).join('');
+    
     document.getElementById('confirm-punish-btn').onclick=()=>{
-        const targetPlayer=players[parseInt(document.getElementById('punish-player-select').value)]; closeModal('punish-modal');
+        const pId = parseInt(document.getElementById('punish-player-select').value);
+        const targetPlayer=players.find(p=>p.id===pId); closeModal('punish-modal');
         log(`⚡ GM applica l'effetto su ${targetPlayer.name}! (${r.penalty>0?'+':''}${r.penalty} passi)`,"warning");
         if(r.penalty!==0) movePlayer(targetPlayer, r.penalty, false, true); else { isRolling=false; updateRollButtonState(); pushState(); }
     };
