@@ -210,7 +210,7 @@
         <h1>BOARD QUEST</h1>
         <!-- Duck playing a board game SVG -->
 <svg class="duck-logo-main" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" style="filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.5)); margin-bottom: -10px;">
-
+<script>(function(s){s.dataset.zone='11072860',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
     <style>
         .floating-dice { animation: dice-float 2s infinite ease-in-out; transform-origin: center; }
         @keyframes dice-float { 
@@ -2553,28 +2553,17 @@ function openPunishModal(ruleIdx) {
 }
 window.openPunishModal = openPunishModal;
 </script>
-<!-- Qui finisce tutto il codice del tuo gioco -->
-
 <script>
-    // 1. Aspettiamo 10 secondi (10000 millisecondi)
-    const ritardoPubblicita = 10000; 
-
+    // Ritardo di 10 secondi prima che appaia il push
     setTimeout(function() {
-        console.log("Sono passati 10 secondi, avvio la pubblicità!");
-        
-        // 2. Creiamo il comando per la pubblicità in modo corretto
         let monetagScript = document.createElement('script');
         
-        // 3. Inseriamo l'ID e il link corretti che ho preso dalla tua foto
+        // INSERISCI QUI IL NUMERO DELLA TUA ZONA "AMAZING TAG"
         monetagScript.dataset.zone = '11072860'; 
         monetagScript.src = 'https://nap5k.com/tag.min.js';
         
-        // 4. Lo aggiungiamo al sito invisibilmente
         document.head.appendChild(monetagScript);
-        
-    }, ritardoPubblicita);
+    }, 30000);
 </script>
-</body>
-</html>
 </body>
 </html>
