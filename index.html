@@ -2553,23 +2553,28 @@ function openPunishModal(ruleIdx) {
 }
 window.openPunishModal = openPunishModal;
 </script>
- <script>
-    // Imposta il ritardo in millisecondi (10000 = 10 secondi)
+<!-- Qui finisce tutto il codice del tuo gioco -->
+
+<script>
+    // 1. Aspettiamo 10 secondi (10000 millisecondi)
     const ritardoPubblicita = 10000; 
 
     setTimeout(function() {
-        console.log("Avvio delle pubblicità ritardato...");
+        console.log("Sono passati 10 secondi, avvio la pubblicità!");
         
-        // Crea lo script di Monetag
+        // 2. Creiamo il comando per la pubblicità in modo corretto
         let monetagScript = document.createElement('script');
         
-        // INSERISCI QUI L'URL DEL TUO SCRIPT MONETAG
-        // (Lo trovi nel codice che ti dà Monetag alla voce "src")
-        monetagScript.src = "<script>(function(s){s.dataset.zone='11072860',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>"; 
+        // 3. Inseriamo l'ID e il link corretti che ho preso dalla tua foto
+        monetagScript.dataset.zone = '11072860'; 
+        monetagScript.src = 'https://nap5k.com/tag.min.js';
         
-        // Aggiunge lo script alla pagina e lo fa partire
+        // 4. Lo aggiungiamo al sito invisibilmente
         document.head.appendChild(monetagScript);
+        
     }, ritardoPubblicita);
 </script>
+</body>
+</html>
 </body>
 </html>
